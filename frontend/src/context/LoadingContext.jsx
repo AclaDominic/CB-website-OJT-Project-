@@ -11,22 +11,37 @@ export const LoadingProvider = ({ children }) => {
     useEffect(() => {
         const reqInterceptor = axiosClient.interceptors.request.use(
             (config) => {
-                setLoadingCount(prev => prev + 1);
+                if (!config.skipLoading) {
+                    setLoadingCount(prev => prev + 1);
+                }
                 return config;
             },
             (error) => {
-                setLoadingCount(prev => prev - 1);
+                // We can't easily check config here, but usually request error happens before interceptor?
+                // Actually if request fails, we should probably decrement if we incremented.
+                // But typically request error in interceptor means config failed.
+                // Let's be safe: if we don't know, we don't decrement? 
+                // Or better: we assume if it hit here, it might have incremented?
+                // Actually, for simplicity and safety against stuck loaders:
+                // If we can't check config, we might decrement just in case, or check error.config
+                if (error.config && !error.config.skipLoading) {
+                    setLoadingCount(prev => prev - 1);
+                }
                 return Promise.reject(error);
             }
         );
 
         const resInterceptor = axiosClient.interceptors.response.use(
             (response) => {
-                setLoadingCount(prev => Math.max(0, prev - 1));
+                if (!response.config.skipLoading) {
+                    setLoadingCount(prev => Math.max(0, prev - 1));
+                }
                 return response;
             },
             (error) => {
-                setLoadingCount(prev => Math.max(0, prev - 1));
+                if (error.config && !error.config.skipLoading) {
+                    setLoadingCount(prev => Math.max(0, prev - 1));
+                }
                 return Promise.reject(error);
             }
         );

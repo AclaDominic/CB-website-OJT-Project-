@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axiosClient from '../../lib/axios';
-import { Save } from 'lucide-react';
+import { Save, Loader2 } from 'lucide-react';
 
 const AboutEditor = () => {
     const [contents, setContents] = useState({
@@ -17,8 +17,9 @@ const AboutEditor = () => {
     }, []);
 
     const fetchContent = async () => {
+        setLoading(true);
         try {
-            const response = await axiosClient.get('/api/page-contents?page=about');
+            const response = await axiosClient.get('/api/page-contents?page=about', { skipLoading: true });
             const data = response.data;
             const newContents = { ...contents };
             
@@ -48,7 +49,7 @@ const AboutEditor = () => {
                 page_name: 'about',
                 section_name: section,
                 content: contents[section]
-            });
+            }, { skipLoading: true });
             setMessage(`${section.charAt(0).toUpperCase() + section.slice(1)} saved successfully!`);
             setTimeout(() => setMessage(''), 3000);
         } catch (error) {
@@ -59,7 +60,13 @@ const AboutEditor = () => {
         }
     };
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-96">
+                <Loader2 className="animate-spin text-blue-600" size={40} />
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-4xl mx-auto">

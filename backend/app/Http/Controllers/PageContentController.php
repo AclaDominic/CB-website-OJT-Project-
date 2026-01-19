@@ -18,7 +18,46 @@ class PageContentController extends Controller
             $query->where('page_name', $request->query('page'));
         }
 
-        return $query->get();
+        $contents = $query->get();
+
+        // Secure filtering for public users
+        if (!$request->user('sanctum')) {
+            $contents->transform(function ($item) {
+                if ($item->page_name === 'contact' && $item->section_name === 'office_info') {
+                    try {
+                        $data = json_decode($item->content, true);
+                        if (is_array($data)) {
+                            // Filter Email
+                            if (isset($data['email']) && is_array($data['email']) && isset($data['email']['visible']) && !$data['email']['visible']) {
+                                $data['email']['value'] = ''; // Redact value
+                            }
+                            // Filter Mobile
+                            if (isset($data['mobile']) && is_array($data['mobile']) && isset($data['mobile']['visible']) && !$data['mobile']['visible']) {
+                                $data['mobile']['value'] = ''; // Redact value
+                            }
+                            // Filter Landline
+                            if (isset($data['landline']) && is_array($data['landline']) && isset($data['landline']['visible']) && !$data['landline']['visible']) {
+                                $data['landline']['value'] = ''; // Redact value
+                            }
+                            // Filter Socials
+                            if (isset($data['socials']) && is_array($data['socials'])) {
+                                $data['socials'] = array_filter($data['socials'], function ($social) {
+                                    return isset($social['visible']) && $social['visible'];
+                                });
+                                $data['socials'] = array_values($data['socials']); // Re-index array
+                            }
+
+                            $item->content = json_encode($data);
+                        }
+                    } catch (\Exception $e) {
+                        // Keep original content if parsing fails
+                    }
+                }
+                return $item;
+            });
+        }
+
+        return $contents;
     }
 
     /**

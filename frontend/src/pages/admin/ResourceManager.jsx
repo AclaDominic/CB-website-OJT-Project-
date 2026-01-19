@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axiosClient from '../../lib/axios';
-import { Plus, Trash2, Edit2, X, Truck, MapPin } from 'lucide-react';
+import { Plus, Trash2, Edit2, X, Truck, MapPin, Loader2 } from 'lucide-react';
 
 const ResourceManager = () => {
     const [activeTab, setActiveTab] = useState('machinery'); // 'machinery' or 'sites'
@@ -13,7 +13,7 @@ const ResourceManager = () => {
 
     const fetchSettings = async () => {
         try {
-            const response = await axiosClient.get('/api/page-contents?page=resources');
+            const response = await axiosClient.get('/api/page-contents?page=resources', { skipLoading: true });
             const settings = response.data.find(item => item.section_name === 'display_settings');
             if (settings) {
                 const config = JSON.parse(settings.content);
@@ -32,7 +32,7 @@ const ResourceManager = () => {
                 page_name: 'resources',
                 section_name: 'display_settings',
                 content: JSON.stringify({ show_plate_numbers: newValue })
-            });
+            }, { skipLoading: true });
         } catch (error) {
             console.error('Error saving settings:', error);
             setShowPlateNumbers(!newValue); // Revert on error
@@ -45,37 +45,39 @@ const ResourceManager = () => {
                 <h2 className="text-2xl font-bold">Manage Resources</h2>
                 
                 {/* Global Settings Toggle */}
-                <div className="flex items-center gap-3 bg-gray-100 p-2 rounded-lg">
-                    <div className="relative">
-                        <button 
-                            className="text-gray-500 hover:text-blue-600 transition-colors"
-                            onMouseEnter={() => setShowTooltip(true)}
-                            onMouseLeave={() => setShowTooltip(false)}
-                            onClick={() => setShowTooltip(!showTooltip)}
-                        >
-                            <Truck size={20} />
-                        </button>
-                        {showTooltip && (
-                            <div className="absolute right-0 bottom-full mb-2 w-64 bg-gray-800 text-white text-xs p-3 rounded shadow-lg z-10">
-                                <strong>Public View Setting:</strong><br/>
-                                If ON: Public sees all non-decommissioned vehicles with plate numbers.<br/>
-                                If OFF: Public sees only unique models (grouped) without plate numbers.
-                                <div className="absolute bottom-0 right-2 transform translate-y-1/2 rotate-45 w-2 h-2 bg-gray-800"></div>
-                            </div>
-                        )}
-                    </div>
+                {activeTab === 'machinery' && (
+                    <div className="flex items-center gap-3 bg-gray-100 p-2 rounded-lg">
+                        <div className="relative">
+                            <button 
+                                className="text-gray-500 hover:text-blue-600 transition-colors"
+                                onMouseEnter={() => setShowTooltip(true)}
+                                onMouseLeave={() => setShowTooltip(false)}
+                                onClick={() => setShowTooltip(!showTooltip)}
+                            >
+                                <Truck size={20} />
+                            </button>
+                            {showTooltip && (
+                                <div className="absolute right-0 bottom-full mb-2 w-64 bg-gray-800 text-white text-xs p-3 rounded shadow-lg z-10">
+                                    <strong>Public View Setting:</strong><br/>
+                                    If ON: Public sees all non-decommissioned vehicles with plate numbers.<br/>
+                                    If OFF: Public sees only unique models (grouped) without plate numbers.
+                                    <div className="absolute bottom-0 right-2 transform translate-y-1/2 rotate-45 w-2 h-2 bg-gray-800"></div>
+                                </div>
+                            )}
+                        </div>
 
-                    <div className="flex items-center gap-2">
-                        <span className={`text-sm font-medium ${!showPlateNumbers ? 'text-blue-600' : 'text-gray-500'}`}>Summary View</span>
-                        <button 
-                            onClick={togglePlateNumbers}
-                            className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ease-in-out ${showPlateNumbers ? 'bg-blue-600' : 'bg-gray-300'}`}
-                        >
-                            <div className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ease-in-out ${showPlateNumbers ? 'translate-x-6' : 'translate-x-0'}`}></div>
-                        </button>
-                        <span className={`text-sm font-medium ${showPlateNumbers ? 'text-blue-600' : 'text-gray-500'}`}>Detailed View</span>
+                        <div className="flex items-center gap-2">
+                            <span className={`text-sm font-medium ${!showPlateNumbers ? 'text-blue-600' : 'text-gray-500'}`}>Summary View</span>
+                            <button 
+                                onClick={togglePlateNumbers}
+                                className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ease-in-out ${showPlateNumbers ? 'bg-blue-600' : 'bg-gray-300'}`}
+                            >
+                                <div className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ease-in-out ${showPlateNumbers ? 'translate-x-6' : 'translate-x-0'}`}></div>
+                            </button>
+                            <span className={`text-sm font-medium ${showPlateNumbers ? 'text-blue-600' : 'text-gray-500'}`}>Detailed View</span>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
             
             <div className="flex gap-4 mb-6 border-b">
@@ -100,6 +102,7 @@ const ResourceManager = () => {
 
 const MachineryList = () => {
     const [items, setItems] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
     const [formData, setFormData] = useState({
@@ -115,11 +118,14 @@ const MachineryList = () => {
     }, []);
 
     const fetchItems = async () => {
+        setLoading(true);
         try {
-            const response = await axiosClient.get('/api/machineries');
+            const response = await axiosClient.get('/api/machineries', { skipLoading: true });
             setItems(response.data);
         } catch (error) {
             console.error('Error fetching machinery:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -127,9 +133,9 @@ const MachineryList = () => {
         e.preventDefault();
         try {
             if (editingItem) {
-                await axiosClient.put(`/api/machineries/${editingItem.id}`, formData);
+                await axiosClient.put(`/api/machineries/${editingItem.id}`, formData, { skipLoading: true });
             } else {
-                await axiosClient.post('/api/machineries', formData);
+                await axiosClient.post('/api/machineries', formData, { skipLoading: true });
             }
             fetchItems();
             closeModal();
@@ -141,7 +147,7 @@ const MachineryList = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure?')) {
             try {
-                await axiosClient.delete(`/api/machineries/${id}`);
+                await axiosClient.delete(`/api/machineries/${id}`, { skipLoading: true });
                 fetchItems();
             } catch (error) {
                 console.error('Error deleting machinery:', error);
@@ -176,6 +182,14 @@ const MachineryList = () => {
         setIsModalOpen(false);
         setEditingItem(null);
     };
+
+    if (loading && items.length === 0) {
+        return (
+            <div className="flex justify-center items-center py-20">
+                <Loader2 className="animate-spin text-blue-600" size={40} />
+            </div>
+        );
+    }
 
     return (
         <div>
@@ -256,6 +270,7 @@ const MachineryList = () => {
 
 const SiteList = () => {
     const [items, setItems] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
     const [formData, setFormData] = useState({
@@ -271,11 +286,14 @@ const SiteList = () => {
     }, []);
 
     const fetchItems = async () => {
+        setLoading(true);
         try {
-            const response = await axiosClient.get('/api/development-sites');
+            const response = await axiosClient.get('/api/development-sites', { skipLoading: true });
             setItems(response.data);
         } catch (error) {
             console.error('Error fetching sites:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -283,9 +301,9 @@ const SiteList = () => {
         e.preventDefault();
         try {
             if (editingItem) {
-                await axiosClient.put(`/api/development-sites/${editingItem.id}`, formData);
+                await axiosClient.put(`/api/development-sites/${editingItem.id}`, formData, { skipLoading: true });
             } else {
-                await axiosClient.post('/api/development-sites', formData);
+                await axiosClient.post('/api/development-sites', formData, { skipLoading: true });
             }
             fetchItems();
             closeModal();
@@ -297,7 +315,7 @@ const SiteList = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure?')) {
             try {
-                await axiosClient.delete(`/api/development-sites/${id}`);
+                await axiosClient.delete(`/api/development-sites/${id}`, { skipLoading: true });
                 fetchItems();
             } catch (error) {
                 console.error('Error deleting site:', error);
@@ -332,6 +350,14 @@ const SiteList = () => {
         setIsModalOpen(false);
         setEditingItem(null);
     };
+
+    if (loading && items.length === 0) {
+        return (
+            <div className="flex justify-center items-center py-20">
+                <Loader2 className="animate-spin text-blue-600" size={40} />
+            </div>
+        );
+    }
 
     return (
         <div>

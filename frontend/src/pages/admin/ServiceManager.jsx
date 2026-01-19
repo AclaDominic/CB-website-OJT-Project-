@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axiosClient from '../../lib/axios';
-import { Plus, Trash2, Edit2, X, Save } from 'lucide-react';
+import { Plus, Trash2, Edit2, X, Save, Loader2 } from 'lucide-react';
 
 const ServiceManager = () => {
     const [services, setServices] = useState([]);
@@ -19,8 +19,9 @@ const ServiceManager = () => {
     }, []);
 
     const fetchServices = async () => {
+        setLoading(true);
         try {
-            const response = await axiosClient.get('/api/services');
+            const response = await axiosClient.get('/api/services', { skipLoading: true });
             setServices(response.data);
         } catch (error) {
             console.error('Error fetching services:', error);
@@ -33,9 +34,9 @@ const ServiceManager = () => {
         e.preventDefault();
         try {
             if (editingService) {
-                await axiosClient.put(`/api/services/${editingService.id}`, formData);
+                await axiosClient.put(`/api/services/${editingService.id}`, formData, { skipLoading: true });
             } else {
-                await axiosClient.post('/api/services', formData);
+                await axiosClient.post('/api/services', formData, { skipLoading: true });
             }
             fetchServices();
             closeModal();
@@ -47,7 +48,7 @@ const ServiceManager = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this service?')) {
             try {
-                await axiosClient.delete(`/api/services/${id}`);
+                await axiosClient.delete(`/api/services/${id}`, { skipLoading: true });
                 fetchServices();
             } catch (error) {
                 console.error('Error deleting service:', error);
@@ -81,7 +82,13 @@ const ServiceManager = () => {
         setEditingService(null);
     };
 
-    if (loading) return <div>Loading...</div>;
+    if (loading && services.length === 0) {
+        return (
+            <div className="flex justify-center items-center h-96">
+                <Loader2 className="animate-spin text-blue-600" size={40} />
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-6xl mx-auto">
