@@ -26,7 +26,20 @@ class DevelopmentSiteController extends Controller
             'capacity' => 'required|string',
             'description' => 'nullable|string',
             'image_url' => 'nullable|string',
+            'image' => 'nullable|image|max:5120', // Accept 'image'
+            'image_file' => 'nullable|image|max:5120', // Keep 'image_file' for backward compatibility
         ]);
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('sites', 'public');
+            $validated['image_url'] = $path;
+        } elseif ($request->hasFile('image_file')) {
+            $path = $request->file('image_file')->store('sites', 'public');
+            $validated['image_url'] = $path;
+        }
+
+        unset($validated['image']);
+        unset($validated['image_file']);
 
         $site = DevelopmentSite::create($validated);
         return response()->json($site, 201);
@@ -53,7 +66,26 @@ class DevelopmentSiteController extends Controller
             'capacity' => 'string',
             'description' => 'nullable|string',
             'image_url' => 'nullable|string',
+            'image' => 'nullable|image|max:5120',
+            'image_file' => 'nullable|image|max:5120',
         ]);
+
+        if ($request->hasFile('image')) {
+            if ($site->image_url && !filter_var($site->image_url, FILTER_VALIDATE_URL)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($site->image_url);
+            }
+            $path = $request->file('image')->store('sites', 'public');
+            $validated['image_url'] = $path;
+        } elseif ($request->hasFile('image_file')) {
+            if ($site->image_url && !filter_var($site->image_url, FILTER_VALIDATE_URL)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($site->image_url);
+            }
+            $path = $request->file('image_file')->store('sites', 'public');
+            $validated['image_url'] = $path;
+        }
+
+        unset($validated['image']);
+        unset($validated['image_file']);
 
         $site->update($validated);
         return response()->json($site);

@@ -60,7 +60,16 @@ class MachineryController extends Controller
             'plate_number' => 'nullable|string',
             'is_decommissioned' => 'boolean',
             'image_url' => 'nullable|string',
+            'image_file' => 'nullable|image|max:5120', // Max 5MB
         ]);
+
+        if ($request->hasFile('image_file')) {
+            $path = $request->file('image_file')->store('machinery', 'public');
+            $validated['image_url'] = $path;
+        }
+
+        // Remove image_file from validated data as it's not in the database
+        unset($validated['image_file']);
 
         $machinery = Machinery::create($validated);
         return response()->json($machinery, 201);
@@ -85,9 +94,27 @@ class MachineryController extends Controller
             'name' => 'string',
             'type' => 'string',
             'plate_number' => 'nullable|string',
-            'is_decommissioned' => 'boolean',
+            'is_decommissioned' => 'boolean', // Handle "true"/"false" strings from FormData
             'image_url' => 'nullable|string',
+            'image_file' => 'nullable|image|max:5120',
         ]);
+
+        // Handle boolean conversion for FormData
+        if (isset($validated['is_decommissioned'])) {
+            $validated['is_decommissioned'] = filter_var($validated['is_decommissioned'], FILTER_VALIDATE_BOOLEAN);
+        }
+
+        if ($request->hasFile('image_file')) {
+            // Delete old image if it exists and is a local file
+            if ($machinery->image_url && !filter_var($machinery->image_url, FILTER_VALIDATE_URL)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($machinery->image_url);
+            }
+
+            $path = $request->file('image_file')->store('machinery', 'public');
+            $validated['image_url'] = $path;
+        }
+
+        unset($validated['image_file']);
 
         $machinery->update($validated);
         return response()->json($machinery);
