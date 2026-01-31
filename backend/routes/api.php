@@ -16,7 +16,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::apiResource('machineries', \App\Http\Controllers\MachineryController::class)->except(['index', 'show']);
     Route::apiResource('development-sites', \App\Http\Controllers\DevelopmentSiteController::class)->except(['index', 'show']);
-    Route::post('/page-contents', [\App\Http\Controllers\PageContentController::class, 'store']);
+    Route::apiResource('organization-members', \App\Http\Controllers\Api\OrganizationMemberController::class)->except(['index', 'show']);
+    Route::post('/organization-members/reorder', [\App\Http\Controllers\Api\OrganizationMemberController::class, 'reorder']);
 });
 
 Route::get('/services', [\App\Http\Controllers\ServiceController::class, 'index']);
@@ -32,5 +33,6 @@ Route::get('/development-sites', [\App\Http\Controllers\DevelopmentSiteControlle
 Route::get('/development-sites/{site}', [\App\Http\Controllers\DevelopmentSiteController::class, 'show']);
 
 Route::get('/page-contents', [\App\Http\Controllers\PageContentController::class, 'index']);
+Route::get('/organization-members', [\App\Http\Controllers\Api\OrganizationMemberController::class, 'index']);
 
 Route::post('/inquiries', [\App\Http\Controllers\InquiryController::class, 'store']);

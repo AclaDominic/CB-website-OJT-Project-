@@ -1,22 +1,21 @@
-import React, { StrictMode } from 'react';
-import { Routes, Route } from 'react-router-dom';
-import Layout from './layouts/Layout';
-import AdminLayout from './layouts/AdminLayout';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import { About, Services, Projects, Contact, Organization, Resources } from './pages/Pages';
-import { AuthProvider } from './context/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
+import React, { StrictMode } from "react";
+import { Routes, Route } from "react-router-dom";
+import Layout from "./layouts/Layout";
+import AdminLayout from "./layouts/AdminLayout";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import { About, Services, Projects, Contact, Resources } from "./pages/Pages";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
+import AboutEditor from "./pages/admin/AboutEditor";
+import ContactEditor from "./pages/admin/ContactEditor";
+import ServiceManager from "./pages/admin/ServiceManager";
+import ProjectManager from "./pages/admin/ProjectManager";
+import ResourceManager from "./pages/admin/ResourceManager";
 
-import AboutEditor from './pages/admin/AboutEditor';
-import ContactEditor from './pages/admin/ContactEditor';
-import ServiceManager from './pages/admin/ServiceManager';
-import ProjectManager from './pages/admin/ProjectManager';
-import ResourceManager from './pages/admin/ResourceManager';
-
-import { LoadingProvider } from './context/LoadingContext';
-import LoadingOverlay from './components/LoadingOverlay';
+import { LoadingProvider } from "./context/LoadingContext";
+import LoadingOverlay from "./components/LoadingOverlay";
 
 function App() {
   return (
@@ -30,7 +29,6 @@ function App() {
             <Route path="services" element={<Services />} />
             <Route path="projects" element={<Projects />} />
             <Route path="resources" element={<Resources />} />
-            <Route path="organization" element={<Organization />} />
             <Route path="contact-us" element={<Contact />} />
           </Route>
 
