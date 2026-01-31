@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axiosClient from "../../lib/axios";
 import { Plus, Edit, Trash2, Save, X, Loader2 } from "lucide-react";
 import ImagePicker from "../ImagePicker";
+import toast from "react-hot-toast";
 
 const OrganizationManager = () => {
   const [members, setMembers] = useState([]);
@@ -66,9 +67,10 @@ const OrganizationManager = () => {
     try {
       await axiosClient.delete(`/api/organization-members/${id}`);
       setMembers(members.filter((m) => m.id !== id));
+      toast.success("Member deleted successfully");
     } catch (error) {
       console.error("Error deleting member:", error);
-      alert("Failed to delete member");
+      toast.error("Failed to delete member");
     }
   };
 
@@ -79,7 +81,7 @@ const OrganizationManager = () => {
     // Validation
     const orderVal = parseInt(formData.order);
     if (orderVal < 0) {
-      alert("Order cannot be negative.");
+      toast.error("Order cannot be negative.");
       setSaving(false);
       return;
     }
@@ -94,7 +96,7 @@ const OrganizationManager = () => {
     );
 
     if (isDuplicate) {
-      alert(
+      toast.error(
         `Order number ${orderVal} is already used in the ${formData.category} category.`,
       );
       setSaving(false);
@@ -123,6 +125,7 @@ const OrganizationManager = () => {
         );
         // Optimistic update or refetch
         fetchMembers();
+        toast.success("Member updated successfully");
       } else {
         const response = await axiosClient.post(
           "/api/organization-members",
@@ -132,6 +135,7 @@ const OrganizationManager = () => {
           },
         );
         setMembers([...members, response.data]);
+        toast.success("Member added successfully");
       }
       resetForm();
     } catch (error) {
@@ -141,9 +145,9 @@ const OrganizationManager = () => {
         error.response.data &&
         error.response.data.message
       ) {
-        alert(`Error: ${error.response.data.message}`);
+        toast.error(`Error: ${error.response.data.message}`);
       } else {
-        alert("Failed to save member");
+        toast.error("Failed to save member");
       }
     } finally {
       setSaving(false);
