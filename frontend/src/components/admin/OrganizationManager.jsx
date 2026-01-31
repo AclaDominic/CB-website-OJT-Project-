@@ -76,6 +76,31 @@ const OrganizationManager = () => {
     e.preventDefault();
     setSaving(true);
 
+    // Validation
+    const orderVal = parseInt(formData.order);
+    if (orderVal < 0) {
+      alert("Order cannot be negative.");
+      setSaving(false);
+      return;
+    }
+
+    // Check for duplicates in the same category
+    // Exclude the current member being edited (if any)
+    const isDuplicate = members.some(
+      (m) =>
+        m.category === formData.category &&
+        m.order === orderVal &&
+        m.id !== editingId,
+    );
+
+    if (isDuplicate) {
+      alert(
+        `Order number ${orderVal} is already used in the ${formData.category} category.`,
+      );
+      setSaving(false);
+      return;
+    }
+
     const data = new FormData();
     data.append("name", formData.name);
     data.append("role", formData.role);
@@ -111,7 +136,15 @@ const OrganizationManager = () => {
       resetForm();
     } catch (error) {
       console.error("Error saving member:", error);
-      alert("Failed to save member");
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        alert(`Error: ${error.response.data.message}`);
+      } else {
+        alert("Failed to save member");
+      }
     } finally {
       setSaving(false);
     }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\OrganizationMember;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class OrganizationMemberController extends Controller
 {
@@ -21,7 +22,13 @@ class OrganizationMemberController extends Controller
             'role' => 'required|string|max:255',
             'category' => 'required|string|max:255',
             'image' => 'nullable|image|max:2048', // Allow image upload
-            'order' => 'integer',
+            'order' => [
+                'integer',
+                'min:0',
+                Rule::unique('organization_members')->where(function ($query) use ($request) {
+                    return $query->where('category', $request->category);
+                }),
+            ],
         ]);
 
         $data = $validated;
@@ -44,7 +51,19 @@ class OrganizationMemberController extends Controller
             'role' => 'sometimes|required|string|max:255',
             'category' => 'sometimes|required|string|max:255',
             'image' => 'nullable|image|max:2048',
-            'order' => 'integer',
+            'order' => [
+                'integer',
+                'min:0',
+                Rule::unique('organization_members')->where(function ($query) use ($request) {
+                    // If category is being updated, use new category, otherwise use existing
+                    $category = $request->input('category', $request->category);
+                    // Actually $request->category might only be present if sent. 
+                    // Better to rely on input or model.
+                    // If 'category' is in request, use it. If not, use model's category.
+                    $categoryToCheck = $request->has('category') ? $request->category : $request->route('organization_member')->category;
+                    return $query->where('category', $categoryToCheck);
+                })->ignore($organizationMember->id),
+            ],
         ]);
 
         $data = $validated;
