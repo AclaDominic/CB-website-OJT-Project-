@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axiosClient from "../../lib/axios";
+import axiosClient from "../../../lib/axios";
 import { Save, Loader2 } from "lucide-react";
-import OrganizationManager from "../../components/admin/OrganizationManager";
+import OrganizationManager from "../../../components/admin/OrganizationManager";
 
 const AboutEditor = () => {
   const [contents, setContents] = useState({

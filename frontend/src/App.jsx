@@ -8,11 +8,11 @@ import { About, Services, Projects, Contact, Resources } from "./pages/Pages";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-import AboutEditor from "./pages/admin/AboutEditor";
-import ContactEditor from "./pages/admin/ContactEditor";
-import ServiceManager from "./pages/admin/ServiceManager";
-import ProjectManager from "./pages/admin/ProjectManager";
-import ResourceManager from "./pages/admin/ResourceManager";
+import AboutEditor from "./pages/admin/cms/AboutEditor";
+import ContactEditor from "./pages/admin/cms/ContactEditor";
+import ServiceManager from "./pages/admin/cms/ServiceManager";
+import ProjectManager from "./pages/admin/cms/ProjectManager";
+import ResourceManager from "./pages/admin/system/ResourceManager";
 
 import { LoadingProvider } from "./context/LoadingContext";
 import LoadingOverlay from "./components/LoadingOverlay";
