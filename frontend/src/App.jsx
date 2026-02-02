@@ -12,6 +12,7 @@ import AboutEditor from "./pages/admin/cms/AboutEditor";
 import ContactEditor from "./pages/admin/cms/ContactEditor";
 import ServiceManager from "./pages/admin/cms/ServiceManager";
 import ProjectManager from "./pages/admin/cms/ProjectManager";
+import AdminInquiries from "./pages/admin/cms/AdminInquiries";
 import ResourceManager from "./pages/admin/system/ResourceManager";
 
 import { LoadingProvider } from "./context/LoadingContext";
@@ -41,6 +42,7 @@ function App() {
               <Route path="contact" element={<ContactEditor />} />
               <Route path="services" element={<ServiceManager />} />
               <Route path="projects" element={<ProjectManager />} />
+              <Route path="inquiries" element={<AdminInquiries />} />
               <Route path="resources" element={<ResourceManager />} />
             </Route>
           </Route>

@@ -12,7 +12,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::apiResource('services', \App\Http\Controllers\Api\Cms\ServiceController::class)->except(['index', 'show']);
     Route::apiResource('projects', \App\Http\Controllers\Api\Cms\ProjectController::class)->except(['index', 'show']);
-    Route::apiResource('inquiries', \App\Http\Controllers\Api\Cms\InquiryController::class)->except(['store']);
+    Route::apiResource('inquiries', \App\Http\Controllers\Api\Cms\InquiryController::class);
+    Route::put('/inquiries/{inquiry}/archive', [\App\Http\Controllers\Api\Cms\InquiryController::class, 'archive']);
 
     Route::apiResource('machineries', \App\Http\Controllers\Api\System\MachineryController::class)->except(['index', 'show']);
     Route::apiResource('development-sites', \App\Http\Controllers\Api\System\DevelopmentSiteController::class)->except(['index', 'show']);
