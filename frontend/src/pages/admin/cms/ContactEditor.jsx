@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axiosClient from "../../../lib/axios";
 import { Save, Loader2, Plus, Trash2 } from "lucide-react";
+import { useAuth } from "../../../context/AuthContext";
 
 const ContactEditor = () => {
   const [officeInfo, setOfficeInfo] = useState({
@@ -13,6 +14,7 @@ const ContactEditor = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchContent();
@@ -131,13 +133,15 @@ const ContactEditor = () => {
       <div className="bg-white p-6 rounded-lg shadow space-y-8">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-semibold">Office Information</h3>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-          >
-            <Save size={18} /> Save
-          </button>
+          {user?.all_permissions?.includes("cms.edit") && (
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+            >
+              <Save size={18} /> Save
+            </button>
+          )}
         </div>
 
         {/* Address */}

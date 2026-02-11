@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import axiosClient from "../../../lib/axios";
 import { Plus, Trash2, Edit2, X, Truck, MapPin, Loader2 } from "lucide-react";
 import ImagePicker from "../../../components/ImagePicker";
+import { useAuth } from "../../../context/AuthContext";
 
 const ResourceManager = () => {
   const [activeTab, setActiveTab] = useState("machinery"); // 'machinery' or 'sites'
   const [showPlateNumbers, setShowPlateNumbers] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchSettings();
@@ -55,53 +57,54 @@ const ResourceManager = () => {
         <h2 className="text-2xl font-bold">Manage Resources</h2>
 
         {/* Global Settings Toggle */}
-        {activeTab === "machinery" && (
-          <div className="flex items-center gap-3 bg-gray-100 p-2 rounded-lg">
-            <div className="relative">
-              <button
-                className="text-gray-500 hover:text-blue-600 transition-colors"
-                onMouseEnter={() => setShowTooltip(true)}
-                onMouseLeave={() => setShowTooltip(false)}
-                onClick={() => setShowTooltip(!showTooltip)}
-              >
-                <Truck size={20} />
-              </button>
-              {showTooltip && (
-                <div className="absolute right-0 bottom-full mb-2 w-64 bg-gray-800 text-white text-xs p-3 rounded shadow-lg z-10">
-                  <strong>Public View Setting:</strong>
-                  <br />
-                  If ON: Public sees all non-decommissioned vehicles with plate
-                  numbers.
-                  <br />
-                  If OFF: Public sees only unique models (grouped) without plate
-                  numbers.
-                  <div className="absolute bottom-0 right-2 transform translate-y-1/2 rotate-45 w-2 h-2 bg-gray-800"></div>
-                </div>
-              )}
-            </div>
+        {activeTab === "machinery" &&
+          user?.all_permissions?.includes("inventory.edit") && (
+            <div className="flex items-center gap-3 bg-gray-100 p-2 rounded-lg">
+              <div className="relative">
+                <button
+                  className="text-gray-500 hover:text-blue-600 transition-colors"
+                  onMouseEnter={() => setShowTooltip(true)}
+                  onMouseLeave={() => setShowTooltip(false)}
+                  onClick={() => setShowTooltip(!showTooltip)}
+                >
+                  <Truck size={20} />
+                </button>
+                {showTooltip && (
+                  <div className="absolute right-0 bottom-full mb-2 w-64 bg-gray-800 text-white text-xs p-3 rounded shadow-lg z-10">
+                    <strong>Public View Setting:</strong>
+                    <br />
+                    If ON: Public sees all non-decommissioned vehicles with
+                    plate numbers.
+                    <br />
+                    If OFF: Public sees only unique models (grouped) without
+                    plate numbers.
+                    <div className="absolute bottom-0 right-2 transform translate-y-1/2 rotate-45 w-2 h-2 bg-gray-800"></div>
+                  </div>
+                )}
+              </div>
 
-            <div className="flex items-center gap-2">
-              <span
-                className={`text-sm font-medium ${!showPlateNumbers ? "text-blue-600" : "text-gray-500"}`}
-              >
-                Summary View
-              </span>
-              <button
-                onClick={togglePlateNumbers}
-                className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ease-in-out ${showPlateNumbers ? "bg-blue-600" : "bg-gray-300"}`}
-              >
-                <div
-                  className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ease-in-out ${showPlateNumbers ? "translate-x-6" : "translate-x-0"}`}
-                ></div>
-              </button>
-              <span
-                className={`text-sm font-medium ${showPlateNumbers ? "text-blue-600" : "text-gray-500"}`}
-              >
-                Detailed View
-              </span>
+              <div className="flex items-center gap-2">
+                <span
+                  className={`text-sm font-medium ${!showPlateNumbers ? "text-blue-600" : "text-gray-500"}`}
+                >
+                  Summary View
+                </span>
+                <button
+                  onClick={togglePlateNumbers}
+                  className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ease-in-out ${showPlateNumbers ? "bg-blue-600" : "bg-gray-300"}`}
+                >
+                  <div
+                    className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ease-in-out ${showPlateNumbers ? "translate-x-6" : "translate-x-0"}`}
+                  ></div>
+                </button>
+                <span
+                  className={`text-sm font-medium ${showPlateNumbers ? "text-blue-600" : "text-gray-500"}`}
+                >
+                  Detailed View
+                </span>
+              </div>
             </div>
-          </div>
-        )}
+          )}
       </div>
 
       <div className="flex gap-4 mb-6 border-b">
@@ -129,6 +132,7 @@ const MachineryList = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const { user } = useAuth();
 
   // Image State
   const [imageType, setImageType] = useState("url");
@@ -270,12 +274,14 @@ const MachineryList = () => {
   return (
     <div>
       <div className="flex justify-end mb-4">
-        <button
-          onClick={() => openModal()}
-          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-        >
-          <Plus size={20} /> Add Equipment
-        </button>
+        {user?.all_permissions?.includes("inventory.create") && (
+          <button
+            onClick={() => openModal()}
+            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            <Plus size={20} /> Add Equipment
+          </button>
+        )}
       </div>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {items.map((item) => (
@@ -307,18 +313,22 @@ const MachineryList = () => {
               Plate: {item.plate_number || "N/A"}
             </p>
             <div className="flex justify-end gap-2">
-              <button
-                onClick={() => openModal(item)}
-                className="text-blue-600 hover:text-blue-800 p-1"
-              >
-                <Edit2 size={18} />
-              </button>
-              <button
-                onClick={() => handleDelete(item.id)}
-                className="text-red-600 hover:text-red-800 p-1"
-              >
-                <Trash2 size={18} />
-              </button>
+              {user?.all_permissions?.includes("inventory.edit") && (
+                <button
+                  onClick={() => openModal(item)}
+                  className="text-blue-600 hover:text-blue-800 p-1"
+                >
+                  <Edit2 size={18} />
+                </button>
+              )}
+              {user?.all_permissions?.includes("inventory.delete") && (
+                <button
+                  onClick={() => handleDelete(item.id)}
+                  className="text-red-600 hover:text-red-800 p-1"
+                >
+                  <Trash2 size={18} />
+                </button>
+              )}
             </div>
           </div>
         ))}
@@ -426,6 +436,7 @@ const SiteList = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const { user } = useAuth();
 
   // Image State
   const [imageType, setImageType] = useState("url");
@@ -569,12 +580,14 @@ const SiteList = () => {
   return (
     <div>
       <div className="flex justify-end mb-4">
-        <button
-          onClick={() => openModal()}
-          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-        >
-          <Plus size={20} /> Add Site
-        </button>
+        {user?.all_permissions?.includes("inventory.create") && (
+          <button
+            onClick={() => openModal()}
+            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            <Plus size={20} /> Add Site
+          </button>
+        )}
       </div>
       <div className="grid md:grid-cols-2 gap-6">
         {items.map((item) => (
@@ -601,18 +614,22 @@ const SiteList = () => {
               </p>
               <p className="text-gray-600 text-sm mb-4">{item.description}</p>
               <div className="flex justify-end gap-2">
-                <button
-                  onClick={() => openModal(item)}
-                  className="text-blue-600 hover:text-blue-800 p-1"
-                >
-                  <Edit2 size={18} />
-                </button>
-                <button
-                  onClick={() => handleDelete(item.id)}
-                  className="text-red-600 hover:text-red-800 p-1"
-                >
-                  <Trash2 size={18} />
-                </button>
+                {user?.all_permissions?.includes("inventory.edit") && (
+                  <button
+                    onClick={() => openModal(item)}
+                    className="text-blue-600 hover:text-blue-800 p-1"
+                  >
+                    <Edit2 size={18} />
+                  </button>
+                )}
+                {user?.all_permissions?.includes("inventory.delete") && (
+                  <button
+                    onClick={() => handleDelete(item.id)}
+                    className="text-red-600 hover:text-red-800 p-1"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                )}
               </div>
             </div>
           </div>

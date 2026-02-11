@@ -9,12 +9,14 @@ import {
   Phone,
   X,
   Mail,
+  Shield,
+  Users,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 const AdminSidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
 
   const isActive = (path) => {
     return location.pathname.startsWith(path)
@@ -46,6 +48,22 @@ const AdminSidebar = ({ isOpen, onClose }) => {
     { path: "/admin/inquiries", label: "Inquiries", icon: <Mail size={20} /> },
     { path: "/admin/contact", label: "Contact", icon: <Phone size={20} /> },
   ];
+
+  if (user?.all_permissions?.includes("system.manage_roles")) {
+    navItems.push({
+      path: "/admin/roles",
+      label: "Roles & Permissions",
+      icon: <Shield size={20} />,
+    });
+  }
+
+  if (user?.all_permissions?.includes("system.manage_users")) {
+    navItems.push({
+      path: "/admin/users",
+      label: "User Management",
+      icon: <Users size={20} />,
+    });
+  }
 
   return (
     <>

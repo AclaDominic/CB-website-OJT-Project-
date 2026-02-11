@@ -3,6 +3,7 @@ import axiosClient from "../../lib/axios";
 import { Plus, Edit, Trash2, Save, X, Loader2 } from "lucide-react";
 import ImagePicker from "../ImagePicker";
 import toast from "react-hot-toast";
+import { useAuth } from "../../context/AuthContext";
 
 const OrganizationManager = () => {
   const [members, setMembers] = useState([]);
@@ -18,6 +19,7 @@ const OrganizationManager = () => {
   });
   const [imagePreview, setImagePreview] = useState(null); // For existing image preview
   const [saving, setSaving] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchMembers();
@@ -174,7 +176,7 @@ const OrganizationManager = () => {
         <h3 className="text-xl font-bold text-gray-800">
           Organizational Structure
         </h3>
-        {!isAdding && (
+        {!isAdding && user?.all_permissions?.includes("cms.edit") && (
           <button
             onClick={() => setIsAdding(true)}
             className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
@@ -324,18 +326,22 @@ const OrganizationManager = () => {
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <button
-                          onClick={() => handleEdit(member)}
-                          className="p-2 text-blue-600 hover:bg-blue-100 rounded transition"
-                        >
-                          <Edit size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(member.id)}
-                          className="p-2 text-red-600 hover:bg-red-100 rounded transition"
-                        >
-                          <Trash2 size={18} />
-                        </button>
+                        {user?.all_permissions?.includes("cms.edit") && (
+                          <>
+                            <button
+                              onClick={() => handleEdit(member)}
+                              className="p-2 text-blue-600 hover:bg-blue-100 rounded transition"
+                            >
+                              <Edit size={18} />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(member.id)}
+                              className="p-2 text-red-600 hover:bg-red-100 rounded transition"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </>
+                        )}
                       </div>
                     </div>
                   ))}
