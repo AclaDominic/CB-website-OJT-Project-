@@ -14,5 +14,10 @@ class Inquiry extends Model
         'email',
         'message',
         'subject',
+        'archived_at',
+    ];
+
+    protected $casts = [
+        'archived_at' => 'datetime',
     ];
 }

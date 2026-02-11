@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axiosClient from "../../lib/axios";
+import axiosClient from "../../../lib/axios";
 import { Plus, Trash2, Edit2, X, Truck, MapPin, Loader2 } from "lucide-react";
-import ImagePicker from "../../components/ImagePicker";
+import ImagePicker from "../../../components/ImagePicker";
 
 const ResourceManager = () => {
   const [activeTab, setActiveTab] = useState("machinery"); // 'machinery' or 'sites'
