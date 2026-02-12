@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Storage;
 
 class ServiceController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:cms.edit')->only(['store', 'update', 'destroy']);
+    }
+
     public function index()
     {
         return Service::all();
