@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import api from "../../../lib/axios";
 import { useAuth } from "../../../context/AuthContext";
+import { Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 import ConfirmModal from "../../../components/admin/ConfirmModal";
 
@@ -45,6 +47,7 @@ const AdminInquiries = () => {
       setInquiries(response.data);
     } catch (error) {
       console.error("Error fetching inquiries", error);
+      toast.error("Failed to fetch inquiries");
     } finally {
       setLoading(false);
     }
@@ -182,7 +185,9 @@ const AdminInquiries = () => {
       </div>
 
       {loading ? (
-        <p className="text-center py-8 text-gray-500">Loading...</p>
+        <div className="flex justify-center items-center py-12">
+          <Loader2 className="animate-spin text-blue-600" size={32} />
+        </div>
       ) : (
         <div className="bg-white shadow rounded-lg overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200">

@@ -27,7 +27,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::apiResource('roles', \App\Http\Controllers\Api\Admin\RoleController::class);
         Route::get('permissions', [\App\Http\Controllers\Api\Admin\PermissionController::class, 'index']);
 
-        Route::apiResource('users', \App\Http\Controllers\Api\Admin\UserController::class)->only(['index', 'update']);
+        Route::apiResource('users', \App\Http\Controllers\Api\Admin\UserController::class)->only(['index', 'store', 'update']);
     });
 });
 

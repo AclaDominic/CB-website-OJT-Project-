@@ -17,6 +17,29 @@ class UserController extends Controller
     }
 
     /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|confirmed|min:8',
+            'role' => 'required|string|exists:roles,name',
+        ]);
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => \Illuminate\Support\Facades\Hash::make($validated['password']),
+        ]);
+
+        $user->assignRole($validated['role']);
+
+        return response()->json($user->load('roles'), 201);
+    }
+
+    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, User $user)
