@@ -19,12 +19,14 @@ import ResourceManager from "./pages/admin/system/ResourceManager";
 
 import { LoadingProvider } from "./context/LoadingContext";
 import LoadingOverlay from "./components/LoadingOverlay";
+import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
   return (
     <LoadingProvider>
       <LoadingOverlay />
       <AuthProvider>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />

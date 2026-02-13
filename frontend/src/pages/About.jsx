@@ -211,7 +211,7 @@ const About = () => {
         </div>
 
         {/* Organizational Structure */}
-        <div className="mt-16">
+        <div id="organization" className="mt-16">
           <Organization />
         </div>
       </div>
