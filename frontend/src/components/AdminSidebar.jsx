@@ -14,6 +14,7 @@ import {
   Package,
   Bell,
   Check,
+  Construction,
 } from "lucide-react";
 import axiosClient from "../lib/axios";
 import { formatDistanceToNow } from "date-fns";
@@ -100,7 +101,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
     }
   };
 
-  const navItems = [
+  const portfolioItems = [
     { path: "/admin/about", label: "About", icon: <FileText size={20} /> },
     {
       path: "/admin/services",
@@ -113,17 +114,25 @@ const AdminSidebar = ({ isOpen, onClose }) => {
       icon: <FolderKanban size={20} />,
     },
     { path: "/admin/resources", label: "Resources", icon: <Truck size={20} /> },
+    { path: "/admin/contact", label: "Contact", icon: <Phone size={20} /> },
+  ];
+
+  const systemItems = [
     {
       path: "/admin/inventory",
       label: "Inventory",
       icon: <Package size={20} />,
     },
     { path: "/admin/inquiries", label: "Inquiries", icon: <Mail size={20} /> },
-    { path: "/admin/contact", label: "Contact", icon: <Phone size={20} /> },
+    {
+      path: "/admin/procurement",
+      label: "Procurement",
+      icon: <Construction size={20} />,
+    },
   ];
 
   if (user?.all_permissions?.includes("system.manage_roles")) {
-    navItems.push({
+    systemItems.push({
       path: "/admin/roles",
       label: "Roles & Permissions",
       icon: <Shield size={20} />,
@@ -131,7 +140,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
   }
 
   if (user?.all_permissions?.includes("system.manage_users")) {
-    navItems.push({
+    systemItems.push({
       path: "/admin/users",
       label: "User Management",
       icon: <Users size={20} />,
@@ -235,19 +244,47 @@ const AdminSidebar = ({ isOpen, onClose }) => {
             </button>
           </div>
         </div>
-        <nav className="flex-1 p-4 space-y-2">
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              onClick={() => onClose && onClose()} // Close sidebar on mobile when link clicked
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive(item.path)}`}
-            >
-              {item.icon}
-              <span className="font-medium">{item.label}</span>
-            </Link>
-          ))}
-        </nav>
+        <nav className="flex-1 p-4 space-y-6 overflow-y-auto">
+          {/* Portfolio Section */}
+          <div>
+            <h3 className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+              Portfolio
+            </h3>
+            <div className="space-y-1">
+              {portfolioItems.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => onClose && onClose()}
+                  className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors text-sm ${isActive(item.path)}`}
+                >
+                  {item.icon}
+                  <span className="font-medium">{item.label}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* System Section */}
+          <div>
+            <h3 className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+              System Modules
+            </h3>
+            <div className="space-y-1">
+              {systemItems.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => onClose && onClose()}
+                  className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors text-sm ${isActive(item.path)}`}
+                >
+                  {item.icon}
+                  <span className="font-medium">{item.label}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </nav>{" "}
         <div className="p-4 border-t border-gray-800">
           <button
             onClick={handleLogout}
