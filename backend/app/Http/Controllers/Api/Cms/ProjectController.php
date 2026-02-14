@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\Storage;
 
 class ProjectController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:projects.create')->only(['store']);
+        $this->middleware('permission:projects.edit')->only(['update']);
+        $this->middleware('permission:projects.delete')->only(['destroy']);
+    }
+
     public function index()
     {
         return Project::all();

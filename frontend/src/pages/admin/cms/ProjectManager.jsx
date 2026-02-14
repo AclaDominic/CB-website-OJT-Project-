@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axiosClient from "../../../lib/axios";
-import { Plus, Trash2, Edit2, X, Loader2 } from "lucide-react";
+import { Plus, Edit2, Trash2, X, Loader2 } from "lucide-react";
 import ImagePicker from "../../../components/ImagePicker";
+import { useAuth } from "../../../context/AuthContext";
 
 const ProjectManager = () => {
+  const { user } = useAuth();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -18,8 +20,8 @@ const ProjectManager = () => {
     name: "",
     location: "",
     year: "",
+    status: "ongoing",
     scope: "",
-    status: "completed",
   });
 
   useEffect(() => {
@@ -57,11 +59,11 @@ const ProjectManager = () => {
     data.append("name", formData.name);
     data.append("location", formData.location);
     data.append("year", formData.year);
-    data.append("scope", formData.scope);
     data.append("status", formData.status);
+    data.append("scope", formData.scope);
 
     if (imageType === "url") {
-      data.append("image", imageUrlValue);
+      data.append("image_url", imageUrlValue);
     } else if (selectedFile) {
       data.append("image", selectedFile);
     }
@@ -92,7 +94,9 @@ const ProjectManager = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this project?")) {
       try {
-        await axiosClient.delete(`/api/projects/${id}`, { skipLoading: true });
+        await axiosClient.delete(`/api/projects/${id}`, {
+          skipLoading: true,
+        });
         fetchProjects();
       } catch (error) {
         console.error("Error deleting project:", error);
@@ -107,8 +111,8 @@ const ProjectManager = () => {
         name: project.name,
         location: project.location,
         year: project.year,
-        scope: project.scope,
         status: project.status,
+        scope: project.scope,
       });
       if (project.image) {
         setImageUrlValue(project.image);
@@ -121,8 +125,8 @@ const ProjectManager = () => {
         name: "",
         location: "",
         year: "",
+        status: "ongoing",
         scope: "",
-        status: "completed",
       });
       setImageUrlValue("");
     }
@@ -138,7 +142,7 @@ const ProjectManager = () => {
     setImageUrlValue("");
   };
 
-  if (loading && projects.length === 0) {
+  if (loading) {
     return (
       <div className="flex justify-center items-center h-96">
         <Loader2 className="animate-spin text-blue-600" size={40} />
@@ -150,12 +154,14 @@ const ProjectManager = () => {
     <div className="max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Manage Projects</h2>
-        <button
-          onClick={() => openModal()}
-          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-        >
-          <Plus size={20} /> Add Project
-        </button>
+        {user?.all_permissions?.includes("projects.create") && (
+          <button
+            onClick={() => openModal()}
+            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            <Plus size={20} /> Add Project
+          </button>
+        )}
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -194,19 +200,24 @@ const ProjectManager = () => {
                 <strong>Scope:</strong> {project.scope}
               </p>
             </div>
+
             <div className="flex justify-end gap-2 mt-auto pt-4 border-t">
-              <button
-                onClick={() => openModal(project)}
-                className="text-blue-600 hover:text-blue-800 p-1"
-              >
-                <Edit2 size={18} />
-              </button>
-              <button
-                onClick={() => handleDelete(project.id)}
-                className="text-red-600 hover:text-red-800 p-1"
-              >
-                <Trash2 size={18} />
-              </button>
+              {user?.all_permissions?.includes("projects.edit") && (
+                <button
+                  onClick={() => openModal(project)}
+                  className="text-blue-600 hover:text-blue-800 p-1"
+                >
+                  <Edit2 size={18} />
+                </button>
+              )}
+              {user?.all_permissions?.includes("projects.delete") && (
+                <button
+                  onClick={() => handleDelete(project.id)}
+                  className="text-red-600 hover:text-red-800 p-1"
+                >
+                  <Trash2 size={18} />
+                </button>
+              )}
             </div>
           </div>
         ))}

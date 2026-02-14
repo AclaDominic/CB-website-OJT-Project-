@@ -13,16 +13,20 @@ import ContactEditor from "./pages/admin/cms/ContactEditor";
 import ServiceManager from "./pages/admin/cms/ServiceManager";
 import ProjectManager from "./pages/admin/cms/ProjectManager";
 import AdminInquiries from "./pages/admin/cms/AdminInquiries";
+import UserManager from "./pages/admin/system/UserManager";
+import RoleManager from "./pages/admin/system/RoleManager";
 import ResourceManager from "./pages/admin/system/ResourceManager";
 
 import { LoadingProvider } from "./context/LoadingContext";
 import LoadingOverlay from "./components/LoadingOverlay";
+import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
   return (
     <LoadingProvider>
       <LoadingOverlay />
       <AuthProvider>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
@@ -44,6 +48,8 @@ function App() {
               <Route path="projects" element={<ProjectManager />} />
               <Route path="inquiries" element={<AdminInquiries />} />
               <Route path="resources" element={<ResourceManager />} />
+              <Route path="roles" element={<RoleManager />} />
+              <Route path="users" element={<UserManager />} />
             </Route>
           </Route>
         </Routes>

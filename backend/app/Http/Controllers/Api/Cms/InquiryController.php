@@ -8,6 +8,13 @@ use Illuminate\Http\Request;
 
 class InquiryController extends Controller
 {
+    public function __construct()
+    {
+        // View (index, show) might be protected by cms.view or just authenticated
+        // But specifically archive and delete need cms.edit
+        $this->middleware('permission:cms.edit')->only(['archive', 'destroy']);
+    }
+
     public function index(Request $request)
     {
         $query = Inquiry::query();

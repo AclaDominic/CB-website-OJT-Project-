@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axiosClient from "../../../lib/axios";
-import { Plus, Trash2, Edit2, X, Loader2 } from "lucide-react";
+import { Plus, Edit2, Trash2, X, Loader2 } from "lucide-react";
 import ImagePicker from "../../../components/ImagePicker";
+import { useAuth } from "../../../context/AuthContext";
 
 const ServiceManager = () => {
+  const { user } = useAuth();
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,8 +18,8 @@ const ServiceManager = () => {
 
   const [formData, setFormData] = useState({
     title: "",
-    description: "",
     type: "primary",
+    description: "",
   });
 
   useEffect(() => {
@@ -53,11 +55,11 @@ const ServiceManager = () => {
 
     const data = new FormData();
     data.append("title", formData.title);
-    data.append("description", formData.description);
     data.append("type", formData.type);
+    data.append("description", formData.description);
 
     if (imageType === "url") {
-      data.append("image", imageUrlValue);
+      data.append("image_url", imageUrlValue);
     } else if (selectedFile) {
       data.append("image", selectedFile);
     }
@@ -88,7 +90,9 @@ const ServiceManager = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this service?")) {
       try {
-        await axiosClient.delete(`/api/services/${id}`, { skipLoading: true });
+        await axiosClient.delete(`/api/services/${id}`, {
+          skipLoading: true,
+        });
         fetchServices();
       } catch (error) {
         console.error("Error deleting service:", error);
@@ -101,8 +105,8 @@ const ServiceManager = () => {
       setEditingService(service);
       setFormData({
         title: service.title,
-        description: service.description,
         type: service.type,
+        description: service.description,
       });
       if (service.image) {
         setImageUrlValue(service.image);
@@ -113,8 +117,8 @@ const ServiceManager = () => {
       setEditingService(null);
       setFormData({
         title: "",
-        description: "",
         type: "primary",
+        description: "",
       });
       setImageUrlValue("");
     }
@@ -130,7 +134,7 @@ const ServiceManager = () => {
     setImageUrlValue("");
   };
 
-  if (loading && services.length === 0) {
+  if (loading) {
     return (
       <div className="flex justify-center items-center h-96">
         <Loader2 className="animate-spin text-blue-600" size={40} />
@@ -142,12 +146,14 @@ const ServiceManager = () => {
     <div className="max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Manage Services</h2>
-        <button
-          onClick={() => openModal()}
-          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-        >
-          <Plus size={20} /> Add Service
-        </button>
+        {user?.all_permissions?.includes("cms.edit") && (
+          <button
+            onClick={() => openModal()}
+            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            <Plus size={20} /> Add Service
+          </button>
+        )}
       </div>
 
       {/* Primary Services */}
@@ -179,18 +185,22 @@ const ServiceManager = () => {
                   {service.description}
                 </p>
                 <div className="flex justify-end gap-2 mt-auto">
-                  <button
-                    onClick={() => openModal(service)}
-                    className="text-blue-600 hover:text-blue-800 p-1"
-                  >
-                    <Edit2 size={18} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(service.id)}
-                    className="text-red-600 hover:text-red-800 p-1"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                  {user?.all_permissions?.includes("cms.edit") && (
+                    <>
+                      <button
+                        onClick={() => openModal(service)}
+                        className="text-blue-600 hover:text-blue-800 p-1"
+                      >
+                        <Edit2 size={18} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(service.id)}
+                        className="text-red-600 hover:text-red-800 p-1"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}
@@ -226,18 +236,22 @@ const ServiceManager = () => {
                   {service.description}
                 </p>
                 <div className="flex justify-end gap-2 mt-auto">
-                  <button
-                    onClick={() => openModal(service)}
-                    className="text-blue-600 hover:text-blue-800 p-1"
-                  >
-                    <Edit2 size={18} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(service.id)}
-                    className="text-red-600 hover:text-red-800 p-1"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                  {user?.all_permissions?.includes("cms.edit") && (
+                    <>
+                      <button
+                        onClick={() => openModal(service)}
+                        className="text-blue-600 hover:text-blue-800 p-1"
+                      >
+                        <Edit2 size={18} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(service.id)}
+                        className="text-red-600 hover:text-red-800 p-1"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}

@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import api from "../../../lib/axios";
+import { useAuth } from "../../../context/AuthContext";
+import { Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 import ConfirmModal from "../../../components/admin/ConfirmModal";
 
@@ -7,6 +10,7 @@ const AdminInquiries = () => {
   const [inquiries, setInquiries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("inbox");
+  const { user } = useAuth();
 
   // Filters
   const [dateFrom, setDateFrom] = useState("");
@@ -43,6 +47,7 @@ const AdminInquiries = () => {
       setInquiries(response.data);
     } catch (error) {
       console.error("Error fetching inquiries", error);
+      toast.error("Failed to fetch inquiries");
     } finally {
       setLoading(false);
     }
@@ -180,7 +185,9 @@ const AdminInquiries = () => {
       </div>
 
       {loading ? (
-        <p className="text-center py-8 text-gray-500">Loading...</p>
+        <div className="flex justify-center items-center py-12">
+          <Loader2 className="animate-spin text-blue-600" size={32} />
+        </div>
       ) : (
         <div className="bg-white shadow rounded-lg overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200">
@@ -259,28 +266,34 @@ const AdminInquiries = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
                       {activeTab === "inbox" ? (
                         <>
-                          <a
-                            href={`https://mail.google.com/mail/?view=cm&fs=1&to=${inquiry.email}&su=${encodeURIComponent(inquiry.subject || "Inquiry Reply")}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded border border-blue-200 inline-block"
-                          >
-                            Reply
-                          </a>
-                          <button
-                            onClick={() => openArchiveModal(inquiry.id)}
-                            className="text-amber-600 hover:text-amber-900 bg-amber-50 px-3 py-1 rounded border border-amber-200"
-                          >
-                            Archive
-                          </button>
+                          {user?.all_permissions?.includes("cms.edit") && (
+                            <>
+                              <a
+                                href={`https://mail.google.com/mail/?view=cm&fs=1&to=${inquiry.email}&su=${encodeURIComponent(inquiry.subject || "Inquiry Reply")}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded border border-blue-200 inline-block"
+                              >
+                                Reply
+                              </a>
+                              <button
+                                onClick={() => openArchiveModal(inquiry.id)}
+                                className="text-amber-600 hover:text-amber-900 bg-amber-50 px-3 py-1 rounded border border-amber-200"
+                              >
+                                Archive
+                              </button>
+                            </>
+                          )}
                         </>
                       ) : (
-                        <button
-                          onClick={() => openDeleteModal(inquiry.id)}
-                          className="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded border border-red-200"
-                        >
-                          Delete
-                        </button>
+                        user?.all_permissions?.includes("cms.edit") && (
+                          <button
+                            onClick={() => openDeleteModal(inquiry.id)}
+                            className="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded border border-red-200"
+                          >
+                            Delete
+                          </button>
+                        )
                       )}
                     </td>
                   </tr>

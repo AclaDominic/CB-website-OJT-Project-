@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axiosClient from "../../../lib/axios";
 import { Save, Loader2 } from "lucide-react";
 import OrganizationManager from "../../../components/admin/OrganizationManager";
+import { useAuth } from "../../../context/AuthContext";
 
 const AboutEditor = () => {
   const [contents, setContents] = useState({
@@ -12,6 +13,7 @@ const AboutEditor = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchContent();
@@ -92,13 +94,15 @@ const AboutEditor = () => {
         <div className="bg-white p-6 rounded-lg shadow">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-semibold">Mission</h3>
-            <button
-              onClick={() => handleSave("mission")}
-              disabled={saving}
-              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-            >
-              <Save size={18} /> Save
-            </button>
+            {user?.all_permissions?.includes("cms.edit") && (
+              <button
+                onClick={() => handleSave("mission")}
+                disabled={saving}
+                className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+              >
+                <Save size={18} /> Save
+              </button>
+            )}
           </div>
           <textarea
             className="w-full h-32 p-3 border rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -112,13 +116,15 @@ const AboutEditor = () => {
         <div className="bg-white p-6 rounded-lg shadow">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-semibold">Vision</h3>
-            <button
-              onClick={() => handleSave("vision")}
-              disabled={saving}
-              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-            >
-              <Save size={18} /> Save
-            </button>
+            {user?.all_permissions?.includes("cms.edit") && (
+              <button
+                onClick={() => handleSave("vision")}
+                disabled={saving}
+                className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+              >
+                <Save size={18} /> Save
+              </button>
+            )}
           </div>
           <textarea
             className="w-full h-32 p-3 border rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -132,13 +138,15 @@ const AboutEditor = () => {
         <div className="bg-white p-6 rounded-lg shadow">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-semibold">Company Background</h3>
-            <button
-              onClick={() => handleSave("background")}
-              disabled={saving}
-              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-            >
-              <Save size={18} /> Save
-            </button>
+            {user?.all_permissions?.includes("cms.edit") && (
+              <button
+                onClick={() => handleSave("background")}
+                disabled={saving}
+                className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+              >
+                <Save size={18} /> Save
+              </button>
+            )}
           </div>
           <textarea
             className="w-full h-64 p-3 border rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"

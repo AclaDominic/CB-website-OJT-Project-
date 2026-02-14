@@ -7,7 +7,9 @@ use App\Http\Controllers\AuthController;
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', function (Request $request) {
-        return $request->user()->load('department');
+        $user = $request->user()->load(['department', 'roles']);
+        $user->all_permissions = $user->getAllPermissions()->pluck('name');
+        return $user;
     });
 
     Route::apiResource('services', \App\Http\Controllers\Api\Cms\ServiceController::class)->except(['index', 'show']);
@@ -19,6 +21,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('development-sites', \App\Http\Controllers\Api\System\DevelopmentSiteController::class)->except(['index', 'show']);
     Route::apiResource('organization-members', \App\Http\Controllers\Api\OrganizationMemberController::class)->except(['index', 'show']);
     Route::post('/organization-members/reorder', [\App\Http\Controllers\Api\OrganizationMemberController::class, 'reorder']);
+
+    // Admin System (RBAC)
+    Route::prefix('admin')->middleware(['role:Admin'])->group(function () {
+        Route::apiResource('roles', \App\Http\Controllers\Api\Admin\RoleController::class);
+        Route::get('permissions', [\App\Http\Controllers\Api\Admin\PermissionController::class, 'index']);
+
+        Route::apiResource('users', \App\Http\Controllers\Api\Admin\UserController::class)->only(['index', 'store', 'update']);
+    });
 });
 
 Route::get('/services', [\App\Http\Controllers\Api\Cms\ServiceController::class, 'index']);

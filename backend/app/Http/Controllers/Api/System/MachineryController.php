@@ -8,6 +8,13 @@ use Illuminate\Http\Request;
 
 class MachineryController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:inventory.create')->only(['store']);
+        $this->middleware('permission:inventory.edit')->only(['update']);
+        $this->middleware('permission:inventory.delete')->only(['destroy']);
+    }
+
     /**
      * Display a listing of the resource.
      */
