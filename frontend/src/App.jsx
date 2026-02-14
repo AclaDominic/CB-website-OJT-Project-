@@ -16,6 +16,7 @@ import AdminInquiries from "./pages/admin/cms/AdminInquiries";
 import UserManager from "./pages/admin/system/UserManager";
 import RoleManager from "./pages/admin/system/RoleManager";
 import ResourceManager from "./pages/admin/system/ResourceManager";
+import InventoryManager from "./pages/admin/system/InventoryManager";
 
 import { LoadingProvider } from "./context/LoadingContext";
 import LoadingOverlay from "./components/LoadingOverlay";
@@ -48,6 +49,7 @@ function App() {
               <Route path="projects" element={<ProjectManager />} />
               <Route path="inquiries" element={<AdminInquiries />} />
               <Route path="resources" element={<ResourceManager />} />
+              <Route path="inventory" element={<InventoryManager />} />
               <Route path="roles" element={<RoleManager />} />
               <Route path="users" element={<UserManager />} />
             </Route>

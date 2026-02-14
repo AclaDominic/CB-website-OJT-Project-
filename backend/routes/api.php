@@ -29,6 +29,26 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::apiResource('users', \App\Http\Controllers\Api\Admin\UserController::class)->only(['index', 'store', 'update']);
     });
+
+    // Inventory Management
+    Route::apiResource('inventory-categories', \App\Http\Controllers\InventoryCategoryController::class);
+    Route::apiResource('inventory-items', \App\Http\Controllers\InventoryItemController::class);
+    Route::post('/inventory-items/{item}/add-stock', [\App\Http\Controllers\InventoryItemController::class, 'addStock']);
+    Route::post('/inventory-items/{item}/remove-stock', [\App\Http\Controllers\InventoryItemController::class, 'removeStock']);
+
+    // Notifications
+    Route::get('/notifications', function (Request $request) {
+        return $request->user()->unreadNotifications;
+    });
+    Route::post('/notifications/{id}/read', function (Request $request, $id) {
+        $notification = $request->user()->notifications()->findOrFail($id);
+        $notification->markAsRead();
+        return response()->json(['message' => 'Marked as read']);
+    });
+    Route::post('/notifications/read-all', function (Request $request) {
+        $request->user()->unreadNotifications->markAsRead();
+        return response()->json(['message' => 'All marked as read']);
+    });
 });
 
 Route::get('/services', [\App\Http\Controllers\Api\Cms\ServiceController::class, 'index']);
