@@ -17,7 +17,9 @@ import UserManager from "./pages/admin/system/UserManager";
 import RoleManager from "./pages/admin/system/RoleManager";
 import ResourceManager from "./pages/admin/system/ResourceManager";
 import InventoryManager from "./pages/admin/system/InventoryManager";
+
 import ProcurementManager from "./pages/admin/system/ProcurementManager";
+import Dashboard from "./pages/admin/Dashboard";
 
 import { LoadingProvider } from "./context/LoadingContext";
 import LoadingOverlay from "./components/LoadingOverlay";
@@ -43,7 +45,7 @@ function App() {
 
           <Route path="/admin" element={<ProtectedRoute />}>
             <Route element={<AdminLayout />}>
-              <Route index element={<ResourceManager />} />
+              <Route index element={<Dashboard />} />
               <Route path="about" element={<AboutEditor />} />
               <Route path="contact" element={<ContactEditor />} />
               <Route path="services" element={<ServiceManager />} />

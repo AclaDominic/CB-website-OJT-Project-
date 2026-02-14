@@ -15,6 +15,7 @@ import {
   Bell,
   Check,
   Construction,
+  ShoppingCart,
 } from "lucide-react";
 import axiosClient from "../lib/axios";
 import { formatDistanceToNow } from "date-fns";
@@ -102,6 +103,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
   };
 
   const portfolioItems = [
+    { path: "/admin", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
     { path: "/admin/about", label: "About", icon: <FileText size={20} /> },
     {
       path: "/admin/services",
@@ -127,7 +129,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
     {
       path: "/admin/procurement",
       label: "Procurement",
-      icon: <Construction size={20} />,
+      icon: <ShoppingCart size={20} />,
     },
   ];
 

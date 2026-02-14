@@ -20,14 +20,22 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('machineries', \App\Http\Controllers\Api\System\MachineryController::class)->except(['index', 'show']);
     Route::apiResource('development-sites', \App\Http\Controllers\Api\System\DevelopmentSiteController::class)->except(['index', 'show']);
     Route::apiResource('organization-members', \App\Http\Controllers\Api\OrganizationMemberController::class)->except(['index', 'show']);
+    Route::apiResource('organization-members', \App\Http\Controllers\Api\OrganizationMemberController::class)->except(['index', 'show']);
     Route::post('/organization-members/reorder', [\App\Http\Controllers\Api\OrganizationMemberController::class, 'reorder']);
 
-    // Admin System (RBAC)
-    Route::prefix('admin')->middleware(['role:Admin'])->group(function () {
-        Route::apiResource('roles', \App\Http\Controllers\Api\Admin\RoleController::class);
-        Route::get('permissions', [\App\Http\Controllers\Api\Admin\PermissionController::class, 'index']);
+    // Procurement
+    Route::apiResource('procurement', \App\Http\Controllers\Api\System\ProcurementController::class);
+    Route::post('procurement/{id}/status', [\App\Http\Controllers\Api\System\ProcurementController::class, 'changeStatus']);
 
-        Route::apiResource('users', \App\Http\Controllers\Api\Admin\UserController::class)->only(['index', 'store', 'update']);
+    // Admin System (RBAC)
+    Route::prefix('admin')->middleware(['role:Admin|Project Manager|Site Engineer|Staff'])->group(function () {
+        Route::get('dashboard-stats', [\App\Http\Controllers\Api\Admin\DashboardController::class, 'index']);
+
+        Route::middleware(['role:Admin'])->group(function () {
+            Route::apiResource('roles', \App\Http\Controllers\Api\Admin\RoleController::class);
+            Route::get('permissions', [\App\Http\Controllers\Api\Admin\PermissionController::class, 'index']);
+            Route::apiResource('users', \App\Http\Controllers\Api\Admin\UserController::class)->only(['index', 'store', 'update']);
+        });
     });
 
     // Inventory Management

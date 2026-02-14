@@ -37,6 +37,15 @@ class RolePermissionSeeder extends Seeder
         Permission::findOrCreate('projects.edit');
         Permission::findOrCreate('projects.delete');
 
+        // Procurement
+        Permission::findOrCreate('procurement.view');
+        Permission::findOrCreate('procurement.create');
+        Permission::findOrCreate('procurement.submit');
+        Permission::findOrCreate('procurement.process');
+        Permission::findOrCreate('procurement.complete');
+        Permission::findOrCreate('procurement.archive');
+        Permission::findOrCreate('procurement.delete');
+
         // --- Roles ---
 
         // 1. Admin (Super User)
@@ -53,6 +62,10 @@ class RolePermissionSeeder extends Seeder
             'inventory.create',
             'inventory.edit',
             'cms.view',
+            'procurement.view',
+            'procurement.create',
+            'procurement.submit',
+            'procurement.delete',
         ]);
 
         // 3. Site Engineer
@@ -62,12 +75,21 @@ class RolePermissionSeeder extends Seeder
             'projects.edit',
             'inventory.view',
             'inventory.create', // Can request materials
+            'procurement.view',
+            'procurement.create',
+            'procurement.submit',
+            'procurement.delete',
         ]);
 
         // 4. Staff (General)
         $staff = Role::findOrCreate('Staff');
         $staff->givePermissionTo([
             'cms.view',
+            'inventory.view', // Needed for Dashboard Low Stock
+            'procurement.view',
+            'procurement.process',
+            'procurement.complete',
+            'procurement.archive',
         ]);
 
         // --- Assign Roles to Existing Users ---
