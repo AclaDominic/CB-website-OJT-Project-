@@ -37,6 +37,27 @@ const AdminSidebar = ({ isOpen, onClose }) => {
     }
   };
 
+  const getDisplayRole = () => {
+    if (!user || !user.roles || user.roles.length === 0) return "Admin Panel";
+
+    // Get the first role name (assuming primary role is first)
+    const roleName = user.roles[0].name;
+
+    // Check if too long (e.g., > 12 chars)
+    if (roleName.length > 12) {
+      // Initials
+      return roleName
+        .split(" ")
+        .map((word) => word[0])
+        .join("")
+        .toUpperCase();
+    }
+
+    return roleName;
+  };
+
+  const displayLabel = getDisplayRole();
+
   // Notifications Logic
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -136,14 +157,14 @@ const AdminSidebar = ({ isOpen, onClose }) => {
             `}
       >
         <div className="p-6 border-b border-gray-800 flex justify-between items-center relative">
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-white flex items-center gap-2">
-              <LayoutDashboard className="text-green-500" />
-              Admin Panel
-            </h1>
+          <h1 className="text-xl font-bold text-white flex items-center gap-2">
+            <LayoutDashboard className="text-green-500" />
+            {displayLabel}
+          </h1>
 
+          <div className="flex items-center gap-2">
             {/* Notification Bell */}
-            <div className="relative ml-2">
+            <div className="relative">
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
                 className="relative text-gray-400 hover:text-white transition-colors p-1"
@@ -158,7 +179,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
 
               {/* Notification Dropdown/Modal */}
               {showNotifications && (
-                <div className="absolute top-full left-0 mt-2 w-80 bg-white rounded-lg shadow-xl z-50 text-gray-800 border overflow-hidden">
+                <div className="absolute top-0 left-full ml-4 w-80 bg-white rounded-lg shadow-xl z-50 text-gray-800 border overflow-hidden">
                   <div className="p-3 border-b flex justify-between items-center bg-gray-50">
                     <h3 className="font-semibold text-sm">Notifications</h3>
                     {unreadCount > 0 && (
@@ -205,14 +226,14 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                 </div>
               )}
             </div>
-          </div>
 
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-white md:hidden"
-          >
-            <X size={24} />
-          </button>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-white md:hidden"
+            >
+              <X size={24} />
+            </button>
+          </div>
         </div>
         <nav className="flex-1 p-4 space-y-2">
           {navItems.map((item) => (
