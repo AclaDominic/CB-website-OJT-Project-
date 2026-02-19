@@ -22,7 +22,35 @@ const ProjectManager = () => {
     year: "",
     status: "ongoing",
     scope: "",
+    is_public: false,
   });
+
+  // Gallery State
+  const [galleryItems, setGalleryItems] = useState([]);
+
+  // Gallery Handlers
+  const addGalleryRow = () => {
+    setGalleryItems([
+      ...galleryItems,
+      {
+        id: null, // New item
+        before: { type: "url", value: "" },
+        after: { type: "url", value: "" },
+      },
+    ]);
+  };
+
+  const removeGalleryRow = (index) => {
+    const newItems = [...galleryItems];
+    newItems.splice(index, 1);
+    setGalleryItems(newItems);
+  };
+
+  const handleGalleryChange = (index, field, { type, value }) => {
+    const newItems = [...galleryItems];
+    newItems[index][field] = { type, value };
+    setGalleryItems(newItems);
+  };
 
   useEffect(() => {
     fetchProjects();
@@ -61,12 +89,39 @@ const ProjectManager = () => {
     data.append("year", formData.year);
     data.append("status", formData.status);
     data.append("scope", formData.scope);
+    data.append("is_public", formData.is_public ? "1" : "0");
 
     if (imageType === "url") {
       data.append("image_url", imageUrlValue);
     } else if (selectedFile) {
       data.append("image", selectedFile);
     }
+
+    // Process Gallery
+    // 1. Collect IDs of items that are kept (have an ID)
+    const keptIds = galleryItems
+      .filter((item) => item.id !== null)
+      .map((item) => item.id);
+
+    keptIds.forEach((id) => data.append("kept_gallery_ids[]", id));
+
+    // 2. Append new items (those without ID) as files
+    // Note: We only support uploading new files for now as per controller logic.
+    // Ideally update controller to handle URLs too if mixed.
+    // But for "Before/After", it's usually uploaded files.
+    // If user enters URL for new item, we might need controller update.
+    // Let's assume user uploads files for new items for now, or just send what we have.
+    // The controller logic expects 'new_gallery' array of files.
+
+    const newItems = galleryItems.filter((item) => item.id === null);
+    newItems.forEach((item, index) => {
+      if (item.before.type === "file" && item.before.value) {
+        data.append(`new_gallery[${index}][before]`, item.before.value);
+      }
+      if (item.after.type === "file" && item.after.value) {
+        data.append(`new_gallery[${index}][after]`, item.after.value);
+      }
+    });
 
     if (editingProject) {
       data.append("_method", "PUT");
@@ -104,6 +159,25 @@ const ProjectManager = () => {
     }
   };
 
+  const handleToggleVisibility = async (project) => {
+    try {
+      // Optimistic update
+      const newStatus = !project.is_public;
+      setProjects(
+        projects.map((p) =>
+          p.id === project.id ? { ...p, is_public: newStatus } : p,
+        ),
+      );
+
+      await axiosClient.put(`/api/projects/${project.id}`, {
+        is_public: newStatus,
+      });
+    } catch (error) {
+      console.error("Error toggling visibility:", error);
+      fetchProjects(); // Revert on error
+    }
+  };
+
   const openModal = (project = null) => {
     if (project) {
       setEditingProject(project);
@@ -113,11 +187,25 @@ const ProjectManager = () => {
         year: project.year,
         status: project.status,
         scope: project.scope,
+        is_public: Boolean(project.is_public),
       });
       if (project.image) {
         setImageUrlValue(project.image);
       } else {
         setImageUrlValue("");
+      }
+
+      // Populate Gallery
+      if (project.before_afters && project.before_afters.length > 0) {
+        setGalleryItems(
+          project.before_afters.map((item) => ({
+            id: item.id,
+            before: { type: "url", value: item.before_image },
+            after: { type: "url", value: item.after_image },
+          })),
+        );
+      } else {
+        setGalleryItems([]);
       }
     } else {
       setEditingProject(null);
@@ -127,8 +215,10 @@ const ProjectManager = () => {
         year: "",
         status: "ongoing",
         scope: "",
+        is_public: false,
       });
       setImageUrlValue("");
+      setGalleryItems([]);
     }
     setImageType("url");
     setSelectedFile(null);
@@ -201,23 +291,43 @@ const ProjectManager = () => {
               </p>
             </div>
 
-            <div className="flex justify-end gap-2 mt-auto pt-4 border-t">
+            <div className="flex justify-between items-center mt-auto pt-4 border-t">
+              {/* Public Toggle Switch */}
               {user?.all_permissions?.includes("projects.edit") && (
-                <button
-                  onClick={() => openModal(project)}
-                  className="text-blue-600 hover:text-blue-800 p-1"
-                >
-                  <Edit2 size={18} />
-                </button>
+                <div className="flex items-center">
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={Boolean(project.is_public)}
+                      onChange={() => handleToggleVisibility(project)}
+                    />
+                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                    <span className="ml-2 text-xs font-medium text-gray-600">
+                      {project.is_public ? "Public" : "Hidden"}
+                    </span>
+                  </label>
+                </div>
               )}
-              {user?.all_permissions?.includes("projects.delete") && (
-                <button
-                  onClick={() => handleDelete(project.id)}
-                  className="text-red-600 hover:text-red-800 p-1"
-                >
-                  <Trash2 size={18} />
-                </button>
-              )}
+
+              <div className="flex gap-2">
+                {user?.all_permissions?.includes("projects.edit") && (
+                  <button
+                    onClick={() => openModal(project)}
+                    className="text-blue-600 hover:text-blue-800 p-1"
+                  >
+                    <Edit2 size={18} />
+                  </button>
+                )}
+                {user?.all_permissions?.includes("projects.delete") && (
+                  <button
+                    onClick={() => handleDelete(project.id)}
+                    className="text-red-600 hover:text-red-800 p-1"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         ))}
@@ -226,7 +336,7 @@ const ProjectManager = () => {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
+          <div className="bg-white p-6 rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-bold">
                 {editingProject ? "Edit Project" : "Add Project"}
@@ -239,83 +349,192 @@ const ProjectManager = () => {
               </button>
             </div>
             <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">
-                  Project Name
-                </label>
-                <input
-                  type="text"
-                  className="w-full p-2 border rounded"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">
-                  Location
-                </label>
-                <input
-                  type="text"
-                  className="w-full p-2 border rounded"
-                  value={formData.location}
-                  onChange={(e) =>
-                    setFormData({ ...formData, location: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Left Column: Project Details */}
                 <div>
-                  <label className="block text-sm font-medium mb-1">Year</label>
-                  <input
-                    type="text"
-                    className="w-full p-2 border rounded"
-                    value={formData.year}
-                    onChange={(e) =>
-                      setFormData({ ...formData, year: e.target.value })
-                    }
-                    required
+                  <h4 className="font-semibold mb-2 text-gray-700">
+                    Project Details
+                  </h4>
+                  {/* ... Existing fields ... */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium mb-1">
+                      Project Name
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full p-2 border rounded"
+                      value={formData.name}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium mb-1">
+                      Location
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full p-2 border rounded"
+                      value={formData.location}
+                      onChange={(e) =>
+                        setFormData({ ...formData, location: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
+
+                  <div className="mb-4 flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="is_public"
+                      checked={formData.is_public}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          is_public: e.target.checked,
+                        })
+                      }
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <label
+                      htmlFor="is_public"
+                      className="text-sm font-medium text-gray-700"
+                    >
+                      Show on Public Profile
+                    </label>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">
+                        Year
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded"
+                        value={formData.year}
+                        onChange={(e) =>
+                          setFormData({ ...formData, year: e.target.value })
+                        }
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">
+                        Status
+                      </label>
+                      <select
+                        className="w-full p-2 border rounded"
+                        value={formData.status}
+                        onChange={(e) =>
+                          setFormData({ ...formData, status: e.target.value })
+                        }
+                      >
+                        <option value="completed">Completed</option>
+                        <option value="ongoing">Ongoing</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium mb-1">
+                      Scope of Work
+                    </label>
+                    <textarea
+                      className="w-full p-2 border rounded h-20"
+                      value={formData.scope}
+                      onChange={(e) =>
+                        setFormData({ ...formData, scope: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
+
+                  <ImagePicker
+                    defaultImage={editingProject?.image}
+                    onImageChanged={handleImageChanged}
+                    label="Project Thumbnail"
                   />
                 </div>
+
+                {/* Right Column: Before & After Gallery */}
                 <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Status
-                  </label>
-                  <select
-                    className="w-full p-2 border rounded"
-                    value={formData.status}
-                    onChange={(e) =>
-                      setFormData({ ...formData, status: e.target.value })
-                    }
-                  >
-                    <option value="completed">Completed</option>
-                    <option value="ongoing">Ongoing</option>
-                  </select>
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="font-semibold text-gray-700">
+                      Before & After Gallery
+                    </h4>
+                    <button
+                      type="button"
+                      onClick={addGalleryRow}
+                      className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                    >
+                      <Plus size={16} /> Add Row
+                    </button>
+                  </div>
+
+                  <div className="space-y-4 max-h-[600px] overflow-y-auto p-1">
+                    {galleryItems.length === 0 && (
+                      <p className="text-sm text-gray-500 italic text-center py-8 bg-gray-50 rounded border border-dashed">
+                        No gallery images yet. Click "Add Row" to start
+                        showcasing your work!
+                      </p>
+                    )}
+                    {galleryItems.map((item, index) => (
+                      <div
+                        key={index}
+                        className="bg-gray-50 p-3 rounded border relative group"
+                      >
+                        <button
+                          type="button"
+                          onClick={() => removeGalleryRow(index)}
+                          className="absolute top-2 right-2 text-red-400 hover:text-red-600 p-1 bg-white rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                          title="Remove Row"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <span className="text-xs font-semibold text-gray-500 uppercase mb-1 block">
+                              Before
+                            </span>
+                            <ImagePicker
+                              defaultImage={item.before.value} // This needs logic: if file, preview is handled by picker internally? No, ImagePicker expects URL string for default
+                              // Actually ImagePicker is tricky with "File object" as default.
+                              // Our simple ImagePicker handles "defaultImage" as string (URL or path).
+                              // If it's a new file, we don't pass defaultImage, we rely on state?
+                              // But ImagePicker doesn't controlled-component fully.
+                              // We need to verify if ImagePicker can handle controlled state or reset.
+                              // Let's rely on `key` prop to force re-render if needed?
+                              // Or better: Pass distinct props.
+                              label=""
+                              name={`gallery-before-${index}`}
+                              onImageChanged={(data) =>
+                                handleGalleryChange(index, "before", data)
+                              }
+                            />
+                          </div>
+                          <div>
+                            <span className="text-xs font-semibold text-gray-500 uppercase mb-1 block">
+                              After
+                            </span>
+                            <ImagePicker // Separate picker
+                              defaultImage={item.after.value}
+                              label=""
+                              name={`gallery-after-${index}`}
+                              onImageChanged={(data) =>
+                                handleGalleryChange(index, "after", data)
+                              }
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">
-                  Scope of Work
-                </label>
-                <textarea
-                  className="w-full p-2 border rounded h-20"
-                  value={formData.scope}
-                  onChange={(e) =>
-                    setFormData({ ...formData, scope: e.target.value })
-                  }
-                  required
-                />
-              </div>
 
-              <ImagePicker
-                defaultImage={editingProject?.image}
-                onImageChanged={handleImageChanged}
-              />
-
-              <div className="flex justify-end gap-2">
+              <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
                 <button
                   type="button"
                   onClick={closeModal}
@@ -327,7 +546,7 @@ const ProjectManager = () => {
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                 >
-                  Save
+                  Save Project
                 </button>
               </div>
             </form>

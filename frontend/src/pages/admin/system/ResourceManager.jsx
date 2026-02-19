@@ -143,12 +143,28 @@ const MachineryList = () => {
     name: "",
     type: "",
     plate_number: "",
-    is_decommissioned: false,
+    status: "Stand By",
+    project_id: "",
   });
+
+  const [projects, setProjects] = useState([]);
 
   useEffect(() => {
     fetchItems();
+    fetchProjects();
   }, []);
+
+  const fetchProjects = async () => {
+    try {
+      // Fetch only ongoing projects for assignment
+      const response = await axiosClient.get("/api/projects");
+      // Filter strictly on frontend if API doesn't support status filter yet,
+      // or assume API returns all. Ideally /api/projects?status=ongoing
+      setProjects(response.data.filter((p) => p.status === "ongoing"));
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+    }
+  };
 
   const fetchItems = async () => {
     setLoading(true);
@@ -181,7 +197,10 @@ const MachineryList = () => {
     data.append("name", formData.name);
     data.append("type", formData.type);
     data.append("plate_number", formData.plate_number || "");
-    data.append("is_decommissioned", formData.is_decommissioned ? "1" : "0");
+    data.append("status", formData.status);
+    if (formData.project_id) {
+      data.append("project_id", formData.project_id);
+    }
 
     if (imageType === "url") {
       data.append("image_url", imageUrlValue);
@@ -233,7 +252,10 @@ const MachineryList = () => {
         name: item.name,
         type: item.type,
         plate_number: item.plate_number || "",
-        is_decommissioned: item.is_decommissioned,
+        status:
+          item.status ||
+          (item.is_decommissioned ? "Decommissioned" : "Stand By"),
+        project_id: item.project_id || "",
       });
       // Set initial image state
       if (item.image_url) {
@@ -247,7 +269,8 @@ const MachineryList = () => {
         name: "",
         type: "",
         plate_number: "",
-        is_decommissioned: false,
+        status: "Stand By",
+        project_id: "",
       });
       setImageUrlValue("");
     }
@@ -303,9 +326,16 @@ const MachineryList = () => {
             <div className="flex justify-between items-start mb-2">
               <h4 className="font-bold text-lg">{item.name}</h4>
               <span
-                className={`text-xs px-2 py-1 rounded ${item.is_decommissioned ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"}`}
+                className={`text-xs px-2 py-1 rounded ${
+                  item.status === "Decommissioned"
+                    ? "bg-red-100 text-red-800"
+                    : item.status === "Active" || item.status === "in-use"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-amber-100 text-amber-800"
+                }`}
               >
-                {item.is_decommissioned ? "Decommissioned" : "Active"}
+                {item.status ||
+                  (item.is_decommissioned ? "Decommissioned" : "Stand By")}
               </span>
             </div>
             <p className="text-gray-600 text-sm">Type: {item.type}</p>
@@ -392,22 +422,49 @@ const MachineryList = () => {
                 onImageChanged={handleImageChanged}
               />
 
-              <div className="mb-4 flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="decommissioned"
-                  checked={formData.is_decommissioned}
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Status</label>
+                <select
+                  className="w-full p-2 border rounded"
+                  value={formData.status}
                   onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      is_decommissioned: e.target.checked,
-                    })
+                    setFormData({ ...formData, status: e.target.value })
                   }
-                />
-                <label htmlFor="decommissioned" className="text-sm font-medium">
-                  Decommissioned
-                </label>
+                  required
+                >
+                  <option value="Stand By">Stand By</option>
+                  <option value="Maintenance">Maintenance</option>
+                  <option value="Decommissioned">Decommissioned</option>
+                  <option value="Lease">Lease (to others)</option>
+                  <option value="Active">Active</option>
+                </select>
               </div>
+
+              {formData.status === "Active" && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-1">
+                    Assign to Project <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    className="w-full p-2 border rounded"
+                    value={formData.project_id || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, project_id: e.target.value })
+                    }
+                    required={formData.status === "Active"}
+                  >
+                    <option value="">Select a Project</option>
+                    {projects.map((project) => (
+                      <option key={project.id} value={project.id}>
+                        {project.name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Active equipment must be assigned to an ongoing project.
+                  </p>
+                </div>
+              )}
               <div className="flex justify-end gap-2">
                 <button
                   type="button"

@@ -17,10 +17,25 @@ class DashboardController extends Controller
         $canViewInventory = $user->can('inventory.view') || $user->hasRole('Admin');
 
         // 1. Low Stock Count
-        // Only show if user has permission to view inventory
         $lowStockCount = $canViewInventory
             ? InventoryItem::whereColumn('quantity', '<=', 'threshold')->count()
-            : null;
+            : 0;
+
+        // Machinery Stats
+        // Statuses: 'Stand By', 'Maintenance', 'Decommissioned', 'Lease', 'Active'
+        $machineryStats = [
+            'total' => \App\Models\Machinery::where('status', '!=', 'Decommissioned')->count(),
+            'available' => \App\Models\Machinery::where('status', 'Stand By')->count(),
+            'in_use' => \App\Models\Machinery::whereIn('status', ['Active', 'Lease'])->count(),
+            'maintenance' => \App\Models\Machinery::where('status', 'Maintenance')->count(),
+        ];
+
+        // Project Status Stats
+        $projectStats = [
+            'ongoing' => Project::where('status', 'ongoing')->count(),
+            'completed' => Project::where('status', 'completed')->count(),
+            // Add planning if you have that status, otherwise just these two
+        ];
 
         // 2. Pending Procurement Requests
         // Admin/Staff: See ALL pending
@@ -53,10 +68,12 @@ class DashboardController extends Controller
             'pending_procurement_count' => $pendingProcurementCount,
             'active_projects_count' => $activeProjectsCount,
             'recent_procurement' => $recentProcurement,
+            'machinery_stats' => $machineryStats,
+            'project_stats' => $projectStats,
             'permissions' => [
                 'can_view_inventory' => $canViewInventory,
-                'can_create_project' => $user->can('project.create') || $user->hasRole('Admin'),
-                'can_create_user' => $user->can('user.create') || $user->hasRole('Admin'),
+                'can_create_project' => $user->can('projects.create') || $user->hasRole('Admin'),
+                'can_create_user' => $user->can('system.manage_users') || $user->hasRole('Admin'),
             ]
         ]);
     }

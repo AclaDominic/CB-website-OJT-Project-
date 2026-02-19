@@ -12,12 +12,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
         return $user;
     });
 
+    Route::put('/user/password', [\App\Http\Controllers\Api\System\ProfileController::class, 'updatePassword']);
+
     Route::apiResource('services', \App\Http\Controllers\Api\Cms\ServiceController::class)->except(['index', 'show']);
     Route::apiResource('projects', \App\Http\Controllers\Api\Cms\ProjectController::class)->except(['index', 'show']);
     Route::apiResource('inquiries', \App\Http\Controllers\Api\Cms\InquiryController::class);
     Route::put('/inquiries/{inquiry}/archive', [\App\Http\Controllers\Api\Cms\InquiryController::class, 'archive']);
 
     Route::apiResource('machineries', \App\Http\Controllers\Api\System\MachineryController::class)->except(['index', 'show']);
+    Route::post('/machineries/{id}/assign-project', [\App\Http\Controllers\Api\System\MachineryController::class, 'assignProject']);
+    Route::post('/machineries/{id}/release-project', [\App\Http\Controllers\Api\System\MachineryController::class, 'releaseProject']);
     Route::apiResource('development-sites', \App\Http\Controllers\Api\System\DevelopmentSiteController::class)->except(['index', 'show']);
     Route::apiResource('organization-members', \App\Http\Controllers\Api\OrganizationMemberController::class)->except(['index', 'show']);
     Route::apiResource('organization-members', \App\Http\Controllers\Api\OrganizationMemberController::class)->except(['index', 'show']);

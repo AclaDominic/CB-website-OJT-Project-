@@ -14,8 +14,12 @@ import {
   Package,
   Bell,
   Check,
-  Construction,
   ShoppingCart,
+  ChevronDown,
+  ChevronRight,
+  Layers,
+  Settings,
+  ClipboardList,
 } from "lucide-react";
 import axiosClient from "../lib/axios";
 import { formatDistanceToNow } from "date-fns";
@@ -24,9 +28,22 @@ import { useAuth } from "../context/AuthContext";
 const AdminSidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
   const { user, logout } = useAuth();
+  const [expandedGroups, setExpandedGroups] = useState({
+    "Content Management": true,
+    Operations: true,
+    "System Administration": false,
+  });
+
+  const toggleGroup = (group) => {
+    setExpandedGroups((prev) => ({
+      ...prev,
+      [group]: !prev[group],
+    }));
+  };
 
   const isActive = (path) => {
-    return location.pathname.startsWith(path)
+    return location.pathname === path ||
+      location.pathname.startsWith(`${path}/`)
       ? "bg-gray-800 text-white"
       : "text-gray-400 hover:bg-gray-800 hover:text-white";
   };
@@ -41,20 +58,14 @@ const AdminSidebar = ({ isOpen, onClose }) => {
 
   const getDisplayRole = () => {
     if (!user || !user.roles || user.roles.length === 0) return "Admin Panel";
-
-    // Get the first role name (assuming primary role is first)
     const roleName = user.roles[0].name;
-
-    // Check if too long (e.g., > 12 chars)
     if (roleName.length > 12) {
-      // Initials
       return roleName
         .split(" ")
         .map((word) => word[0])
         .join("")
         .toUpperCase();
     }
-
     return roleName;
   };
 
@@ -67,7 +78,6 @@ const AdminSidebar = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     fetchNotifications();
-    // Poll every minute
     const interval = setInterval(fetchNotifications, 60000);
     return () => clearInterval(interval);
   }, []);
@@ -102,52 +112,110 @@ const AdminSidebar = ({ isOpen, onClose }) => {
     }
   };
 
-  const portfolioItems = [
-    { path: "/admin", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
-    { path: "/admin/about", label: "About", icon: <FileText size={20} /> },
+  // Navigation Structure
+  const navigationGroups = [
     {
-      path: "/admin/services",
-      label: "Services",
-      icon: <Briefcase size={20} />,
+      title: null, // Root items
+      items: [
+        {
+          path: "/admin",
+          label: "Dashboard",
+          icon: <LayoutDashboard size={20} />,
+        },
+      ],
     },
     {
-      path: "/admin/projects",
-      label: "Projects",
-      icon: <FolderKanban size={20} />,
+      title: "Content Management",
+      icon: <Layers size={18} />,
+      items: [
+        {
+          path: "/admin/projects",
+          label: "Projects",
+          icon: <FolderKanban size={18} />,
+        },
+        {
+          path: "/admin/services",
+          label: "Services",
+          icon: <Briefcase size={18} />,
+        },
+        {
+          path: "/admin/resources",
+          label: "Resources",
+          icon: <Truck size={18} />,
+        },
+        {
+          path: "/admin/about",
+          label: "About Us",
+          icon: <FileText size={18} />,
+        },
+        {
+          path: "/admin/contact",
+          label: "Contact Info",
+          icon: <Phone size={18} />,
+        },
+      ],
     },
-    { path: "/admin/resources", label: "Resources", icon: <Truck size={20} /> },
-    { path: "/admin/contact", label: "Contact", icon: <Phone size={20} /> },
+    {
+      title: "Operations",
+      icon: <ClipboardList size={18} />,
+      items: [
+        {
+          path: "/admin/inventory",
+          label: "Inventory",
+          icon: <Package size={18} />,
+        },
+        {
+          path: "/admin/procurement",
+          label: "Procurement",
+          icon: <ShoppingCart size={18} />,
+        },
+        {
+          path: "/admin/inquiries",
+          label: "Inquiries",
+          icon: <Mail size={18} />,
+        },
+      ],
+    },
+    {
+      title: "System Administration",
+      icon: <Settings size={18} />,
+      items: [
+        ...(user?.all_permissions?.includes("system.manage_users")
+          ? [
+              {
+                path: "/admin/users",
+                label: "User Management",
+                icon: <Users size={18} />,
+              },
+            ]
+          : []),
+        ...(user?.all_permissions?.includes("system.manage_roles")
+          ? [
+              {
+                path: "/admin/roles",
+                label: "Roles & Permissions",
+                icon: <Shield size={18} />,
+              },
+            ]
+          : []),
+      ],
+    },
   ];
 
-  const systemItems = [
-    {
-      path: "/admin/inventory",
-      label: "Inventory",
-      icon: <Package size={20} />,
-    },
-    { path: "/admin/inquiries", label: "Inquiries", icon: <Mail size={20} /> },
-    {
-      path: "/admin/procurement",
-      label: "Procurement",
-      icon: <ShoppingCart size={20} />,
-    },
-  ];
-
-  if (user?.all_permissions?.includes("system.manage_roles")) {
-    systemItems.push({
-      path: "/admin/roles",
-      label: "Roles & Permissions",
-      icon: <Shield size={20} />,
-    });
-  }
-
-  if (user?.all_permissions?.includes("system.manage_users")) {
-    systemItems.push({
-      path: "/admin/users",
-      label: "User Management",
-      icon: <Users size={20} />,
-    });
-  }
+  const SidebarItem = ({ item }) => (
+    <Link
+      to={item.path}
+      onClick={() => onClose && onClose()}
+      className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium ${isActive(item.path)}`}
+    >
+      {item.icon}
+      <span>{item.label}</span>
+      {/* Active Indicator for aesthetics */}
+      {isActive(item.path).includes("bg-gray-800") && (
+        <div className="ml-auto w-1.5 h-1.5 rounded-full bg-company-blue"></div>
+      )}
+    </Link>
+  );
 
   return (
     <>
@@ -169,8 +237,8 @@ const AdminSidebar = ({ isOpen, onClose }) => {
       >
         <div className="p-6 border-b border-gray-800 flex justify-between items-center relative">
           <h1 className="text-xl font-bold text-white flex items-center gap-2">
-            <LayoutDashboard className="text-green-500" />
-            {displayLabel}
+            <LayoutDashboard className="text-company-blue" />
+            <span className="tracking-tight">{displayLabel}</span>
           </h1>
 
           <div className="flex items-center gap-2">
@@ -188,9 +256,9 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                 )}
               </button>
 
-              {/* Notification Dropdown/Modal */}
+              {/* Notification Dropdown */}
               {showNotifications && (
-                <div className="absolute top-0 left-full ml-4 w-80 bg-white rounded-lg shadow-xl z-50 text-gray-800 border overflow-hidden">
+                <div className="absolute top-0 left-full ml-4 w-80 bg-white rounded-lg shadow-xl z-50 text-gray-800 border overflow-hidden animate-in fade-in zoom-in-95 duration-100 origin-top-left">
                   <div className="p-3 border-b flex justify-between items-center bg-gray-50">
                     <h3 className="font-semibold text-sm">Notifications</h3>
                     {unreadCount > 0 && (
@@ -210,12 +278,12 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                           className="p-3 border-b hover:bg-gray-50 transition-colors"
                         >
                           <div className="flex justify-between items-start">
-                            <p className="text-sm text-gray-800 mb-1">
+                            <p className="text-sm text-gray-800 mb-1 line-clamp-2">
                               {notification.data.message}
                             </p>
                             <button
                               onClick={() => markAsRead(notification.id)}
-                              className="text-gray-400 hover:text-green-600"
+                              className="text-gray-400 hover:text-green-600 shrink-0 ml-2"
                             >
                               <Check size={14} />
                             </button>
@@ -246,52 +314,78 @@ const AdminSidebar = ({ isOpen, onClose }) => {
             </button>
           </div>
         </div>
-        <nav className="flex-1 p-4 space-y-6 overflow-y-auto">
-          {/* Portfolio Section */}
-          <div>
-            <h3 className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-              Portfolio
-            </h3>
-            <div className="space-y-1">
-              {portfolioItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => onClose && onClose()}
-                  className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors text-sm ${isActive(item.path)}`}
-                >
-                  {item.icon}
-                  <span className="font-medium">{item.label}</span>
-                </Link>
-              ))}
-            </div>
-          </div>
 
-          {/* System Section */}
-          <div>
-            <h3 className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-              System Modules
-            </h3>
-            <div className="space-y-1">
-              {systemItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => onClose && onClose()}
-                  className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors text-sm ${isActive(item.path)}`}
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto no-scrollbar">
+          {navigationGroups.map((group, index) => {
+            // Check if group has visible items
+            if (group.items.length === 0) return null;
+
+            if (!group.title) {
+              // Render Root Items (like Dashboard)
+              return (
+                <div key={index} className="mb-2">
+                  {group.items.map((item) => (
+                    <SidebarItem key={item.path} item={item} />
+                  ))}
+                </div>
+              );
+            }
+
+            return (
+              <div key={group.title} className="mb-1">
+                <button
+                  onClick={() => toggleGroup(group.title)}
+                  className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:text-gray-300 transition-colors"
                 >
-                  {item.icon}
-                  <span className="font-medium">{item.label}</span>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </nav>{" "}
-        <div className="p-4 border-t border-gray-800">
+                  <div className="flex items-center gap-2">
+                    {group.icon}
+                    <span>{group.title}</span>
+                  </div>
+                  {expandedGroups[group.title] ? (
+                    <ChevronDown size={14} />
+                  ) : (
+                    <ChevronRight size={14} />
+                  )}
+                </button>
+
+                {expandedGroups[group.title] && (
+                  <div className="mt-1 space-y-1 ml-1 pl-2 border-l border-gray-800 animate-in slide-in-from-left-2 duration-200">
+                    {group.items.map((item) => (
+                      <SidebarItem key={item.path} item={item} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </nav>
+
+        <div className="p-4 border-t border-gray-800 space-y-2">
+          <Link
+            to="/admin/settings"
+            onClick={() => onClose && onClose()}
+            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium ${isActive("/admin/settings")}`}
+          >
+            <Settings size={20} />
+            <span>Account Settings</span>
+          </Link>
           <button
             onClick={handleLogout}
-            className="w-full text-left px-4 py-2 text-red-400 hover:text-red-300 transition-colors text-sm font-medium"
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-red-400 hover:bg-gray-800/50 hover:text-red-300 rounded-lg transition-colors text-sm font-medium"
           >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+              ></path>
+            </svg>
             Logout
           </button>
         </div>
