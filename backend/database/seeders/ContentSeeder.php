@@ -131,28 +131,28 @@ class ContentSeeder extends Seeder
                 'name' => 'Caterpillar 320D',
                 'type' => 'Excavator',
                 'plate_number' => 'CAT-001',
-                'is_decommissioned' => false,
+                'status' => 'Stand By',
                 'image_url' => 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
             ],
             [
                 'name' => 'Komatsu D65',
                 'type' => 'Bulldozer',
                 'plate_number' => 'KOM-002',
-                'is_decommissioned' => false,
+                'status' => 'Active',
                 'image_url' => 'https://images.unsplash.com/photo-1579407364450-481fe19dbfaa?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
             ],
             [
                 'name' => 'Isuzu Giga',
                 'type' => 'Dump Truck',
                 'plate_number' => 'DT-003',
-                'is_decommissioned' => false,
+                'status' => 'Lease',
                 'image_url' => 'https://images.unsplash.com/photo-1591736287094-1e53b451785f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
             ],
             [
                 'name' => 'Hitachi Zaxis',
                 'type' => 'Excavator',
                 'plate_number' => 'HIT-004',
-                'is_decommissioned' => true,
+                'status' => 'Decommissioned',
                 'image_url' => 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
             ]
         ];

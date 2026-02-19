@@ -293,7 +293,7 @@ const StockManagement = ({ user }) => {
       {categories.map((category) => (
         <div
           key={category.id}
-          className="bg-white rounded-lg shadow overflow-hidden"
+          className="bg-white rounded-lg shadow overflow-hidden overflow-x-auto"
         >
           <div className="bg-gray-50 px-6 py-4 border-b">
             <h3 className="text-lg font-bold text-gray-800">{category.name}</h3>

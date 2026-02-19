@@ -72,6 +72,8 @@ const ProcurementManager = () => {
         return "bg-green-100 text-green-800";
       case "archived":
         return "bg-gray-200 text-gray-600";
+      case "rejected":
+        return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -143,7 +145,7 @@ const ProcurementManager = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
         <table className="w-full text-left">
           <thead className="bg-gray-50 border-b border-gray-100">
             <tr>

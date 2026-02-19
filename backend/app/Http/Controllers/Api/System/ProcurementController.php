@@ -45,7 +45,8 @@ class ProcurementController extends Controller
             } elseif ($request->tab === 'completed') {
                 $query->whereIn('status', [
                     ProcurementRequest::STATUS_COMPLETED,
-                    ProcurementRequest::STATUS_ARCHIVED
+                    ProcurementRequest::STATUS_ARCHIVED,
+                    ProcurementRequest::STATUS_REJECTED
                 ]);
             }
         }

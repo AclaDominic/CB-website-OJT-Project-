@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->string('name');
             $table->string('type'); // e.g., 'Excavator'
             $table->string('plate_number')->nullable();
-            $table->boolean('is_decommissioned')->default(false);
+            // is_decommissioned removed
             $table->string('image_url')->nullable();
             $table->timestamps();
         });

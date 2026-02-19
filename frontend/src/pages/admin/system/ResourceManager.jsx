@@ -252,9 +252,7 @@ const MachineryList = () => {
         name: item.name,
         type: item.type,
         plate_number: item.plate_number || "",
-        status:
-          item.status ||
-          (item.is_decommissioned ? "Decommissioned" : "Stand By"),
+        status: item.status || "Stand By",
         project_id: item.project_id || "",
       });
       // Set initial image state
@@ -310,7 +308,7 @@ const MachineryList = () => {
         {items.map((item) => (
           <div
             key={item.id}
-            className={`bg-white p-4 rounded-lg shadow border-l-4 ${item.is_decommissioned ? "border-red-500" : "border-green-500"}`}
+            className={`bg-white p-4 rounded-lg shadow border-l-4 ${item.status === "Decommissioned" ? "border-red-500" : "border-green-500"}`}
           >
             {item.image_url && (
               <img
@@ -334,8 +332,7 @@ const MachineryList = () => {
                       : "bg-amber-100 text-amber-800"
                 }`}
               >
-                {item.status ||
-                  (item.is_decommissioned ? "Decommissioned" : "Stand By")}
+                {item.status}
               </span>
             </div>
             <p className="text-gray-600 text-sm">Type: {item.type}</p>

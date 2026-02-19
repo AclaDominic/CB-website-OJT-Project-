@@ -70,7 +70,7 @@ const Organization = () => {
                   {leadership.map((member) => (
                     <div
                       key={member.id}
-                      className="bg-company-blue text-white p-6 rounded-lg shadow-lg text-center w-72 transform hover:scale-105 transition-transform"
+                      className="bg-company-blue text-white p-6 rounded-lg shadow-lg text-center w-full max-w-xs md:w-72 transform hover:scale-105 transition-transform"
                     >
                       <div className="w-24 h-24 mx-auto bg-white rounded-full mb-4 flex items-center justify-center overflow-hidden border-4 border-blue-400">
                         {member.image_path ? (
@@ -95,8 +95,8 @@ const Organization = () => {
               {/* Connector Line (Only if both leadership and management exist) */}
               {leadership.length > 0 && management.length > 0 && (
                 <>
-                  <div className="w-1 h-8 bg-gray-300 mx-auto -mt-12 mb-12"></div>
-                  <div className="w-full h-1 bg-gray-300 mb-8 max-w-4xl mx-auto"></div>
+                  <div className="hidden md:block w-1 h-8 bg-gray-300 mx-auto -mt-12 mb-12"></div>
+                  <div className="hidden md:block w-full h-1 bg-gray-300 mb-8 max-w-4xl mx-auto"></div>
                 </>
               )}
 
@@ -106,10 +106,10 @@ const Organization = () => {
                   {management.map((member) => (
                     <div
                       key={member.id}
-                      className="flex flex-col items-center w-64"
+                      className="flex flex-col items-center w-full max-w-xs md:w-64"
                     >
                       {leadership.length > 0 && (
-                        <div className="w-1 h-8 bg-gray-300 mb-0"></div>
+                        <div className="hidden md:block w-1 h-8 bg-gray-300 mb-0"></div>
                       )}
                       <div className="bg-white border-2 border-gray-100 p-4 rounded-lg shadow-sm w-full hover:shadow-md transition-shadow">
                         <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full mb-3 flex items-center justify-center overflow-hidden">
@@ -139,13 +139,13 @@ const Organization = () => {
               {staff.length > 0 && (
                 <>
                   {management.length > 0 && (
-                    <div className="w-1 h-8 bg-gray-300 mx-auto -mt-4 mb-4"></div>
+                    <div className="hidden md:block w-1 h-8 bg-gray-300 mx-auto -mt-4 mb-4"></div>
                   )}
                   <div className="flex flex-wrap justify-center gap-8 mt-4">
                     {staff.map((member) => (
                       <div
                         key={member.id}
-                        className="flex flex-col items-center w-64"
+                        className="flex flex-col items-center w-full max-w-xs md:w-64"
                       >
                         <div className="bg-white border-2 border-gray-100 p-4 rounded-lg shadow-sm w-full hover:shadow-md transition-shadow">
                           <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full mb-3 flex items-center justify-center overflow-hidden">
