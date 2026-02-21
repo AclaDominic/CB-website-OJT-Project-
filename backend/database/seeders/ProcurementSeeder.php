@@ -90,14 +90,15 @@ class ProcurementSeeder extends Seeder
             'unit' => 'reams',
         ]);
 
-        // 4. Rejected Request
+        // 4. Archived Request
         $req4 = ProcurementRequest::create([
             'project_id' => $projects->last()->id,
             'user_id' => $admin->id,
-            'status' => 'rejected',
+            'status' => 'archived',
             'remarks' => 'Requesting new laptop for site engineer.',
-            'supplier_notes' => 'Budget constraints. Use existing equipment.',
-            'created_at' => Carbon::now()->subDays(1),
+            'supplier_notes' => 'Delivered and verified. Request closed.',
+            'expected_arrival_date' => Carbon::now()->subDays(5),
+            'created_at' => Carbon::now()->subDays(15),
         ]);
 
         ProcurementItem::create([
