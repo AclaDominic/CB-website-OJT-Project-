@@ -5,7 +5,9 @@ const ImagePicker = ({
   defaultImage,
   onImageChanged,
   label = "Image Source",
+  name, // New unique identifier prop
 }) => {
+  const checkboxName = name || `imageType-${label}`;
   const [mode, setMode] = useState("url"); // 'url' | 'file'
   const [urlValue, setUrlValue] = useState("");
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -16,17 +18,23 @@ const ImagePicker = ({
 
   useEffect(() => {
     if (defaultImage) {
-      if (defaultImage.startsWith("http")) {
+      if (typeof defaultImage === "string" && defaultImage.startsWith("http")) {
         setMode("url");
         setUrlValue(defaultImage);
-      } else {
-        setMode("file"); // It's a stored file path, but we treat it as "file mode" initial state
+      } else if (typeof defaultImage === "string") {
+        setMode("file"); // It's a stored file path
         setPreviewUrl(
           `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/storage/${defaultImage}`,
         );
       }
+      // If defaultImage is a File/Blob (not string), we ignore it here
+      // because the picker itself handles the file selection state immediately.
     } else {
-      setMode("url");
+      // Only reset mode to URL if explicitly empty string (e.g. cleared field)
+      // If null/undefined (e.g. mode switch to file), keep current mode.
+      if (defaultImage === "") {
+        setMode("url");
+      }
       setUrlValue("");
       setPreviewUrl(null);
     }
@@ -86,12 +94,14 @@ const ImagePicker = ({
         />
       )}
 
-      <label className="block text-sm font-medium mb-2">{label}</label>
+      {label && (
+        <label className="block text-sm font-medium mb-2">{label}</label>
+      )}
       <div className="flex gap-4 mb-2">
         <label className="flex items-center gap-2 cursor-pointer">
           <input
             type="radio"
-            name={`imageType-${label}`} // Unique name if multiple pickers exist
+            name={checkboxName}
             checked={mode === "url"}
             onChange={() => handleTypeChange("url")}
             className="text-blue-600"
@@ -101,7 +111,7 @@ const ImagePicker = ({
         <label className="flex items-center gap-2 cursor-pointer">
           <input
             type="radio"
-            name={`imageType-${label}`}
+            name={checkboxName}
             checked={mode === "file"}
             onChange={() => handleTypeChange("file")}
             className="text-blue-600"

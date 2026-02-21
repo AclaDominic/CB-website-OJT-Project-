@@ -12,22 +12,34 @@ Route::middleware(['auth:sanctum'])->group(function () {
         return $user;
     });
 
+    Route::put('/user/password', [\App\Http\Controllers\Api\System\ProfileController::class, 'updatePassword']);
+
     Route::apiResource('services', \App\Http\Controllers\Api\Cms\ServiceController::class)->except(['index', 'show']);
     Route::apiResource('projects', \App\Http\Controllers\Api\Cms\ProjectController::class)->except(['index', 'show']);
     Route::apiResource('inquiries', \App\Http\Controllers\Api\Cms\InquiryController::class);
     Route::put('/inquiries/{inquiry}/archive', [\App\Http\Controllers\Api\Cms\InquiryController::class, 'archive']);
 
     Route::apiResource('machineries', \App\Http\Controllers\Api\System\MachineryController::class)->except(['index', 'show']);
+    Route::post('/machineries/{id}/assign-project', [\App\Http\Controllers\Api\System\MachineryController::class, 'assignProject']);
+    Route::post('/machineries/{id}/release-project', [\App\Http\Controllers\Api\System\MachineryController::class, 'releaseProject']);
     Route::apiResource('development-sites', \App\Http\Controllers\Api\System\DevelopmentSiteController::class)->except(['index', 'show']);
+    Route::apiResource('organization-members', \App\Http\Controllers\Api\OrganizationMemberController::class)->except(['index', 'show']);
     Route::apiResource('organization-members', \App\Http\Controllers\Api\OrganizationMemberController::class)->except(['index', 'show']);
     Route::post('/organization-members/reorder', [\App\Http\Controllers\Api\OrganizationMemberController::class, 'reorder']);
 
-    // Admin System (RBAC)
-    Route::prefix('admin')->middleware(['role:Admin'])->group(function () {
-        Route::apiResource('roles', \App\Http\Controllers\Api\Admin\RoleController::class);
-        Route::get('permissions', [\App\Http\Controllers\Api\Admin\PermissionController::class, 'index']);
+    // Procurement
+    Route::apiResource('procurement', \App\Http\Controllers\Api\System\ProcurementController::class);
+    Route::post('procurement/{id}/status', [\App\Http\Controllers\Api\System\ProcurementController::class, 'changeStatus']);
 
-        Route::apiResource('users', \App\Http\Controllers\Api\Admin\UserController::class)->only(['index', 'store', 'update']);
+    // Admin System (RBAC)
+    Route::prefix('admin')->middleware(['role:Admin|Project Manager|Site Engineer|Staff'])->group(function () {
+        Route::get('dashboard-stats', [\App\Http\Controllers\Api\Admin\DashboardController::class, 'index']);
+
+        Route::middleware(['role:Admin'])->group(function () {
+            Route::apiResource('roles', \App\Http\Controllers\Api\Admin\RoleController::class);
+            Route::get('permissions', [\App\Http\Controllers\Api\Admin\PermissionController::class, 'index']);
+            Route::apiResource('users', \App\Http\Controllers\Api\Admin\UserController::class)->only(['index', 'store', 'update']);
+        });
     });
 
     // Inventory Management

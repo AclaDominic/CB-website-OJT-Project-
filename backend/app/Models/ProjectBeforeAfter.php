@@ -4,16 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Machinery extends Model
+class ProjectBeforeAfter extends Model
 {
-    protected $fillable = ['name', 'type', 'plate_number', 'image_url', 'project_id', 'status'];
-
-
+    protected $fillable = [
+        'project_id',
+        'before_image',
+        'after_image',
+    ];
 
     public function project()
     {
         return $this->belongsTo(Project::class);
     }
-
-    //
 }

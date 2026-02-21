@@ -7,6 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Project extends Model
 {
+    protected $guarded = [];
+
+    public function machineries()
+    {
+        return $this->hasMany(Machinery::class);
+    }
+    public function beforeAfters()
+    {
+        return $this->hasMany(ProjectBeforeAfter::class);
+    }
     use HasFactory;
 
     protected $fillable = [
@@ -15,6 +25,7 @@ class Project extends Model
         'year',
         'scope',
         'status',
+        'is_public',
         'image',
     ];
 }

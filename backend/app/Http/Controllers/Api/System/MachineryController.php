@@ -102,38 +102,92 @@ class MachineryController extends Controller
             'name' => 'string',
             'type' => 'string',
             'plate_number' => 'nullable|string',
-            'is_decommissioned' => 'boolean', // Handle "true"/"false" strings from FormData
+            'is_decommissioned' => 'boolean',
             'image_url' => 'nullable|string',
             'image_file' => 'nullable|image|max:5120',
+            'project_id' => 'nullable|exists:projects,id',
+            'status' => 'nullable|string',
         ]);
 
-        // Handle boolean conversion for FormData
         if (isset($validated['is_decommissioned'])) {
-            $validated['is_decommissioned'] = filter_var($validated['is_decommissioned'], FILTER_VALIDATE_BOOLEAN);
+            // Backward compatibility or direct setting
+            if (filter_var($validated['is_decommissioned'], FILTER_VALIDATE_BOOLEAN)) {
+                $validated['status'] = 'Decommissioned';
+            }
+            unset($validated['is_decommissioned']);
         }
 
         if ($request->hasFile('image_file')) {
-            // Delete old image if it exists and is a local file
             if ($machinery->image_url && !filter_var($machinery->image_url, FILTER_VALIDATE_URL)) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($machinery->image_url);
             }
-
             $path = $request->file('image_file')->store('machinery', 'public');
             $validated['image_url'] = $path;
         }
 
         unset($validated['image_file']);
 
+        // Business Logic: If Status is Active, Project ID is required.
+        // If Project ID is provided, Status becomes Active (or In Use).
+        // Let's allow manual status setting, but enforce constraints.
+
+        if (isset($validated['status']) && $validated['status'] === 'Active') {
+            if (empty($validated['project_id']) && empty($machinery->project_id)) {
+                return response()->json(['message' => 'Active status requires a selected Project.'], 422);
+            }
+        }
+
+        // If Project ID is being set
+        if (array_key_exists('project_id', $validated)) {
+            if ($validated['project_id']) {
+                // Suggest Active/In Use if not explicitly set to something else?
+                // Let's trust the frontend or default to Active.
+                if (!isset($validated['status'])) {
+                    $validated['status'] = 'Active';
+                }
+            } else {
+                // Project removed
+                if (!isset($validated['status']) || $validated['status'] === 'Active') {
+                    $validated['status'] = 'Stand By';
+                }
+            }
+        }
+
         $machinery->update($validated);
         return response()->json($machinery);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         Machinery::destroy($id);
         return response()->json(['message' => 'Deleted successfully']);
+    }
+
+    public function assignProject(Request $request, string $id)
+    {
+        $machinery = Machinery::findOrFail($id);
+
+        $validated = $request->validate([
+            'project_id' => 'required|exists:projects,id'
+        ]);
+
+        $machinery->update([
+            'project_id' => $validated['project_id'],
+            'status' => 'Active'
+        ]);
+
+        return response()->json($machinery);
+    }
+
+    public function releaseProject(string $id)
+    {
+        $machinery = Machinery::findOrFail($id);
+
+        $machinery->update([
+            'project_id' => null,
+            'status' => 'Stand By'
+        ]);
+
+        return response()->json($machinery);
     }
 }

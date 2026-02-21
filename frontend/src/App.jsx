@@ -17,17 +17,23 @@ import UserManager from "./pages/admin/system/UserManager";
 import RoleManager from "./pages/admin/system/RoleManager";
 import ResourceManager from "./pages/admin/system/ResourceManager";
 import InventoryManager from "./pages/admin/system/InventoryManager";
+
 import ProcurementManager from "./pages/admin/system/ProcurementManager";
+import AccountSettings from "./pages/admin/system/AccountSettings";
+import Dashboard from "./pages/admin/Dashboard";
 
 import { LoadingProvider } from "./context/LoadingContext";
 import LoadingOverlay from "./components/LoadingOverlay";
 import ScrollToTop from "./components/ScrollToTop";
+
+import DynamicTitle from "./components/DynamicTitle";
 
 function App() {
   return (
     <LoadingProvider>
       <LoadingOverlay />
       <AuthProvider>
+        <DynamicTitle />
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<Layout />}>
@@ -43,7 +49,7 @@ function App() {
 
           <Route path="/admin" element={<ProtectedRoute />}>
             <Route element={<AdminLayout />}>
-              <Route index element={<ResourceManager />} />
+              <Route index element={<Dashboard />} />
               <Route path="about" element={<AboutEditor />} />
               <Route path="contact" element={<ContactEditor />} />
               <Route path="services" element={<ServiceManager />} />
@@ -54,6 +60,7 @@ function App() {
               <Route path="procurement" element={<ProcurementManager />} />
               <Route path="roles" element={<RoleManager />} />
               <Route path="users" element={<UserManager />} />
+              <Route path="settings" element={<AccountSettings />} />
             </Route>
           </Route>
         </Routes>
