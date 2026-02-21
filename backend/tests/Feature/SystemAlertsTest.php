@@ -129,4 +129,163 @@ class SystemAlertsTest extends TestCase
             'resolved_by' => $admin->id,
         ]);
     }
+
+    public function test_unauthenticated_user_cannot_resolve_alerts()
+    {
+        $alert = SystemAlert::create(['type' => 'minor', 'message' => 'unresolved alert', 'resolved' => false]);
+
+        $response = $this->postJson("/api/admin/system-alerts/{$alert->id}/resolve");
+
+        $response->assertStatus(401);
+
+        // Ensure it is still unresolved
+        $this->assertDatabaseHas('system_alerts', [
+            'id' => $alert->id,
+            'resolved' => false,
+        ]);
+    }
+
+    public function test_staff_cannot_resolve_alerts()
+    {
+        $staff = User::factory()->create();
+        $staff->assignRole('Staff');
+
+        $alert = SystemAlert::create(['type' => 'critical', 'message' => 'critical alert', 'resolved' => false]);
+
+        $response = $this->actingAs($staff)->postJson("/api/admin/system-alerts/{$alert->id}/resolve");
+
+        // Should be forbidden
+        $response->assertStatus(403);
+
+        $this->assertDatabaseHas('system_alerts', [
+            'id' => $alert->id,
+            'resolved' => false,
+        ]);
+    }
+
+    public function test_system_status_is_minor_problem_when_only_minor_alerts_exist()
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole('Admin');
+
+        SystemAlert::create(['type' => 'minor', 'message' => 'a minor issue']);
+
+        $response = $this->actingAs($admin)->getJson('/api/admin/dashboard-stats');
+
+        $response->assertStatus(200)
+            ->assertJson(['system_status' => 'Minor Problem']);
+    }
+
+    public function test_critical_status_takes_priority_over_minor()
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole('Admin');
+
+        SystemAlert::create(['type' => 'minor', 'message' => 'minor issue']);
+        SystemAlert::create(['type' => 'critical', 'message' => 'critical issue']);
+
+        $response = $this->actingAs($admin)->getJson('/api/admin/dashboard-stats');
+
+        $response->assertStatus(200)
+            ->assertJson(['system_status' => 'Critical Problem']);
+    }
+
+    public function test_system_status_is_operational_when_all_alerts_resolved()
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole('Admin');
+
+        SystemAlert::create(['type' => 'critical', 'message' => 'old issue', 'resolved' => true, 'resolved_by' => $admin->id, 'resolved_at' => now()]);
+
+        $response = $this->actingAs($admin)->getJson('/api/admin/dashboard-stats');
+
+        $response->assertStatus(200)
+            ->assertJson(['system_status' => 'System Operational'])
+            ->assertJsonCount(0, 'system_alerts');
+    }
+
+    public function test_resolved_alerts_do_not_appear_in_dashboard_list()
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole('Admin');
+
+        // One resolved, one active
+        SystemAlert::create(['type' => 'critical', 'message' => 'resolved issue', 'resolved' => true, 'resolved_by' => $admin->id, 'resolved_at' => now()]);
+        SystemAlert::create(['type' => 'minor', 'message' => 'active issue', 'resolved' => false]);
+
+        $response = $this->actingAs($admin)->getJson('/api/admin/dashboard-stats');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(1, 'system_alerts')
+            ->assertJson(['system_alerts' => [['message' => 'active issue']]]);
+    }
+
+    public function test_resolving_non_existent_alert_returns_404()
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole('Admin');
+
+        $response = $this->actingAs($admin)->postJson('/api/admin/system-alerts/99999/resolve');
+
+        $response->assertStatus(404);
+    }
+
+    public function test_resolving_already_resolved_alert_is_idempotent()
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole('Admin');
+
+        $alert = SystemAlert::create([
+            'type' => 'minor',
+            'message' => 'already resolved',
+            'resolved' => true,
+            'resolved_by' => $admin->id,
+            'resolved_at' => now(),
+        ]);
+
+        // Calling resolve again should not crash
+        $response = $this->actingAs($admin)->postJson("/api/admin/system-alerts/{$alert->id}/resolve");
+
+        $response->assertStatus(200);
+
+        // The alert should still be resolved and with the same data
+        $this->assertDatabaseHas('system_alerts', [
+            'id' => $alert->id,
+            'resolved' => true,
+        ]);
+    }
+
+    public function test_critical_alert_context_captures_user_and_url()
+    {
+        $admin = User::factory()->create();
+        $admin->assignRole('Admin');
+
+        \Illuminate\Support\Facades\Route::get('/api/admin/context-test', function () {
+            throw new \Exception('Context Test Error');
+        })->middleware(['auth:sanctum', 'role:Admin']);
+
+        $this->actingAs($admin)->getJson('/api/admin/context-test');
+
+        $alert = SystemAlert::where('type', 'critical')->first();
+
+        $this->assertNotNull($alert);
+        $this->assertArrayHasKey('user_id', $alert->context);
+        $this->assertArrayHasKey('url', $alert->context);
+        $this->assertArrayHasKey('file', $alert->context);
+        $this->assertArrayHasKey('line', $alert->context);
+        $this->assertArrayHasKey('method', $alert->context);
+        $this->assertEquals($admin->id, $alert->context['user_id']);
+        $this->assertStringContainsString('context-test', $alert->context['url']);
+    }
+
+    public function test_simulate_alerts_command_creates_exactly_one_minor_and_one_critical()
+    {
+        \Illuminate\Support\Facades\Artisan::call('simulate:alerts');
+
+        $this->assertDatabaseHas('system_alerts', ['type' => 'minor', 'resolved' => false]);
+        $this->assertDatabaseHas('system_alerts', ['type' => 'critical', 'resolved' => false]);
+
+        $totalCreated = SystemAlert::count();
+        $this->assertEquals(2, $totalCreated);
+    }
 }
