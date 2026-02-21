@@ -3,6 +3,7 @@ import axiosClient from "../../../lib/axios";
 import { Plus, Trash2, Edit2, X, Truck, MapPin, Loader2 } from "lucide-react";
 import ImagePicker from "../../../components/ImagePicker";
 import { useAuth } from "../../../context/AuthContext";
+import PageLoader from "../../../components/PageLoader";
 
 const ResourceManager = () => {
   const [activeTab, setActiveTab] = useState("machinery"); // 'machinery' or 'sites'
@@ -252,9 +253,7 @@ const MachineryList = () => {
         name: item.name,
         type: item.type,
         plate_number: item.plate_number || "",
-        status:
-          item.status ||
-          (item.is_decommissioned ? "Decommissioned" : "Stand By"),
+        status: item.status || "Stand By",
         project_id: item.project_id || "",
       });
       // Set initial image state
@@ -287,11 +286,7 @@ const MachineryList = () => {
   };
 
   if (loading && items.length === 0) {
-    return (
-      <div className="flex justify-center items-center py-20">
-        <Loader2 className="animate-spin text-blue-600" size={40} />
-      </div>
-    );
+    return <PageLoader />;
   }
 
   return (
@@ -310,7 +305,7 @@ const MachineryList = () => {
         {items.map((item) => (
           <div
             key={item.id}
-            className={`bg-white p-4 rounded-lg shadow border-l-4 ${item.is_decommissioned ? "border-red-500" : "border-green-500"}`}
+            className={`bg-white p-4 rounded-lg shadow border-l-4 ${item.status === "Decommissioned" ? "border-red-500" : "border-green-500"}`}
           >
             {item.image_url && (
               <img
@@ -334,8 +329,7 @@ const MachineryList = () => {
                       : "bg-amber-100 text-amber-800"
                 }`}
               >
-                {item.status ||
-                  (item.is_decommissioned ? "Decommissioned" : "Stand By")}
+                {item.status}
               </span>
             </div>
             <p className="text-gray-600 text-sm">Type: {item.type}</p>
@@ -627,11 +621,7 @@ const SiteList = () => {
   };
 
   if (loading && items.length === 0) {
-    return (
-      <div className="flex justify-center items-center py-20">
-        <Loader2 className="animate-spin text-blue-600" size={40} />
-      </div>
-    );
+    return <PageLoader />;
   }
 
   return (

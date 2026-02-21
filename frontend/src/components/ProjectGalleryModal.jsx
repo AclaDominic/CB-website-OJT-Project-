@@ -27,12 +27,14 @@ const ProjectGalleryModal = ({ project, isOpen, onClose }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
       <div className="bg-white w-full max-w-6xl max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col relative animate-in fade-in zoom-in duration-200">
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-100">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">{project.name}</h2>
-            <p className="text-gray-500 text-sm flex items-center gap-2 mt-1">
+        <div className="flex justify-between items-start p-4 md:p-6 border-b border-gray-100">
+          <div className="pr-8">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">
+              {project.name}
+            </h2>
+            <p className="text-gray-500 text-sm flex flex-wrap items-center gap-2 mt-1">
               <span className="font-medium">{project.location}</span>
-              <span>•</span>
+              <span className="hidden md:inline">•</span>
               <span className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full font-bold uppercase">
                 {project.year}
               </span>
@@ -40,14 +42,14 @@ const ProjectGalleryModal = ({ project, isOpen, onClose }) => {
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors shrink-0"
           >
             <X size={24} className="text-gray-500" />
           </button>
         </div>
 
         {/* Content - Scrollable */}
-        <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50">
           {/* Scope of Work */}
           <div className="mb-8 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
             <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">

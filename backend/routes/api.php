@@ -27,9 +27,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('organization-members', \App\Http\Controllers\Api\OrganizationMemberController::class)->except(['index', 'show']);
     Route::post('/organization-members/reorder', [\App\Http\Controllers\Api\OrganizationMemberController::class, 'reorder']);
 
-    // Procurement
     Route::apiResource('procurement', \App\Http\Controllers\Api\System\ProcurementController::class);
     Route::post('procurement/{id}/status', [\App\Http\Controllers\Api\System\ProcurementController::class, 'changeStatus']);
+
+    // Page Contents (CMS)
+    Route::post('/page-contents', [\App\Http\Controllers\Api\Cms\PageContentController::class, 'store']);
 
     // Admin System (RBAC)
     Route::prefix('admin')->middleware(['role:Admin|Project Manager|Site Engineer|Staff'])->group(function () {
@@ -39,6 +41,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::apiResource('roles', \App\Http\Controllers\Api\Admin\RoleController::class);
             Route::get('permissions', [\App\Http\Controllers\Api\Admin\PermissionController::class, 'index']);
             Route::apiResource('users', \App\Http\Controllers\Api\Admin\UserController::class)->only(['index', 'store', 'update']);
+            Route::post('system-alerts/{id}/resolve', [\App\Http\Controllers\Api\Admin\SystemAlertController::class, 'resolve']);
         });
     });
 

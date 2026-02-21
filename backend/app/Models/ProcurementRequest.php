@@ -15,6 +15,7 @@ class ProcurementRequest extends Model
     const STATUS_PROCESSING = 'processing';
     const STATUS_COMPLETED = 'completed';
     const STATUS_ARCHIVED = 'archived';
+    const STATUS_REJECTED = 'rejected';
 
     protected $fillable = [
         'project_id',

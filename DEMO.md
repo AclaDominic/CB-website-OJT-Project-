@@ -51,6 +51,45 @@ php artisan test --filter InventoryTest
 - **Stock Adjustments**: Adding and Removing stock updates the quantity.
 - **Logic Constraints**: Preventing negative stock (400 Bad Request).
 
+## 4. System Alerts Demo
+
+**Automated Tests:**
+
+This test suite verifies that the application properly intercepts errors and creates the appropriate log entries without crashing exactly as intended.
+
+```bash
+php artisan test --filter SystemAlertsTest
+```
+
+**What this tests:**
+
+- **Public Contact Form Failure**: Simulates a database failure during an inquiry, asserting it logs a "minor" alert while safely returning a generic 500 error to the user.
+- **Private Route Error**: Simulates a fatal exception on an authenticated admin route, asserting it logs a "critical" alert with the exact URL and User ID.
+- **Dashboard API**: Verifies the admin dashboard endpoint correctly fetches active alerts and sets the status to "Minor Problem" or "Critical Problem".
+- **Resolution Endpoint**: Verifies an admin can successfully mark an alert as resolved.
+
+---
+
+**Manual Generation Command:**
+
+This command demonstrates the self-reporting system by generating minor and critical system alerts that appear in the admin dashboard.
+
+```bash
+php artisan simulate:alerts
+```
+
+Or to generate multiple alerts of each type:
+
+```bash
+php artisan simulate:alerts --count=3
+```
+
+**What this demonstrates:**
+
+- **Critical Problems**: Simulates unhandled server errors (500s) on private pages.
+- **Minor Problems**: Simulates non-critical errors like failed contact form submissions.
+- **Dashboard UI**: Notice the "System Operational" badge on the Admin Dashboard turn Red or Yellow, displaying the number of active alerts. Click the badge to view and resolve the stacked alerts.
+
 ---
 
 ## Manual Demo Script

@@ -17,8 +17,8 @@ class InventorySeeder extends Seeder
                 'name' => 'Office Supplies',
                 'description' => 'Pens, paper, staplers, etc.',
                 'items' => [
-                    ['name' => 'Ballpoint Pen (Black)', 'quantity' => 50, 'threshold' => 10, 'unit' => 'pcs'],
-                    ['name' => 'A4 Bond Paper', 'quantity' => 20, 'threshold' => 5, 'unit' => 'reams'],
+                    ['name' => 'Ballpoint Pen (Black)', 'quantity' => 5, 'threshold' => 10, 'unit' => 'pcs'],
+                    ['name' => 'A4 Bond Paper', 'quantity' => 2, 'threshold' => 5, 'unit' => 'reams'],
                     ['name' => 'Stapler Wire #35', 'quantity' => 5, 'threshold' => 2, 'unit' => 'box'],
                 ]
             ],
@@ -36,6 +36,36 @@ class InventorySeeder extends Seeder
                 'items' => [
                     ['name' => 'Cement (40kg)', 'quantity' => 100, 'threshold' => 20, 'unit' => 'bags'],
                     ['name' => 'Plywood 1/4"', 'quantity' => 15, 'threshold' => 10, 'unit' => 'sheets'],
+                    ['name' => 'Deformed Bar 10mm', 'quantity' => 500, 'threshold' => 100, 'unit' => 'pcs'],
+                    ['name' => 'Tie Wire #16', 'quantity' => 5, 'threshold' => 2, 'unit' => 'roll'],
+                ]
+            ],
+            [
+                'name' => 'Safety Gear',
+                'description' => 'PPE and safety equipment',
+                'items' => [
+                    ['name' => 'Safety Helmet (Standard)', 'quantity' => 25, 'threshold' => 5, 'unit' => 'pcs'],
+                    ['name' => 'Safety Vest (Reflective)', 'quantity' => 30, 'threshold' => 5, 'unit' => 'pcs'],
+                    ['name' => 'Safety Shoes (Size 9)', 'quantity' => 2, 'threshold' => 5, 'unit' => 'pairs'], // Low stock
+                    ['name' => 'First Aid Kit (Industrial)', 'quantity' => 3, 'threshold' => 2, 'unit' => 'kit'],
+                ]
+            ],
+            [
+                'name' => 'Tools & Equipment',
+                'description' => 'Hand tools and power tools',
+                'items' => [
+                    ['name' => 'Angle Grinder 4"', 'quantity' => 4, 'threshold' => 2, 'unit' => 'unit'],
+                    ['name' => 'Power Drill (Cordless)', 'quantity' => 3, 'threshold' => 2, 'unit' => 'unit'],
+                    ['name' => 'Shovel (Pointed)', 'quantity' => 12, 'threshold' => 5, 'unit' => 'pcs'],
+                ]
+            ],
+            [
+                'name' => 'Machinery Parts',
+                'description' => 'Spare parts and maintenance items',
+                'items' => [
+                    ['name' => 'Hydraulic Oil (Bucket)', 'quantity' => 10, 'threshold' => 3, 'unit' => 'pail'],
+                    ['name' => 'Fuel Filter (CAT)', 'quantity' => 4, 'threshold' => 2, 'unit' => 'pcs'],
+                    ['name' => 'Grease (Lithium)', 'quantity' => 15, 'threshold' => 5, 'unit' => 'tubes'],
                 ]
             ]
         ];

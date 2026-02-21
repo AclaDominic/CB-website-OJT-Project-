@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import axiosClient from "../../../lib/axios";
 import { User, Users, Edit2, Check, X, Loader2, Plus } from "lucide-react";
 import toast from "react-hot-toast";
-
 import { useAuth } from "../../../context/AuthContext";
 import { Navigate } from "react-router-dom";
+import PageLoader from "../../../components/PageLoader";
 
 const UserManager = () => {
   const { user, loading: authLoading } = useAuth();
@@ -26,11 +26,7 @@ const UserManager = () => {
   const [errors, setErrors] = useState({});
 
   if (authLoading) {
-    return (
-      <div className="flex justify-center items-center h-96">
-        <Loader2 className="animate-spin text-blue-600" size={40} />
-      </div>
-    );
+    return <PageLoader />;
   }
 
   if (!user?.all_permissions?.includes("system.manage_users")) {
@@ -136,11 +132,7 @@ const UserManager = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-96">
-        <Loader2 className="animate-spin text-blue-600" size={40} />
-      </div>
-    );
+    return <PageLoader />;
   }
 
   return (
@@ -163,7 +155,7 @@ const UserManager = () => {
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white rounded-lg shadow overflow-hidden overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>

@@ -54,7 +54,19 @@ class InquiryController extends Controller
             'subject' => 'nullable|string',
         ]);
 
-        return Inquiry::create($validated);
+        try {
+            return Inquiry::create($validated);
+        } catch (\Exception $e) {
+            \App\Models\SystemAlert::create([
+                'type' => 'minor',
+                'message' => 'Failed to process contact inquiry',
+                'context' => [
+                    'error' => $e->getMessage(),
+                    'data' => $validated
+                ]
+            ]);
+            return response()->json(['message' => 'An error occurred while processing your request. Please try again later.'], 500);
+        }
     }
 
     public function show(Inquiry $inquiry)

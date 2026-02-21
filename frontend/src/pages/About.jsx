@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import api from "../lib/axios";
 import Organization from "./Organization";
+import PageLoader from "../components/PageLoader";
 
 const About = () => {
   const [content, setContent] = useState({
@@ -34,14 +35,14 @@ const About = () => {
     fetchContent();
   }, []);
 
-  if (loading) return <div className="text-center py-20">Loading...</div>;
+  if (loading) return <PageLoader />;
 
   return (
     <div className="font-sans">
       {/* Hero */}
       <div className="bg-company-dark py-20 text-center text-white">
         <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">
             About Cliberduche Corporation
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
@@ -55,8 +56,8 @@ const About = () => {
       <div className="max-w-7xl mx-auto px-4 py-16">
         {/* Mission & Vision */}
         <div className="grid md:grid-cols-2 gap-12 mb-20">
-          <div className="bg-blue-50 p-8 rounded-xl shadow-sm border border-blue-100">
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-6 text-blue-600">
+          <div className="bg-company-light p-8 rounded-xl shadow-sm border border-company-blue/20">
+            <div className="w-12 h-12 bg-company-blue/10 rounded-full flex items-center justify-center mb-6 text-company-blue">
               <svg
                 className="w-6 h-6"
                 fill="none"
@@ -78,8 +79,8 @@ const About = () => {
               {content.mission || "Loading mission..."}
             </p>
           </div>
-          <div className="bg-green-50 p-8 rounded-xl shadow-sm border border-green-100">
-            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-6 text-green-600">
+          <div className="bg-company-green/10 p-8 rounded-xl shadow-sm border border-company-green/20">
+            <div className="w-12 h-12 bg-company-green/20 rounded-full flex items-center justify-center mb-6 text-company-green">
               <svg
                 className="w-6 h-6"
                 fill="none"
@@ -116,7 +117,7 @@ const About = () => {
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center p-6 bg-white shadow-sm rounded-lg hover:shadow-md transition-shadow">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 text-blue-600 mb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-company-light text-company-blue mb-6">
                 <svg
                   className="w-8 h-8"
                   fill="none"
@@ -137,7 +138,7 @@ const About = () => {
               </p>
             </div>
             <div className="text-center p-6 bg-white shadow-sm rounded-lg hover:shadow-md transition-shadow">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-600 mb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-company-green/20 text-company-green mb-6">
                 <svg
                   className="w-8 h-8"
                   fill="none"
@@ -159,7 +160,7 @@ const About = () => {
               </p>
             </div>
             <div className="text-center p-6 bg-white shadow-sm rounded-lg hover:shadow-md transition-shadow">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 text-blue-600 mb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-company-light text-company-blue mb-6">
                 <svg
                   className="w-8 h-8"
                   fill="none"

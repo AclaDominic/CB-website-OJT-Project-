@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axiosClient from "../../lib/axios";
+import PageLoader from "../../components/PageLoader";
 import {
   Activity,
   AlertTriangle,
@@ -22,6 +23,9 @@ import {
 } from "../../components/dashboard/DashboardWidgets";
 import { motion } from "framer-motion";
 import ProcurementDetailModal from "../../components/procurement/ProcurementDetailModal";
+import SystemAlertsModal from "../../components/dashboard/SystemAlertsModal";
+
+import echo from "../../lib/echo";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -32,6 +36,8 @@ const Dashboard = () => {
     recent_procurement: [],
     machinery_stats: { available: 0, in_use: 0, maintenance: 0, total: 0 },
     project_stats: { ongoing: 0, completed: 0 },
+    system_status: "System Operational",
+    system_alerts: [],
     permissions: {},
   });
   const [loading, setLoading] = useState(true);
@@ -39,6 +45,7 @@ const Dashboard = () => {
   // Modal State
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isAlertsModalOpen, setIsAlertsModalOpen] = useState(false);
 
   const handleViewDetail = (request) => {
     setSelectedRequest(request);
@@ -54,6 +61,17 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchStats();
+
+    // Listen for real-time dashboard updates via Reverb WebSockets
+    const channel = echo.channel("admin");
+    channel.listen(".App\\Events\\DashboardUpdated", (e) => {
+      fetchStats();
+    });
+
+    // Cleanup listener on component unmount
+    return () => {
+      channel.stopListening(".App\\Events\\DashboardUpdated");
+    };
   }, []);
 
   const fetchStats = async () => {
@@ -73,7 +91,7 @@ const Dashboard = () => {
   };
 
   if (loading) {
-    return <div className="p-8 text-center">Loading dashboard...</div>;
+    return <PageLoader />;
   }
 
   // Permission Checks
@@ -95,12 +113,46 @@ const Dashboard = () => {
           </h1>
           <p className="text-gray-500">Here's what's happening today.</p>
         </div>
-        <div className="flex items-center gap-2 bg-green-50 px-3 py-1 rounded-full border border-green-100">
-          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-          <span className="text-sm font-medium text-green-700">
-            System Operational
+        <button
+          onClick={() => {
+            if (stats.system_alerts?.length > 0) {
+              setIsAlertsModalOpen(true);
+            }
+          }}
+          className={`flex items-center gap-2 px-3 py-1 rounded-full border transition-colors ${
+            stats.system_status === "Critical Problem"
+              ? "bg-red-50 border-red-200 hover:bg-red-100 cursor-pointer"
+              : stats.system_status === "Minor Problem"
+                ? "bg-amber-50 border-amber-200 hover:bg-amber-100 cursor-pointer"
+                : "bg-green-50 border-green-100"
+          }`}
+        >
+          <div
+            className={`w-2 h-2 rounded-full animate-pulse ${
+              stats.system_status === "Critical Problem"
+                ? "bg-red-500"
+                : stats.system_status === "Minor Problem"
+                  ? "bg-amber-500"
+                  : "bg-green-500"
+            }`}
+          ></div>
+          <span
+            className={`text-sm font-medium ${
+              stats.system_status === "Critical Problem"
+                ? "text-red-700"
+                : stats.system_status === "Minor Problem"
+                  ? "text-amber-700"
+                  : "text-green-700"
+            }`}
+          >
+            {stats.system_status || "System Operational"}
           </span>
-        </div>
+          {stats.system_alerts?.length > 0 && (
+            <span className="ml-1 px-1.5 py-0.5 text-xs font-bold rounded-full bg-white bg-opacity-50">
+              {stats.system_alerts.length}
+            </span>
+          )}
+        </button>
       </div>
 
       {/* Hero Stats Grid */}
@@ -238,6 +290,15 @@ const Dashboard = () => {
           isOpen={isDetailModalOpen}
           onClose={handleDetailClose}
           request={selectedRequest}
+        />
+      )}
+
+      {isAlertsModalOpen && (
+        <SystemAlertsModal
+          isOpen={isAlertsModalOpen}
+          onClose={() => setIsAlertsModalOpen(false)}
+          alerts={stats.system_alerts}
+          onResolve={fetchStats}
         />
       )}
     </motion.div>

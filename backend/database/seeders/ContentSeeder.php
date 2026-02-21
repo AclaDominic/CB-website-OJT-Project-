@@ -101,6 +101,7 @@ class ContentSeeder extends Seeder
                 'year' => '2023',
                 'scope' => 'Site development and foundation works.',
                 'status' => 'Ongoing',
+                'is_public' => true,
                 'image' => 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
             ],
             [
@@ -109,6 +110,7 @@ class ContentSeeder extends Seeder
                 'year' => '2022',
                 'scope' => 'Road construction and drainage systems.',
                 'status' => 'Completed',
+                'is_public' => true,
                 'image' => 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
             ],
             [
@@ -117,6 +119,7 @@ class ContentSeeder extends Seeder
                 'year' => '2021',
                 'scope' => 'Large scale earthmoving and leveling.',
                 'status' => 'Completed',
+                'is_public' => true,
                 'image' => 'https://images.unsplash.com/photo-1590486803833-1c5dc8ddd4c8?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
             ]
         ];
@@ -131,28 +134,28 @@ class ContentSeeder extends Seeder
                 'name' => 'Caterpillar 320D',
                 'type' => 'Excavator',
                 'plate_number' => 'CAT-001',
-                'is_decommissioned' => false,
+                'status' => 'Stand By',
                 'image_url' => 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
             ],
             [
                 'name' => 'Komatsu D65',
                 'type' => 'Bulldozer',
                 'plate_number' => 'KOM-002',
-                'is_decommissioned' => false,
+                'status' => 'Active',
                 'image_url' => 'https://images.unsplash.com/photo-1579407364450-481fe19dbfaa?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
             ],
             [
                 'name' => 'Isuzu Giga',
                 'type' => 'Dump Truck',
                 'plate_number' => 'DT-003',
-                'is_decommissioned' => false,
+                'status' => 'Lease',
                 'image_url' => 'https://images.unsplash.com/photo-1591736287094-1e53b451785f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
             ],
             [
                 'name' => 'Hitachi Zaxis',
                 'type' => 'Excavator',
                 'plate_number' => 'HIT-004',
-                'is_decommissioned' => true,
+                'status' => 'Decommissioned',
                 'image_url' => 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
             ]
         ];
@@ -181,6 +184,20 @@ class ContentSeeder extends Seeder
 
         foreach ($sites as $site) {
             DevelopmentSite::firstOrCreate(['name' => $site['name']], $site);
+        }
+
+        // 6. Organization Members
+        $members = [
+            ['name' => 'Person A', 'role' => 'President', 'category' => 'Leadership', 'order' => 1],
+            ['name' => 'Person B', 'role' => 'Vice President', 'category' => 'Management', 'order' => 1],
+            ['name' => 'Person C', 'role' => 'General Manager', 'category' => 'Management', 'order' => 2],
+            ['name' => 'Person D', 'role' => 'Operations Head', 'category' => 'Staff', 'order' => 1],
+            ['name' => 'Person E', 'role' => 'Project Engineer', 'category' => 'Staff', 'order' => 2],
+            ['name' => 'Person F', 'role' => 'Safety Officer', 'category' => 'Staff', 'order' => 3],
+        ];
+
+        foreach ($members as $member) {
+            \App\Models\OrganizationMember::firstOrCreate(['name' => $member['name']], $member);
         }
     }
 }

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../../context/AuthContext";
 import { toast } from "react-hot-toast";
+import PageLoader from "../../../components/PageLoader";
 
 const InventoryManager = () => {
   const [activeTab, setActiveTab] = useState("catalog"); // 'catalog' or 'stock'
@@ -94,12 +95,7 @@ const ItemCatalog = ({ user }) => {
     }
   };
 
-  if (loading)
-    return (
-      <div className="flex justify-center py-20">
-        <Loader2 className="animate-spin text-blue-600" size={40} />
-      </div>
-    );
+  if (loading) return <PageLoader />;
 
   return (
     <div>
@@ -267,12 +263,7 @@ const StockManagement = ({ user }) => {
     }
   };
 
-  if (loading)
-    return (
-      <div className="flex justify-center py-20">
-        <Loader2 className="animate-spin text-blue-600" size={40} />
-      </div>
-    );
+  if (loading) return <PageLoader />;
 
   return (
     <div className="space-y-8">
@@ -293,7 +284,7 @@ const StockManagement = ({ user }) => {
       {categories.map((category) => (
         <div
           key={category.id}
-          className="bg-white rounded-lg shadow overflow-hidden"
+          className="bg-white rounded-lg shadow overflow-hidden overflow-x-auto"
         >
           <div className="bg-gray-50 px-6 py-4 border-b">
             <h3 className="text-lg font-bold text-gray-800">{category.name}</h3>

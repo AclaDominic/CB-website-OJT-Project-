@@ -26,7 +26,7 @@ class MachineryController extends Controller
         }
 
         // Public View: Hide decommissioned
-        $query = Machinery::where('is_decommissioned', false);
+        $query = Machinery::where('status', '!=', 'Decommissioned');
 
         // Check display settings
         $settings = \App\Models\PageContent::where('page_name', 'resources')
@@ -66,9 +66,10 @@ class MachineryController extends Controller
             'name' => 'required|string',
             'type' => 'required|string',
             'plate_number' => 'nullable|string',
-            'is_decommissioned' => 'boolean',
+            'status' => 'required|string',
             'image_url' => 'nullable|string',
             'image_file' => 'nullable|image|max:5120', // Max 5MB
+            'project_id' => 'nullable|exists:projects,id',
         ]);
 
         if ($request->hasFile('image_file')) {
@@ -102,20 +103,11 @@ class MachineryController extends Controller
             'name' => 'string',
             'type' => 'string',
             'plate_number' => 'nullable|string',
-            'is_decommissioned' => 'boolean',
+            'status' => 'string',
             'image_url' => 'nullable|string',
             'image_file' => 'nullable|image|max:5120',
             'project_id' => 'nullable|exists:projects,id',
-            'status' => 'nullable|string',
         ]);
-
-        if (isset($validated['is_decommissioned'])) {
-            // Backward compatibility or direct setting
-            if (filter_var($validated['is_decommissioned'], FILTER_VALIDATE_BOOLEAN)) {
-                $validated['status'] = 'Decommissioned';
-            }
-            unset($validated['is_decommissioned']);
-        }
 
         if ($request->hasFile('image_file')) {
             if ($machinery->image_url && !filter_var($machinery->image_url, FILTER_VALIDATE_URL)) {

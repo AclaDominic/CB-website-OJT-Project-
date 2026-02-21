@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import api from "../lib/axios";
 import { Toaster, toast } from "react-hot-toast";
 import ProjectGalleryModal from "../components/ProjectGalleryModal";
+import PageLoader from "../components/PageLoader";
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
@@ -63,8 +64,8 @@ const Projects = () => {
         onClose={closeModal}
       />
 
-      <div className="bg-gray-900 py-16 text-center text-white">
-        <h1 className="text-4xl font-bold mb-2">Our Projects</h1>
+      <div className="bg-company-dark py-16 text-center text-white">
+        <h1 className="text-4xl font-bold mb-2 text-white">Our Projects</h1>
         <p className="text-gray-400">
           Delivering Excellence Across Infrastructures
         </p>
@@ -72,9 +73,7 @@ const Projects = () => {
 
       <div className="max-w-7xl mx-auto px-4 py-16">
         {loading ? (
-          <div className="text-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-company-blue mx-auto"></div>
-          </div>
+          <PageLoader />
         ) : (
           <>
             {/* Ongoing Projects */}
@@ -147,7 +146,7 @@ const ProjectCard = ({ project, onClick }) => (
 
       {/* Gallery Badge */}
       {project.before_afters && project.before_afters.length > 0 && (
-        <div className="absolute bottom-4 right-4 bg-black/60 text-white text-xs px-2 py-1 rounded flex items-center gap-1 backdrop-blur-sm">
+        <div className="absolute bottom-4 right-4 bg-company-blue/80 text-white text-xs px-2 py-1 rounded flex items-center gap-1 backdrop-blur-sm">
           <svg
             className="w-3 h-3"
             fill="none"
