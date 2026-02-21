@@ -85,17 +85,29 @@ Link the public storage to access uploaded files:
 php artisan storage:link
 ```
 
-### Serve Backend
+### 4. Run the Backend Servers
+
+You need to run two backend processes: the local HTTP server, and the Laravel Reverb WebSocket server for real-time dashboard notifications.
+
+Open **two** terminal instances in the `backend/` directory:
+
+**Terminal A (HTTP):**
 
 ```bash
 php artisan serve
 ```
 
-The backend will run at `http://localhost:8000`.
+The HTTP backend will run at `http://localhost:8000`.
+
+**Terminal B (WebSockets):**
+
+```bash
+php artisan reverb:start
+```
 
 ---
 
-## 3. Frontend Setup (React + Vite)
+## 5. Frontend Setup (React + Vite)
 
 Open a new terminal and navigate to the frontend directory:
 
@@ -122,6 +134,17 @@ Ensure the API URL points to your Laravel backend in `.env`:
 ```ini
 VITE_API_BASE_URL=http://localhost:8000
 ```
+
+### Sync WebSockets (Reverb) Configuration
+
+To easily copy your backend Reverb settings to the frontend without manual copying, use the artisan command from the `backend/` directory:
+
+```bash
+# from the backend directory
+php artisan env:sync-frontend
+```
+
+This will automatically extract all `VITE_` variables from the backend `.env` and configure your frontend `.env`.
 
 ### Run Development Server
 

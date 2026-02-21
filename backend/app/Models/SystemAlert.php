@@ -20,4 +20,17 @@ class SystemAlert extends Model
         'resolved' => 'boolean',
         'resolved_at' => 'datetime',
     ];
+
+    protected static function booted()
+    {
+        static::saved(function ($model) {
+            event(new \App\Events\DashboardUpdated());
+            event(new \App\Events\NotificationSent()); // also trigger notification bell just in case
+        });
+
+        static::deleted(function ($model) {
+            event(new \App\Events\DashboardUpdated());
+            event(new \App\Events\NotificationSent());
+        });
+    }
 }

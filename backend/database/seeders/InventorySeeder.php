@@ -17,8 +17,8 @@ class InventorySeeder extends Seeder
                 'name' => 'Office Supplies',
                 'description' => 'Pens, paper, staplers, etc.',
                 'items' => [
-                    ['name' => 'Ballpoint Pen (Black)', 'quantity' => 50, 'threshold' => 10, 'unit' => 'pcs'],
-                    ['name' => 'A4 Bond Paper', 'quantity' => 20, 'threshold' => 5, 'unit' => 'reams'],
+                    ['name' => 'Ballpoint Pen (Black)', 'quantity' => 5, 'threshold' => 10, 'unit' => 'pcs'],
+                    ['name' => 'A4 Bond Paper', 'quantity' => 2, 'threshold' => 5, 'unit' => 'reams'],
                     ['name' => 'Stapler Wire #35', 'quantity' => 5, 'threshold' => 2, 'unit' => 'box'],
                 ]
             ],

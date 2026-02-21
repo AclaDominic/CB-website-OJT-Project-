@@ -25,6 +25,8 @@ import { motion } from "framer-motion";
 import ProcurementDetailModal from "../../components/procurement/ProcurementDetailModal";
 import SystemAlertsModal from "../../components/dashboard/SystemAlertsModal";
 
+import echo from "../../lib/echo";
+
 const Dashboard = () => {
   const { user } = useAuth();
   const [stats, setStats] = useState({
@@ -59,6 +61,17 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchStats();
+
+    // Listen for real-time dashboard updates via Reverb WebSockets
+    const channel = echo.channel("admin");
+    channel.listen(".App\\Events\\DashboardUpdated", (e) => {
+      fetchStats();
+    });
+
+    // Cleanup listener on component unmount
+    return () => {
+      channel.stopListening(".App\\Events\\DashboardUpdated");
+    };
   }, []);
 
   const fetchStats = async () => {

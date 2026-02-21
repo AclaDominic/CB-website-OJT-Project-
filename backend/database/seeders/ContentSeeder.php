@@ -101,6 +101,7 @@ class ContentSeeder extends Seeder
                 'year' => '2023',
                 'scope' => 'Site development and foundation works.',
                 'status' => 'Ongoing',
+                'is_public' => true,
                 'image' => 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
             ],
             [
@@ -109,6 +110,7 @@ class ContentSeeder extends Seeder
                 'year' => '2022',
                 'scope' => 'Road construction and drainage systems.',
                 'status' => 'Completed',
+                'is_public' => true,
                 'image' => 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
             ],
             [
@@ -117,6 +119,7 @@ class ContentSeeder extends Seeder
                 'year' => '2021',
                 'scope' => 'Large scale earthmoving and leveling.',
                 'status' => 'Completed',
+                'is_public' => true,
                 'image' => 'https://images.unsplash.com/photo-1590486803833-1c5dc8ddd4c8?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
             ]
         ];
@@ -181,6 +184,20 @@ class ContentSeeder extends Seeder
 
         foreach ($sites as $site) {
             DevelopmentSite::firstOrCreate(['name' => $site['name']], $site);
+        }
+
+        // 6. Organization Members
+        $members = [
+            ['name' => 'Person A', 'role' => 'President', 'category' => 'Leadership', 'order' => 1],
+            ['name' => 'Person B', 'role' => 'Vice President', 'category' => 'Management', 'order' => 1],
+            ['name' => 'Person C', 'role' => 'General Manager', 'category' => 'Management', 'order' => 2],
+            ['name' => 'Person D', 'role' => 'Operations Head', 'category' => 'Staff', 'order' => 1],
+            ['name' => 'Person E', 'role' => 'Project Engineer', 'category' => 'Staff', 'order' => 2],
+            ['name' => 'Person F', 'role' => 'Safety Officer', 'category' => 'Staff', 'order' => 3],
+        ];
+
+        foreach ($members as $member) {
+            \App\Models\OrganizationMember::firstOrCreate(['name' => $member['name']], $member);
         }
     }
 }

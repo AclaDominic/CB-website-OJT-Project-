@@ -25,6 +25,8 @@ import axiosClient from "../lib/axios";
 import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "../context/AuthContext";
 
+import echo from "../lib/echo";
+
 const AdminSidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
   const { user, logout } = useAuth();
@@ -78,8 +80,16 @@ const AdminSidebar = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 60000);
-    return () => clearInterval(interval);
+
+    // Listen for real-time notification updates via Reverb WebSockets
+    const channel = echo.channel("admin");
+    channel.listen(".App\\Events\\NotificationSent", (e) => {
+      fetchNotifications();
+    });
+
+    return () => {
+      channel.stopListening(".App\\Events\\NotificationSent");
+    };
   }, []);
 
   const fetchNotifications = async () => {
