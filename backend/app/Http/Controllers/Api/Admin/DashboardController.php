@@ -63,6 +63,18 @@ class DashboardController extends Controller
 
         $recentProcurement = $recentQuery->get();
 
+        // System Alerts Status
+        $activeAlerts = \App\Models\SystemAlert::where('resolved', false)
+            ->latest()
+            ->get();
+
+        $systemStatus = 'System Operational';
+        if ($activeAlerts->contains('type', 'critical')) {
+            $systemStatus = 'Critical Problem';
+        } elseif ($activeAlerts->contains('type', 'minor')) {
+            $systemStatus = 'Minor Problem';
+        }
+
         return response()->json([
             'low_stock_count' => $lowStockCount,
             'pending_procurement_count' => $pendingProcurementCount,
@@ -70,6 +82,8 @@ class DashboardController extends Controller
             'recent_procurement' => $recentProcurement,
             'machinery_stats' => $machineryStats,
             'project_stats' => $projectStats,
+            'system_status' => $systemStatus,
+            'system_alerts' => $activeAlerts,
             'permissions' => [
                 'can_view_inventory' => $canViewInventory,
                 'can_create_project' => $user->can('projects.create') || $user->hasRole('Admin'),

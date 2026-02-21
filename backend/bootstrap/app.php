@@ -26,5 +26,21 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->report(function (Throwable $e) {
+            // Only log if the user is authenticated (meaning it's an internal/private page error)
+            // and it's not a validation exception or authentication exception
+            if (auth()->check() && !$e instanceof \Illuminate\Validation\ValidationException && !$e instanceof \Illuminate\Auth\AuthenticationException) {
+                \App\Models\SystemAlert::create([
+                    'type' => 'critical',
+                    'message' => $e->getMessage() ?: 'Unhandled Internal Error',
+                    'context' => [
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine(),
+                        'url' => request()->url(),
+                        'method' => request()->method(),
+                        'user_id' => auth()->id(),
+                    ]
+                ]);
+            }
+        });
     })->create();
