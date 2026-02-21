@@ -3,6 +3,7 @@ import axiosClient from "../../../lib/axios";
 import { Plus, Trash2, Edit2, X, Truck, MapPin, Loader2 } from "lucide-react";
 import ImagePicker from "../../../components/ImagePicker";
 import { useAuth } from "../../../context/AuthContext";
+import PageLoader from "../../../components/PageLoader";
 
 const ResourceManager = () => {
   const [activeTab, setActiveTab] = useState("machinery"); // 'machinery' or 'sites'
@@ -285,11 +286,7 @@ const MachineryList = () => {
   };
 
   if (loading && items.length === 0) {
-    return (
-      <div className="flex justify-center items-center py-20">
-        <Loader2 className="animate-spin text-blue-600" size={40} />
-      </div>
-    );
+    return <PageLoader />;
   }
 
   return (
@@ -624,11 +621,7 @@ const SiteList = () => {
   };
 
   if (loading && items.length === 0) {
-    return (
-      <div className="flex justify-center items-center py-20">
-        <Loader2 className="animate-spin text-blue-600" size={40} />
-      </div>
-    );
+    return <PageLoader />;
   }
 
   return (

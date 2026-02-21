@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axiosClient from "../../../lib/axios";
 import { Save, Loader2, Plus, Trash2 } from "lucide-react";
 import { useAuth } from "../../../context/AuthContext";
+import PageLoader from "../../../components/PageLoader";
 
 const ContactEditor = () => {
   const [officeInfo, setOfficeInfo] = useState({
@@ -113,11 +114,7 @@ const ContactEditor = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-96">
-        <Loader2 className="animate-spin text-blue-600" size={40} />
-      </div>
-    );
+    return <PageLoader />;
   }
 
   return (

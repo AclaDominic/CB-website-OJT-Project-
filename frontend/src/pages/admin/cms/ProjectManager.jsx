@@ -3,6 +3,7 @@ import axiosClient from "../../../lib/axios";
 import { Plus, Edit2, Trash2, X, Loader2 } from "lucide-react";
 import ImagePicker from "../../../components/ImagePicker";
 import { useAuth } from "../../../context/AuthContext";
+import PageLoader from "../../../components/PageLoader";
 
 const ProjectManager = () => {
   const { user } = useAuth();
@@ -233,11 +234,7 @@ const ProjectManager = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-96">
-        <Loader2 className="animate-spin text-blue-600" size={40} />
-      </div>
-    );
+    return <PageLoader />;
   }
 
   return (

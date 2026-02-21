@@ -3,6 +3,7 @@ import axiosClient from "../../../lib/axios";
 import { Plus, Trash2, Edit2, Shield, Check, X, Loader2 } from "lucide-react";
 import { useAuth } from "../../../context/AuthContext";
 import { Navigate } from "react-router-dom";
+import PageLoader from "../../../components/PageLoader";
 
 /**
  * RoleManager Component
@@ -22,11 +23,7 @@ const RoleManager = () => {
   const [error, setError] = useState("");
 
   if (authLoading) {
-    return (
-      <div className="flex justify-center items-center h-96">
-        <Loader2 className="animate-spin text-blue-600" size={40} />
-      </div>
-    );
+    return <PageLoader />;
   }
 
   if (!user?.all_permissions?.includes("system.manage_roles")) {
@@ -133,11 +130,7 @@ const RoleManager = () => {
   }, {});
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-96">
-        <Loader2 className="animate-spin text-blue-600" size={40} />
-      </div>
-    );
+    return <PageLoader />;
   }
 
   return (

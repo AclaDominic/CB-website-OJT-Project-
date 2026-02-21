@@ -3,6 +3,7 @@ import axiosClient from "../../../lib/axios";
 import { Save, Loader2 } from "lucide-react";
 import OrganizationManager from "../../../components/admin/OrganizationManager";
 import { useAuth } from "../../../context/AuthContext";
+import PageLoader from "../../../components/PageLoader";
 
 const AboutEditor = () => {
   const [contents, setContents] = useState({
@@ -72,11 +73,7 @@ const AboutEditor = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-96">
-        <Loader2 className="animate-spin text-blue-600" size={40} />
-      </div>
-    );
+    return <PageLoader />;
   }
 
   return (

@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 
 import ConfirmModal from "../../../components/admin/ConfirmModal";
+import PageLoader from "../../../components/PageLoader";
 
 const AdminInquiries = () => {
   const [inquiries, setInquiries] = useState([]);
@@ -185,9 +186,7 @@ const AdminInquiries = () => {
       </div>
 
       {loading ? (
-        <div className="flex justify-center items-center py-12">
-          <Loader2 className="animate-spin text-blue-600" size={32} />
-        </div>
+        <PageLoader />
       ) : (
         <div className="bg-white shadow rounded-lg overflow-hidden overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">

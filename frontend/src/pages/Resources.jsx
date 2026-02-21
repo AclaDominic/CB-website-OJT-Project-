@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../lib/axios";
+import PageLoader from "../components/PageLoader";
 
 const Resources = () => {
   const [machinery, setMachinery] = useState([]);
@@ -56,8 +57,8 @@ const Resources = () => {
 
   return (
     <div className="font-sans pt-20">
-      <div className="bg-gray-900 py-16 text-center text-white">
-        <h1 className="text-4xl font-bold mb-2">Our Resources</h1>
+      <div className="bg-company-dark py-16 text-center text-white">
+        <h1 className="text-4xl font-bold mb-2 text-white">Our Resources</h1>
         <p className="text-gray-400">
           Backfill Materials & Heavy Equipment Fleet
         </p>
@@ -65,9 +66,7 @@ const Resources = () => {
 
       <div className="max-w-7xl mx-auto px-4 py-16">
         {loading ? (
-          <div className="text-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-company-blue mx-auto"></div>
-          </div>
+          <PageLoader />
         ) : (
           <>
             {/* Land Development Sites */}
@@ -143,7 +142,7 @@ const Resources = () => {
                   <p className="font-bold text-gray-800 text-lg">{item.name}</p>
                   <p className="text-sm text-gray-500">{item.type}</p>
                   {showPlateNumbers && item.plate_number && (
-                    <p className="text-xs text-blue-600 mt-2 font-mono bg-blue-50 inline-block px-2 py-1 rounded">
+                    <p className="text-xs text-company-blue mt-2 font-mono bg-company-light inline-block px-2 py-1 rounded">
                       {item.plate_number}
                     </p>
                   )}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../lib/axios";
+import PageLoader from "../components/PageLoader";
 
 const Services = () => {
   const [services, setServices] = useState([]);
@@ -26,8 +27,8 @@ const Services = () => {
   return (
     <div className="font-sans pt-20">
       {/* Hero */}
-      <div className="bg-gray-900 py-16 text-center text-white">
-        <h1 className="text-4xl font-bold mb-2">Our Services</h1>
+      <div className="bg-company-dark py-16 text-center text-white">
+        <h1 className="text-4xl font-bold mb-2 text-white">Our Services</h1>
         <p className="text-gray-400">
           Comprehensive Construction & Development Solutions
         </p>
@@ -35,9 +36,7 @@ const Services = () => {
 
       <div className="max-w-7xl mx-auto px-4 py-16">
         {loading ? (
-          <div className="text-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-company-blue mx-auto"></div>
-          </div>
+          <PageLoader />
         ) : (
           <>
             {/* Primary Services */}
@@ -102,8 +101,8 @@ const Services = () => {
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-green-50">
-                          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                        <div className="w-full h-full flex items-center justify-center bg-company-green/10">
+                          <div className="w-16 h-16 bg-company-green/20 rounded-full flex items-center justify-center text-company-green">
                             <svg
                               className="w-8 h-8"
                               fill="none"

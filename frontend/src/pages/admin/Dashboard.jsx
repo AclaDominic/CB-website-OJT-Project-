@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axiosClient from "../../lib/axios";
+import PageLoader from "../../components/PageLoader";
 import {
   Activity,
   AlertTriangle,
@@ -73,7 +74,7 @@ const Dashboard = () => {
   };
 
   if (loading) {
-    return <div className="p-8 text-center">Loading dashboard...</div>;
+    return <PageLoader />;
   }
 
   // Permission Checks
