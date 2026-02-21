@@ -51,7 +51,15 @@ class SyncFrontendEnv extends Command
 
         $syncedCount = 0;
         foreach ($matches[1] as $index => $key) {
-            $value = $matches[2][$index];
+            $value = trim($matches[2][$index]);
+
+            // Resolve internal .env variables like "${REVERB_APP_KEY}"
+            if (preg_match('/^"?\$\{([A-Z_]+)\}"?$/', $value, $refMatches)) {
+                $refKey = $refMatches[1];
+                if (preg_match("/^{$refKey}=(.*)$/m", $backendEnv, $valMatches)) {
+                    $value = trim($valMatches[1]);
+                }
+            }
 
             // If key exists in frontend .env, replace it. Otherwise, append it.
             if (preg_match("/^{$key}=/m", $frontendEnv)) {
