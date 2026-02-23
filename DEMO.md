@@ -51,6 +51,22 @@ php artisan test --filter InventoryTest
 - **Stock Adjustments**: Adding and Removing stock updates the quantity.
 - **Logic Constraints**: Preventing negative stock (400 Bad Request).
 
+---
+
+**Manual Low Stock Notification Check:**
+
+The system automatically checks for low stock every day at **Midnight (00:00)** to alert admins. You can manually trigger this check and generate the notifications to demonstrate it:
+
+```bash
+php artisan inventory:check-low-stock
+```
+
+**What this demonstrates:**
+
+- Analyzes all inventory items against their configured `threshold`.
+- Triggers notifications to all users with Admin or Inventory Manager roles.
+- The notification bell in the system UI will instantly update with new alerts.
+
 ## 4. System Alerts Demo
 
 **Automated Tests:**
