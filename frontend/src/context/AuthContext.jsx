@@ -56,9 +56,13 @@ export const AuthProvider = ({ children }) => {
     navigate("/");
   };
 
+  const hasPermission = (permission) => {
+    return user?.all_permissions?.includes(permission) || false;
+  };
+
   return (
     <AuthContext.Provider
-      value={{ user, login, logout, getUser, errors, loading }}
+      value={{ user, login, logout, getUser, errors, loading, hasPermission }}
     >
       {children}
     </AuthContext.Provider>

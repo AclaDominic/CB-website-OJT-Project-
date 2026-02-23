@@ -42,6 +42,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('permissions', [\App\Http\Controllers\Api\System\PermissionController::class, 'index']);
             Route::apiResource('users', \App\Http\Controllers\Api\System\UserController::class)->only(['index', 'store', 'update']);
             Route::post('system-alerts/{id}/resolve', [\App\Http\Controllers\Api\System\SystemAlertController::class, 'resolve']);
+
+            // Backup Management
+            Route::get('backups', [\App\Http\Controllers\Api\System\BackupController::class, 'index'])->middleware('permission:view_backups');
+            Route::post('backups', [\App\Http\Controllers\Api\System\BackupController::class, 'store'])->middleware('permission:create_backups');
+            Route::get('backups/{file_name}', [\App\Http\Controllers\Api\System\BackupController::class, 'download'])
+                ->where('file_name', '.*')->name('backups.download')->middleware('permission:download_backups');
+            Route::delete('backups/{file_name}', [\App\Http\Controllers\Api\System\BackupController::class, 'destroy'])
+                ->where('file_name', '.*')->middleware('permission:delete_backups');
         });
     });
 

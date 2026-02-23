@@ -123,7 +123,13 @@ const RoleManager = () => {
 
   // Group permissions for better UI
   const groupedPermissions = permissions.reduce((acc, perm) => {
-    const [group] = perm.name.split(".");
+    let [group] = perm.name.split(".");
+
+    // Group backup permissions together since they use snake_case instead of dot notation
+    if (perm.name.endsWith("_backups")) {
+      group = "backups";
+    }
+
     if (!acc[group]) acc[group] = [];
     acc[group].push(perm);
     return acc;
@@ -187,21 +193,23 @@ const RoleManager = () => {
             </div>
 
             <div className="flex justify-end gap-2 mt-auto pt-4 border-t border-gray-100">
-              <button
-                onClick={() => openModal(role)}
-                className="text-blue-600 hover:text-blue-800 p-2 rounded hover:bg-blue-50 transition-colors"
-                title="Edit Role"
-              >
-                <Edit2 size={18} />
-              </button>
-              {role.name !== "Admin" && ( // Prevent deleting Super Admin
-                <button
-                  onClick={() => handleDelete(role.id)}
-                  className="text-red-600 hover:text-red-800 p-2 rounded hover:bg-red-50 transition-colors"
-                  title="Delete Role"
-                >
-                  <Trash2 size={18} />
-                </button>
+              {role.name !== "Admin" && ( // Prevent editing/deleting Super Admin
+                <>
+                  <button
+                    onClick={() => openModal(role)}
+                    className="text-blue-600 hover:text-blue-800 p-2 rounded hover:bg-blue-50 transition-colors"
+                    title="Edit Role"
+                  >
+                    <Edit2 size={18} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(role.id)}
+                    className="text-red-600 hover:text-red-800 p-2 rounded hover:bg-red-50 transition-colors"
+                    title="Delete Role"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </>
               )}
             </div>
           </div>
