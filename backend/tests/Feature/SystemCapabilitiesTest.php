@@ -121,8 +121,8 @@ class SystemCapabilitiesTest extends TestCase
         $admin->assignRole('Admin');
         Sanctum::actingAs($admin, ['*']);
 
-        // Create User (Route is /api/admin/users)
-        $response = $this->postJson('/api/admin/users', [
+        // Create User (Route is /api/system/users)
+        $response = $this->postJson('/api/system/users', [
             'name' => 'Test Staff',
             'email' => 'teststaff@example.com',
             'password' => 'password',
@@ -133,7 +133,7 @@ class SystemCapabilitiesTest extends TestCase
         $userId = $response->json('id');
 
         // Update User
-        $response = $this->putJson("/api/admin/users/{$userId}", [
+        $response = $this->putJson("/api/system/users/{$userId}", [
             // API only allows updating role in the update method according to UserController::update
             'role' => 'Project Manager'
         ]);

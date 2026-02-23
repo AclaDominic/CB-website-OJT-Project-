@@ -33,15 +33,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Page Contents (CMS)
     Route::post('/page-contents', [\App\Http\Controllers\Api\Cms\PageContentController::class, 'store']);
 
-    // Admin System (RBAC)
-    Route::prefix('admin')->middleware(['role:Admin|Project Manager|Site Engineer|Staff'])->group(function () {
-        Route::get('dashboard-stats', [\App\Http\Controllers\Api\Admin\DashboardController::class, 'index']);
+    // System Portal (RBAC)
+    Route::prefix('system')->middleware(['role:Admin|Project Manager|Site Engineer|Staff'])->group(function () {
+        Route::get('dashboard-stats', [\App\Http\Controllers\Api\System\DashboardController::class, 'index']);
 
         Route::middleware(['role:Admin'])->group(function () {
-            Route::apiResource('roles', \App\Http\Controllers\Api\Admin\RoleController::class);
-            Route::get('permissions', [\App\Http\Controllers\Api\Admin\PermissionController::class, 'index']);
-            Route::apiResource('users', \App\Http\Controllers\Api\Admin\UserController::class)->only(['index', 'store', 'update']);
-            Route::post('system-alerts/{id}/resolve', [\App\Http\Controllers\Api\Admin\SystemAlertController::class, 'resolve']);
+            Route::apiResource('roles', \App\Http\Controllers\Api\System\RoleController::class);
+            Route::get('permissions', [\App\Http\Controllers\Api\System\PermissionController::class, 'index']);
+            Route::apiResource('users', \App\Http\Controllers\Api\System\UserController::class)->only(['index', 'store', 'update']);
+            Route::post('system-alerts/{id}/resolve', [\App\Http\Controllers\Api\System\SystemAlertController::class, 'resolve']);
         });
     });
 

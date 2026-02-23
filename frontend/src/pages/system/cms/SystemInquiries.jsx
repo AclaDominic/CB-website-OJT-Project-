@@ -4,10 +4,10 @@ import { useAuth } from "../../../context/AuthContext";
 import { Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 
-import ConfirmModal from "../../../components/admin/ConfirmModal";
+import ConfirmModal from "../../../components/system/ConfirmModal";
 import PageLoader from "../../../components/PageLoader";
 
-const AdminInquiries = () => {
+const SystemInquiries = () => {
   const [inquiries, setInquiries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("inbox");
@@ -316,4 +316,4 @@ const AdminInquiries = () => {
   );
 };
 
-export default AdminInquiries;
+export default SystemInquiries;

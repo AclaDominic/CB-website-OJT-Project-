@@ -45,7 +45,7 @@ class DashboardTest extends TestCase
         Project::factory()->create(['status' => 'completed']);
 
         // Execute
-        $response = $this->actingAs($this->admin)->getJson('/api/admin/dashboard-stats');
+        $response = $this->actingAs($this->admin)->getJson('/api/system/dashboard-stats');
 
         // Verify
         $response->assertStatus(200)
@@ -81,7 +81,7 @@ class DashboardTest extends TestCase
         // Create PM's own request
         ProcurementRequest::create(['project_id' => $project->id, 'user_id' => $pm->id, 'status' => 'submitted']);
 
-        $response = $this->actingAs($pm)->getJson('/api/admin/dashboard-stats');
+        $response = $this->actingAs($pm)->getJson('/api/system/dashboard-stats');
 
         $response->assertStatus(200)
             ->assertJson([
@@ -106,7 +106,7 @@ class DashboardTest extends TestCase
         $staff = User::factory()->create();
         $staff->assignRole('Staff');
 
-        $response = $this->actingAs($staff)->getJson('/api/admin/dashboard-stats');
+        $response = $this->actingAs($staff)->getJson('/api/system/dashboard-stats');
 
         $response->assertStatus(200)
             ->assertJson([

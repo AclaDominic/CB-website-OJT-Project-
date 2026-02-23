@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axiosClient from "../../../lib/axios";
 import { Save, Loader2 } from "lucide-react";
-import OrganizationManager from "../../../components/admin/OrganizationManager";
+import OrganizationManager from "../../../components/system/OrganizationManager";
 import { useAuth } from "../../../context/AuthContext";
 import PageLoader from "../../../components/PageLoader";
 

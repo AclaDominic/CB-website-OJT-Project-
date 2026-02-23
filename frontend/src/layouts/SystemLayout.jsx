@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { Menu } from "lucide-react";
 import { Toaster } from "react-hot-toast";
-import AdminSidebar from "../components/AdminSidebar";
+import SystemSidebar from "../components/SystemSidebar";
 
-const AdminLayout = () => {
+const SystemLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
-      <AdminSidebar
+      <SystemSidebar
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
       />
@@ -23,7 +23,9 @@ const AdminLayout = () => {
           >
             <Menu size={24} />
           </button>
-          <span className="ml-4 font-semibold text-gray-800">Admin Panel</span>
+          <span className="ml-4 font-semibold text-gray-800">
+            System Portal
+          </span>
         </div>
 
         <div className="p-4 md:p-8">
@@ -35,4 +37,4 @@ const AdminLayout = () => {
   );
 };
 
-export default AdminLayout;
+export default SystemLayout;

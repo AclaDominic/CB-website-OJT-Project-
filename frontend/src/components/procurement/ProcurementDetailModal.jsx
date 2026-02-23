@@ -12,7 +12,7 @@ import {
 import axiosClient from "../../lib/axios";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-hot-toast";
-import ConfirmModal from "../admin/ConfirmModal";
+import ConfirmModal from "../system/ConfirmModal";
 
 const ProcurementDetailModal = ({ isOpen, onClose, request }) => {
   const { user } = useAuth();

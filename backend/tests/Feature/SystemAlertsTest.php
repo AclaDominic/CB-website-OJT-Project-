@@ -70,12 +70,12 @@ class SystemAlertsTest extends TestCase
         $admin->assignRole('Admin');
 
         // We can force a route to throw an exception for testing
-        \Illuminate\Support\Facades\Route::get('/api/admin/force-error', function () {
+        \Illuminate\Support\Facades\Route::get('/api/system/force-error', function () {
             throw new \Exception('Unexpected Server Exploded');
         })->middleware(['auth:sanctum', 'role:Admin']);
 
         $response = $this->actingAs($admin)
-            ->getJson('/api/admin/force-error');
+            ->getJson('/api/system/force-error');
 
         // It should return 500
         $response->assertStatus(500);
@@ -89,7 +89,7 @@ class SystemAlertsTest extends TestCase
         $alert = SystemAlert::first();
         $this->assertEquals('critical', $alert->type);
         $this->assertEquals($admin->id, $alert->context['user_id']);
-        $this->assertStringContainsString('/api/admin/force-error', $alert->context['url']);
+        $this->assertStringContainsString('/api/system/force-error', $alert->context['url']);
     }
 
     public function test_dashboard_api_returns_active_alerts_and_status()
@@ -101,7 +101,7 @@ class SystemAlertsTest extends TestCase
         SystemAlert::create(['type' => 'minor', 'message' => 'test minor']);
         SystemAlert::create(['type' => 'critical', 'message' => 'test critical']);
 
-        $response = $this->actingAs($admin)->getJson('/api/admin/dashboard-stats');
+        $response = $this->actingAs($admin)->getJson('/api/system/dashboard-stats');
 
         $response->assertStatus(200)
             ->assertJson([
@@ -119,7 +119,7 @@ class SystemAlertsTest extends TestCase
 
         $this->assertFalse($alert->resolved);
 
-        $response = $this->actingAs($admin)->postJson("/api/admin/system-alerts/{$alert->id}/resolve");
+        $response = $this->actingAs($admin)->postJson("/api/system/system-alerts/{$alert->id}/resolve");
 
         $response->assertStatus(200);
 
@@ -134,7 +134,7 @@ class SystemAlertsTest extends TestCase
     {
         $alert = SystemAlert::create(['type' => 'minor', 'message' => 'unresolved alert', 'resolved' => false]);
 
-        $response = $this->postJson("/api/admin/system-alerts/{$alert->id}/resolve");
+        $response = $this->postJson("/api/system/system-alerts/{$alert->id}/resolve");
 
         $response->assertStatus(401);
 
@@ -152,7 +152,7 @@ class SystemAlertsTest extends TestCase
 
         $alert = SystemAlert::create(['type' => 'critical', 'message' => 'critical alert', 'resolved' => false]);
 
-        $response = $this->actingAs($staff)->postJson("/api/admin/system-alerts/{$alert->id}/resolve");
+        $response = $this->actingAs($staff)->postJson("/api/system/system-alerts/{$alert->id}/resolve");
 
         // Should be forbidden
         $response->assertStatus(403);
@@ -170,7 +170,7 @@ class SystemAlertsTest extends TestCase
 
         SystemAlert::create(['type' => 'minor', 'message' => 'a minor issue']);
 
-        $response = $this->actingAs($admin)->getJson('/api/admin/dashboard-stats');
+        $response = $this->actingAs($admin)->getJson('/api/system/dashboard-stats');
 
         $response->assertStatus(200)
             ->assertJson(['system_status' => 'Minor Problem']);
@@ -184,7 +184,7 @@ class SystemAlertsTest extends TestCase
         SystemAlert::create(['type' => 'minor', 'message' => 'minor issue']);
         SystemAlert::create(['type' => 'critical', 'message' => 'critical issue']);
 
-        $response = $this->actingAs($admin)->getJson('/api/admin/dashboard-stats');
+        $response = $this->actingAs($admin)->getJson('/api/system/dashboard-stats');
 
         $response->assertStatus(200)
             ->assertJson(['system_status' => 'Critical Problem']);
@@ -197,7 +197,7 @@ class SystemAlertsTest extends TestCase
 
         SystemAlert::create(['type' => 'critical', 'message' => 'old issue', 'resolved' => true, 'resolved_by' => $admin->id, 'resolved_at' => now()]);
 
-        $response = $this->actingAs($admin)->getJson('/api/admin/dashboard-stats');
+        $response = $this->actingAs($admin)->getJson('/api/system/dashboard-stats');
 
         $response->assertStatus(200)
             ->assertJson(['system_status' => 'System Operational'])
@@ -213,7 +213,7 @@ class SystemAlertsTest extends TestCase
         SystemAlert::create(['type' => 'critical', 'message' => 'resolved issue', 'resolved' => true, 'resolved_by' => $admin->id, 'resolved_at' => now()]);
         SystemAlert::create(['type' => 'minor', 'message' => 'active issue', 'resolved' => false]);
 
-        $response = $this->actingAs($admin)->getJson('/api/admin/dashboard-stats');
+        $response = $this->actingAs($admin)->getJson('/api/system/dashboard-stats');
 
         $response->assertStatus(200)
             ->assertJsonCount(1, 'system_alerts')
@@ -225,7 +225,7 @@ class SystemAlertsTest extends TestCase
         $admin = User::factory()->create();
         $admin->assignRole('Admin');
 
-        $response = $this->actingAs($admin)->postJson('/api/admin/system-alerts/99999/resolve');
+        $response = $this->actingAs($admin)->postJson('/api/system/system-alerts/99999/resolve');
 
         $response->assertStatus(404);
     }
@@ -244,7 +244,7 @@ class SystemAlertsTest extends TestCase
         ]);
 
         // Calling resolve again should not crash
-        $response = $this->actingAs($admin)->postJson("/api/admin/system-alerts/{$alert->id}/resolve");
+        $response = $this->actingAs($admin)->postJson("/api/system/system-alerts/{$alert->id}/resolve");
 
         $response->assertStatus(200);
 
@@ -260,11 +260,11 @@ class SystemAlertsTest extends TestCase
         $admin = User::factory()->create();
         $admin->assignRole('Admin');
 
-        \Illuminate\Support\Facades\Route::get('/api/admin/context-test', function () {
+        \Illuminate\Support\Facades\Route::get('/api/system/context-test', function () {
             throw new \Exception('Context Test Error');
         })->middleware(['auth:sanctum', 'role:Admin']);
 
-        $this->actingAs($admin)->getJson('/api/admin/context-test');
+        $this->actingAs($admin)->getJson('/api/system/context-test');
 
         $alert = SystemAlert::where('type', 'critical')->first();
 
