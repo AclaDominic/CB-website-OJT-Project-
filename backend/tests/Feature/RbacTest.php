@@ -32,7 +32,7 @@ class RbacTest extends TestCase
 
         Sanctum::actingAs($admin, ['*']);
 
-        $response = $this->getJson('/api/admin/users');
+        $response = $this->getJson('/api/system/users');
 
         $response->assertStatus(200);
     }
@@ -44,7 +44,7 @@ class RbacTest extends TestCase
 
         Sanctum::actingAs($admin, ['*']);
 
-        $response = $this->postJson('/api/admin/users', [
+        $response = $this->postJson('/api/system/users', [
             'name' => 'New Staff',
             'email' => 'newstaff@example.com',
             'password' => 'password',
@@ -77,7 +77,7 @@ class RbacTest extends TestCase
         Sanctum::actingAs($pm, ['*']);
 
         // Attempt to access user management
-        $response = $this->getJson('/api/admin/users');
+        $response = $this->getJson('/api/system/users');
 
         // Should be Forbidden
         $response->assertStatus(403);
@@ -104,7 +104,7 @@ class RbacTest extends TestCase
 
         Sanctum::actingAs($staff, ['*']);
 
-        $response = $this->getJson('/api/admin/users');
+        $response = $this->getJson('/api/system/users');
 
         $response->assertStatus(403);
     }
@@ -135,7 +135,7 @@ class RbacTest extends TestCase
 
     public function test_guest_cannot_access_protected_routes()
     {
-        $response = $this->getJson('/api/admin/users');
+        $response = $this->getJson('/api/system/users');
 
         $response->assertStatus(401); // Unauthorized
     }

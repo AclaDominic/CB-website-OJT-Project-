@@ -27,7 +27,7 @@ import { useAuth } from "../context/AuthContext";
 
 import echo from "../lib/echo";
 
-const AdminSidebar = ({ isOpen, onClose }) => {
+const SystemSidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
   const { user, logout } = useAuth();
   const [expandedGroups, setExpandedGroups] = useState({
@@ -128,7 +128,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
       title: null, // Root items
       items: [
         {
-          path: "/admin",
+          path: "/system",
           label: "Dashboard",
           icon: <LayoutDashboard size={20} />,
         },
@@ -139,27 +139,27 @@ const AdminSidebar = ({ isOpen, onClose }) => {
       icon: <Layers size={18} />,
       items: [
         {
-          path: "/admin/projects",
+          path: "/system/projects",
           label: "Projects",
           icon: <FolderKanban size={18} />,
         },
         {
-          path: "/admin/services",
+          path: "/system/services",
           label: "Services",
           icon: <Briefcase size={18} />,
         },
         {
-          path: "/admin/resources",
+          path: "/system/resources",
           label: "Resources",
           icon: <Truck size={18} />,
         },
         {
-          path: "/admin/about",
+          path: "/system/about",
           label: "About Us",
           icon: <FileText size={18} />,
         },
         {
-          path: "/admin/contact",
+          path: "/system/contact",
           label: "Contact Info",
           icon: <Phone size={18} />,
         },
@@ -170,17 +170,17 @@ const AdminSidebar = ({ isOpen, onClose }) => {
       icon: <ClipboardList size={18} />,
       items: [
         {
-          path: "/admin/inventory",
+          path: "/system/inventory",
           label: "Inventory",
           icon: <Package size={18} />,
         },
         {
-          path: "/admin/procurement",
+          path: "/system/procurement",
           label: "Procurement",
           icon: <ShoppingCart size={18} />,
         },
         {
-          path: "/admin/inquiries",
+          path: "/system/inquiries",
           label: "Inquiries",
           icon: <Mail size={18} />,
         },
@@ -193,7 +193,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
         ...(user?.all_permissions?.includes("system.manage_users")
           ? [
               {
-                path: "/admin/users",
+                path: "/system/users",
                 label: "User Management",
                 icon: <Users size={18} />,
               },
@@ -202,7 +202,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
         ...(user?.all_permissions?.includes("system.manage_roles")
           ? [
               {
-                path: "/admin/roles",
+                path: "/system/roles",
                 label: "Roles & Permissions",
                 icon: <Shield size={18} />,
               },
@@ -372,9 +372,9 @@ const AdminSidebar = ({ isOpen, onClose }) => {
 
         <div className="p-4 border-t border-gray-800 space-y-2">
           <Link
-            to="/admin/settings"
+            to="/system/settings"
             onClick={() => onClose && onClose()}
-            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium ${isActive("/admin/settings")}`}
+            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium ${isActive("/system/settings")}`}
           >
             <Settings size={20} />
             <span>Account Settings</span>
@@ -404,4 +404,4 @@ const AdminSidebar = ({ isOpen, onClose }) => {
   );
 };
 
-export default AdminSidebar;
+export default SystemSidebar;

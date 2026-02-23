@@ -30,7 +30,7 @@ const UserManager = () => {
   }
 
   if (!user?.all_permissions?.includes("system.manage_users")) {
-    return <Navigate to="/admin" replace />;
+    return <Navigate to="/system" replace />;
   }
 
   useEffect(() => {
@@ -41,8 +41,8 @@ const UserManager = () => {
     setLoading(true);
     try {
       const [usersRes, rolesRes] = await Promise.all([
-        axiosClient.get("/api/admin/users"),
-        axiosClient.get("/api/admin/roles"),
+        axiosClient.get("/api/system/users"),
+        axiosClient.get("/api/system/roles"),
       ]);
       setUsers(usersRes.data);
       setRoles(rolesRes.data);
@@ -70,7 +70,7 @@ const UserManager = () => {
     if (!selectedRole) return;
 
     try {
-      await axiosClient.put(`/api/admin/users/${editingUser.id}`, {
+      await axiosClient.put(`/api/system/users/${editingUser.id}`, {
         role: selectedRole,
       });
       fetchData();
@@ -100,7 +100,7 @@ const UserManager = () => {
     setErrors({});
 
     try {
-      await axiosClient.post("/api/admin/users", {
+      await axiosClient.post("/api/system/users", {
         name: newUser.name,
         email: newUser.email,
         password: newUser.password,

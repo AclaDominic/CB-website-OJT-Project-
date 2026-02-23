@@ -12,7 +12,7 @@ const Login = () => {
 
   React.useEffect(() => {
     if (user) {
-      navigate("/admin");
+      navigate("/system");
     }
   }, [user, navigate]);
 
@@ -22,7 +22,7 @@ const Login = () => {
     setIsLoading(true);
     try {
       await login({ email, password });
-      // navigate('/admin'); // Handled by AuthContext or useEffect
+      // navigate('/system'); // Handled by AuthContext or useEffect
     } catch (err) {
       setError("Invalid credentials");
     } finally {
@@ -34,7 +34,7 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold mb-6 text-center text-company-blue">
-          Admin Login
+          System Login
         </h2>
         {error && (
           <div className="bg-red-100 text-red-700 p-3 rounded mb-4">

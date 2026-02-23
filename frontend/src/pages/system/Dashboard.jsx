@@ -76,7 +76,7 @@ const Dashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await axiosClient.get("/api/admin/dashboard-stats");
+      const response = await axiosClient.get("/api/system/dashboard-stats");
       setStats(response.data);
     } catch (error) {
       console.error("Failed to fetch dashboard stats", error);
@@ -241,21 +241,21 @@ const Dashboard = () => {
             <div className="space-y-3">
               {canCreateProject && (
                 <QuickActionButton
-                  to="/admin/projects"
+                  to="/system/projects"
                   label="New Project"
                   icon={Plus}
                   colorClass="bg-blue-50 hover:bg-blue-100 text-blue-600"
                 />
               )}
               <QuickActionButton
-                to="/admin/procurement"
+                to="/system/procurement"
                 label="Request Materials"
                 icon={Package}
                 colorClass="bg-amber-50 hover:bg-amber-100 text-amber-600"
               />
               {canViewInventory && (
                 <QuickActionButton
-                  to="/admin/inventory"
+                  to="/system/inventory"
                   label="Add Inventory"
                   icon={Files}
                   colorClass="bg-green-50 hover:bg-green-100 text-green-600"
@@ -272,7 +272,7 @@ const Dashboard = () => {
               Recent Procurement Requests
             </h3>
             <Link
-              to="/admin/procurement"
+              to="/system/procurement"
               className="text-sm text-blue-600 hover:text-blue-800 font-medium"
             >
               View All

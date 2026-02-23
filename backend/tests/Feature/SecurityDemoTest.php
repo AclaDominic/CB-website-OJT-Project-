@@ -26,7 +26,7 @@ class SecurityDemoTest extends TestCase
     /** @test */
     public function public_users_cannot_access_admin_panel()
     {
-        $response = $this->getJson('/api/admin/users');
+        $response = $this->getJson('/api/system/users');
 
         // Expect: 401 Unauthorized (Because they are not logged in)
         $response->assertStatus(401);

@@ -27,7 +27,7 @@ const RoleManager = () => {
   }
 
   if (!user?.all_permissions?.includes("system.manage_roles")) {
-    return <Navigate to="/admin" replace />;
+    return <Navigate to="/system" replace />;
   }
 
   useEffect(() => {
@@ -38,8 +38,8 @@ const RoleManager = () => {
     setLoading(true);
     try {
       const [rolesRes, permsRes] = await Promise.all([
-        axiosClient.get("/api/admin/roles"),
-        axiosClient.get("/api/admin/permissions"),
+        axiosClient.get("/api/system/roles"),
+        axiosClient.get("/api/system/permissions"),
       ]);
       setRoles(rolesRes.data);
       setPermissions(permsRes.data);
@@ -94,9 +94,9 @@ const RoleManager = () => {
 
     try {
       if (editingRole) {
-        await axiosClient.put(`/api/admin/roles/${editingRole.id}`, payload);
+        await axiosClient.put(`/api/system/roles/${editingRole.id}`, payload);
       } else {
-        await axiosClient.post("/api/admin/roles", payload);
+        await axiosClient.post("/api/system/roles", payload);
       }
       fetchData();
       closeModal();
@@ -113,7 +113,7 @@ const RoleManager = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this role?")) {
       try {
-        await axiosClient.delete(`/api/admin/roles/${id}`);
+        await axiosClient.delete(`/api/system/roles/${id}`);
         fetchData();
       } catch (error) {
         console.error("Error deleting role:", error);

@@ -11,7 +11,7 @@ const SystemAlertsModal = ({ isOpen, onClose, alerts, onResolve }) => {
   const handleResolve = async (id) => {
     setResolvingId(id);
     try {
-      await axiosClient.post(`/api/admin/system-alerts/${id}/resolve`);
+      await axiosClient.post(`/api/system/system-alerts/${id}/resolve`);
       onResolve();
     } catch (error) {
       console.error("Failed to resolve alert:", error);

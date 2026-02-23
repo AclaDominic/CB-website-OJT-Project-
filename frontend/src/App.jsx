@@ -1,26 +1,26 @@
 import React, { StrictMode } from "react";
 import { Routes, Route } from "react-router-dom";
 import Layout from "./layouts/Layout";
-import AdminLayout from "./layouts/AdminLayout";
+import SystemLayout from "./layouts/SystemLayout";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import { About, Services, Projects, Contact, Resources } from "./pages/Pages";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-import AboutEditor from "./pages/admin/cms/AboutEditor";
-import ContactEditor from "./pages/admin/cms/ContactEditor";
-import ServiceManager from "./pages/admin/cms/ServiceManager";
-import ProjectManager from "./pages/admin/cms/ProjectManager";
-import AdminInquiries from "./pages/admin/cms/AdminInquiries";
-import UserManager from "./pages/admin/system/UserManager";
-import RoleManager from "./pages/admin/system/RoleManager";
-import ResourceManager from "./pages/admin/system/ResourceManager";
-import InventoryManager from "./pages/admin/system/InventoryManager";
+import AboutEditor from "./pages/system/cms/AboutEditor";
+import ContactEditor from "./pages/system/cms/ContactEditor";
+import ServiceManager from "./pages/system/cms/ServiceManager";
+import ProjectManager from "./pages/system/cms/ProjectManager";
+import SystemInquiries from "./pages/system/cms/SystemInquiries";
+import UserManager from "./pages/system/system/UserManager";
+import RoleManager from "./pages/system/system/RoleManager";
+import ResourceManager from "./pages/system/system/ResourceManager";
+import InventoryManager from "./pages/system/system/InventoryManager";
 
-import ProcurementManager from "./pages/admin/system/ProcurementManager";
-import AccountSettings from "./pages/admin/system/AccountSettings";
-import Dashboard from "./pages/admin/Dashboard";
+import ProcurementManager from "./pages/system/system/ProcurementManager";
+import AccountSettings from "./pages/system/system/AccountSettings";
+import Dashboard from "./pages/system/Dashboard";
 
 import { LoadingProvider } from "./context/LoadingContext";
 import LoadingOverlay from "./components/LoadingOverlay";
@@ -47,14 +47,14 @@ function App() {
 
           <Route path="/login" element={<Login />} />
 
-          <Route path="/admin" element={<ProtectedRoute />}>
-            <Route element={<AdminLayout />}>
+          <Route path="/system" element={<ProtectedRoute />}>
+            <Route element={<SystemLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="about" element={<AboutEditor />} />
               <Route path="contact" element={<ContactEditor />} />
               <Route path="services" element={<ServiceManager />} />
               <Route path="projects" element={<ProjectManager />} />
-              <Route path="inquiries" element={<AdminInquiries />} />
+              <Route path="inquiries" element={<SystemInquiries />} />
               <Route path="resources" element={<ResourceManager />} />
               <Route path="inventory" element={<InventoryManager />} />
               <Route path="procurement" element={<ProcurementManager />} />
