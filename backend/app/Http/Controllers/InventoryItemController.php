@@ -10,6 +10,13 @@ use Illuminate\Support\Facades\DB;
 
 class InventoryItemController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:inventory.create')->only(['store', 'addStock', 'removeStock']);
+        $this->middleware('permission:inventory.edit')->only(['update']);
+        $this->middleware('permission:inventory.delete')->only(['destroy']);
+    }
+
     public function index(Request $request)
     {
         $query = InventoryItem::with('category');

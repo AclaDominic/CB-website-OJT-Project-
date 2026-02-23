@@ -81,4 +81,4 @@ Route::get('/development-sites/{site}', [\App\Http\Controllers\Api\System\Develo
 Route::get('/page-contents', [\App\Http\Controllers\Api\Cms\PageContentController::class, 'index']);
 Route::get('/organization-members', [\App\Http\Controllers\Api\OrganizationMemberController::class, 'index']);
 
-Route::post('/inquiries', [\App\Http\Controllers\Api\Cms\InquiryController::class, 'store']);
+Route::post('/inquiries', [\App\Http\Controllers\Api\Cms\InquiryController::class, 'store'])->middleware('throttle:5,1');

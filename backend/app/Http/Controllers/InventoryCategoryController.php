@@ -8,6 +8,13 @@ use Illuminate\Http\Request;
 
 class InventoryCategoryController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:inventory.create')->only(['store']);
+        $this->middleware('permission:inventory.edit')->only(['update']);
+        $this->middleware('permission:inventory.delete')->only(['destroy']);
+    }
+
     public function index()
     {
         // Return categories with their items and count

@@ -8,6 +8,11 @@ use Illuminate\Http\Request;
 
 class PageContentController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:cms.edit')->only(['store', 'update', 'destroy']);
+    }
+
     /**
      * Display a listing of the resource.
      */

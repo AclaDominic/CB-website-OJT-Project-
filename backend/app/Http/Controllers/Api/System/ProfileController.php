@@ -20,6 +20,8 @@ class ProfileController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
+        $request->user()->tokens()->delete();
+
         return response()->json(['message' => 'Password updated successfully.']);
     }
 }
