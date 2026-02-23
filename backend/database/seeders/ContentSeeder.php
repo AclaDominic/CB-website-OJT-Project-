@@ -28,7 +28,7 @@ class ContentSeeder extends Seeder
             [
                 'page_name' => 'about',
                 'section_name' => 'background',
-                'content' => "Established: November 28, 2018\nRegistration: Securities and Exchange Commission (SEC)\nIndustry: Construction, Land Development, Backfill Materials Supply\nOperating Areas: CALABARZON and nearby regions\n\nOrigin of Name: CLIBERDUCHE = CLImaco + BERonilla + DUCHE (Piaduche)"
+                'content' => "Established: November 28, 2018\nRegistration: Securities and Exchange Commission (SEC)\nIndustry: Construction, Land Development, Backfill Materials Supply\nOperating Areas: CALABARZON and nearby regions\nCore Services: General Construction, Site Development, Earthworks, and Backfilling Operations\n\nOrigin of Name: CLIBERDUCHE = CLImaco + BERonilla + DUCHE (Piaduche)"
             ],
             [
                 'page_name' => 'contact',
@@ -187,17 +187,184 @@ class ContentSeeder extends Seeder
         }
 
         // 6. Organization Members
-        $members = [
-            ['name' => 'Person A', 'role' => 'President', 'category' => 'Leadership', 'order' => 1],
-            ['name' => 'Person B', 'role' => 'Vice President', 'category' => 'Management', 'order' => 1],
-            ['name' => 'Person C', 'role' => 'General Manager', 'category' => 'Management', 'order' => 2],
-            ['name' => 'Person D', 'role' => 'Operations Head', 'category' => 'Staff', 'order' => 1],
-            ['name' => 'Person E', 'role' => 'Project Engineer', 'category' => 'Staff', 'order' => 2],
-            ['name' => 'Person F', 'role' => 'Safety Officer', 'category' => 'Staff', 'order' => 3],
-        ];
+        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        \App\Models\OrganizationMember::truncate();
+        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        foreach ($members as $member) {
-            \App\Models\OrganizationMember::firstOrCreate(['name' => $member['name']], $member);
-        }
+        // Level 1
+        $president = \App\Models\OrganizationMember::create([
+            'name' => 'Rolando Climaco',
+            'role' => 'President / CEO',
+            'category' => 'leadership',
+            'order' => 1
+        ]);
+
+        // Level 2
+        $vp = \App\Models\OrganizationMember::create([
+            'name' => 'Maria Bella Climaco',
+            'role' => 'Vice President',
+            'category' => 'leadership',
+            'order' => 1,
+            'parent_id' => $president->id
+        ]);
+
+        // Level 3
+        $marketing = \App\Models\OrganizationMember::create([
+            'name' => 'Rheamie Alberastine',
+            'role' => 'Marketing Manager',
+            'category' => 'management',
+            'order' => 1,
+            'parent_id' => $vp->id
+        ]);
+
+        $siteOps = \App\Models\OrganizationMember::create([
+            'name' => 'Rolando Climaco',
+            'role' => 'Chief of Site Operations',
+            'category' => 'management',
+            'order' => 2,
+            'parent_id' => $vp->id
+        ]);
+
+        $purchasingHead = \App\Models\OrganizationMember::create([
+            'name' => 'Benilda Padilla',
+            'role' => 'Purchasing Head',
+            'category' => 'management',
+            'order' => 3,
+            'parent_id' => $vp->id
+        ]);
+
+        $hrLegalHead = \App\Models\OrganizationMember::create([
+            'name' => 'Ofelia Macaldo',
+            'role' => 'Head - HR Admin & Legal',
+            'category' => 'management',
+            'order' => 4,
+            'parent_id' => $vp->id
+        ]);
+
+        // Level 4
+        $accounting = \App\Models\OrganizationMember::create([
+            'name' => 'Maria Cristina Dino',
+            'role' => 'Accounting Head',
+            'category' => 'staff',
+            'order' => 1,
+            'parent_id' => $marketing->id
+        ]);
+
+        $pmGenesis = \App\Models\OrganizationMember::create([
+            'name' => 'Genesis De Guzman',
+            'role' => 'Project Manager',
+            'category' => 'staff',
+            'order' => 1,
+            'parent_id' => $siteOps->id
+        ]);
+
+        $purchasingOfficer = \App\Models\OrganizationMember::create([
+            'name' => 'Ivan Roy Climaco',
+            'role' => 'Purchasing Officer',
+            'category' => 'staff',
+            'order' => 1,
+            'parent_id' => $purchasingHead->id
+        ]);
+
+        $hrAdminOfficer = \App\Models\OrganizationMember::create([
+            'name' => 'Ian Climaco',
+            'role' => 'HR Admin Officer',
+            'category' => 'staff',
+            'order' => 1,
+            'parent_id' => $hrLegalHead->id
+        ]);
+
+        // Level 5
+        \App\Models\OrganizationMember::create([
+            'name' => 'Rommel Matias',
+            'role' => 'Field Agent',
+            'category' => 'staff',
+            'order' => 1,
+            'parent_id' => $accounting->id
+        ]);
+
+        $pmCaringal = \App\Models\OrganizationMember::create([
+            'name' => 'Col. Jose Caringal',
+            'role' => 'Project Manager',
+            'category' => 'staff',
+            'order' => 1,
+            'parent_id' => $pmGenesis->id
+        ]);
+
+        $legalOfficer1 = \App\Models\OrganizationMember::create([
+            'name' => 'Atty. Paulo Punzalan',
+            'role' => 'Legal Officer',
+            'category' => 'staff',
+            'order' => 1,
+            'parent_id' => $hrAdminOfficer->id
+        ]);
+
+        // Level 6
+        $engManager = \App\Models\OrganizationMember::create([
+            'name' => 'Rheamie Alberastine',
+            'role' => 'Engineering Manager',
+            'category' => 'staff',
+            'order' => 1,
+            'parent_id' => $pmCaringal->id
+        ]);
+
+        $seniorEng = \App\Models\OrganizationMember::create([
+            'name' => 'Aldwin Miranda',
+            'role' => 'Senior Engineer',
+            'category' => 'staff',
+            'order' => 2,
+            'parent_id' => $pmCaringal->id
+        ]);
+
+        \App\Models\OrganizationMember::create([
+            'name' => 'Atty. Dante Manguiat',
+            'role' => 'Legal Officer',
+            'category' => 'staff',
+            'order' => 1,
+            'parent_id' => $legalOfficer1->id
+        ]);
+
+        // Level 7
+        $foremanLucas = \App\Models\OrganizationMember::create([
+            'name' => 'Lucas Martinez',
+            'role' => 'Site Foreman',
+            'category' => 'staff',
+            'order' => 1,
+            'parent_id' => $engManager->id
+        ]);
+
+        $supervisorRolisdio = \App\Models\OrganizationMember::create([
+            'name' => 'Rolisdio Climaco',
+            'role' => 'Supervisor/Safety Officer',
+            'category' => 'staff',
+            'order' => 1,
+            'parent_id' => $seniorEng->id
+        ]);
+
+        // Level 8
+        \App\Models\OrganizationMember::create([
+            'name' => 'Renato Nebrida',
+            'role' => 'Site Foreman',
+            'category' => 'staff',
+            'order' => 1,
+            'parent_id' => $foremanLucas->id
+        ]);
+
+        $qaqc = \App\Models\OrganizationMember::create([
+            'name' => 'Katleen Mae Martinez',
+            'role' => 'QA / QC Engineer',
+            'category' => 'staff',
+            'order' => 1,
+            'parent_id' => $supervisorRolisdio->id
+        ]);
+
+        // Level 9
+        \App\Models\OrganizationMember::create([
+            'name' => 'Persues Sarte',
+            'role' => 'Site Engineer',
+            'category' => 'staff',
+            'order' => 1,
+            'parent_id' => $qaqc->id
+        ]);
     }
 }

@@ -46,14 +46,14 @@ const Resources = () => {
   const displayedMachinery = showPlateNumbers
     ? activeMachinery
     : Object.values(
-        activeMachinery.reduce((acc, item) => {
-          const key = `${item.name}-${item.type}`;
-          if (!acc[key]) {
-            acc[key] = item;
-          }
-          return acc;
-        }, {}),
-      );
+      activeMachinery.reduce((acc, item) => {
+        const key = `${item.name}-${item.type}`;
+        if (!acc[key]) {
+          acc[key] = item;
+        }
+        return acc;
+      }, {}),
+    );
 
   return (
     <div className="font-sans pt-20">

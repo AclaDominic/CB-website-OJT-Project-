@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import api from "../lib/axios";
 import Organization from "./Organization";
 import PageLoader from "../components/PageLoader";
+import { Calendar, ShieldCheck, Building2, MapPin, Info, Wrench } from "lucide-react";
 
 const About = () => {
   const [content, setContent] = useState({
@@ -185,28 +186,76 @@ const About = () => {
         </div>
 
         {/* Company Info */}
-        <div className="bg-gray-50 p-8 rounded-xl">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">
+        <div className="mt-8">
+          <h2 className="text-3xl font-bold text-center text-gray-800 mb-2">
             Company Background
           </h2>
-          <div className="text-gray-700 whitespace-pre-wrap">
+          <div className="w-16 h-1 bg-green-500 mx-auto mb-12 rounded-full"></div>
+
+          <div className="grid md:grid-cols-2 gap-6">
             {content.background
               ? content.background.split("\n").map((line, index) => {
-                  const parts = line.split(":");
-                  if (parts.length > 1) {
-                    return (
-                      <div key={index} className="mb-2">
-                        <strong>{parts[0]}:</strong>
-                        {parts.slice(1).join(":")}
-                      </div>
-                    );
+                const parts = line.split(":");
+                if (parts.length > 1) {
+                  const label = parts[0].trim();
+                  const value = parts.slice(1).join(":").trim();
+
+                  // Icon and color mapping
+                  let icon = <Info size={24} />;
+                  let bgClass = "bg-blue-50";
+                  let iconClass = "text-blue-600";
+
+                  if (label.toLowerCase().includes("established")) {
+                    icon = <Calendar size={24} />;
+                    bgClass = "bg-blue-50";
+                    iconClass = "text-blue-600";
+                  } else if (label.toLowerCase().includes("registration")) {
+                    icon = <ShieldCheck size={24} />;
+                    bgClass = "bg-green-50";
+                    iconClass = "text-green-600";
+                  } else if (label.toLowerCase().includes("industry")) {
+                    icon = <Building2 size={24} />;
+                    bgClass = "bg-blue-50";
+                    iconClass = "text-blue-600";
+                  } else if (label.toLowerCase().includes("areas")) {
+                    icon = <MapPin size={24} />;
+                    bgClass = "bg-green-50";
+                    iconClass = "text-green-600";
+                  } else if (label.toLowerCase().includes("origin")) {
+                    icon = <Info size={24} />;
+                    bgClass = "bg-blue-50";
+                    iconClass = "text-blue-600";
+                  } else if (label.toLowerCase().includes("services")) {
+                    icon = <Wrench size={24} />;
+                    bgClass = "bg-green-50";
+                    iconClass = "text-green-600";
                   }
+
                   return (
-                    <div key={index} className="mb-2">
-                      {line}
+                    <div
+                      key={index}
+                      className="flex items-center p-6 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-1 transition-all duration-300"
+                    >
+                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center mr-5 ${bgClass} ${iconClass}`}>
+                        {icon}
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">
+                          {label}
+                        </p>
+                        <p className="text-gray-800 font-semibold leading-tight">
+                          {value}
+                        </p>
+                      </div>
                     </div>
                   );
-                })
+                }
+                return line.trim() ? (
+                  <div key={index} className="md:col-span-2 p-4 bg-gray-50 rounded-lg text-gray-600 text-center italic">
+                    {line}
+                  </div>
+                ) : null;
+              })
               : "Loading background..."}
           </div>
         </div>
