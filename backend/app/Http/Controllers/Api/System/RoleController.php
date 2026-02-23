@@ -52,6 +52,10 @@ class RoleController extends Controller
     {
         $role = Role::findOrFail($id);
 
+        if ($role->name === 'Admin') {
+            return response()->json(['message' => 'The core Admin role cannot be modified.'], 403);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|unique:roles,name,' . $id,
             'permissions' => 'array',
@@ -73,6 +77,11 @@ class RoleController extends Controller
     public function destroy(string $id)
     {
         $role = Role::findOrFail($id);
+
+        if ($role->name === 'Admin') {
+            return response()->json(['message' => 'The core Admin role cannot be deleted.'], 403);
+        }
+
         $role->delete();
 
         return response()->json(['message' => 'Role deleted successfully']);

@@ -20,6 +20,7 @@ import InventoryManager from "./pages/system/system/InventoryManager";
 
 import ProcurementManager from "./pages/system/system/ProcurementManager";
 import AccountSettings from "./pages/system/system/AccountSettings";
+import BackupManager from "./pages/system/BackupManager";
 import Dashboard from "./pages/system/Dashboard";
 
 import { LoadingProvider } from "./context/LoadingContext";
@@ -60,6 +61,7 @@ function App() {
               <Route path="procurement" element={<ProcurementManager />} />
               <Route path="roles" element={<RoleManager />} />
               <Route path="users" element={<UserManager />} />
+              <Route path="backups" element={<BackupManager />} />
               <Route path="settings" element={<AccountSettings />} />
             </Route>
           </Route>

@@ -20,6 +20,7 @@ import {
   Layers,
   Settings,
   ClipboardList,
+  Database,
 } from "lucide-react";
 import axiosClient from "../lib/axios";
 import { formatDistanceToNow } from "date-fns";
@@ -205,6 +206,15 @@ const SystemSidebar = ({ isOpen, onClose }) => {
                 path: "/system/roles",
                 label: "Roles & Permissions",
                 icon: <Shield size={18} />,
+              },
+            ]
+          : []),
+        ...(user?.all_permissions?.includes("view_backups")
+          ? [
+              {
+                path: "/system/backups",
+                label: "System Backups",
+                icon: <Database size={18} />,
               },
             ]
           : []),
