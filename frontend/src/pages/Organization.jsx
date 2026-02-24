@@ -45,19 +45,9 @@ const Organization = () => {
 
   const orgTree = useMemo(() => buildTree(members), [members]);
 
-  const leadership = members
-    .filter((m) => m.category === "leadership")
-    .sort((a, b) => a.order - b.order);
-  const management = members
-    .filter((m) => m.category === "management")
-    .sort((a, b) => a.order - b.order);
-  const staff = members
-    .filter((m) => m.category === "staff")
-    .sort((a, b) => a.order - b.order);
-
   const DefaultAvatar = () => (
     <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">
-      <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 20 20">
+      <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
         <path
           fillRule="evenodd"
           d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
@@ -93,8 +83,24 @@ const Organization = () => {
               {member.role}
             </span>
           </div>
+
+          {/* Conditional Profile Image */}
+          {showProfile && (
+            <div className="w-12 h-12 mx-auto mt-2 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden border border-gray-200">
+              {member.image_path ? (
+                <img
+                  src={`${import.meta.env.VITE_API_URL || "http://localhost:8000"}${member.image_path}`}
+                  alt={member.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <DefaultAvatar />
+              )}
+            </div>
+          )}
+
           {/* Name */}
-          <div className="py-1.5 px-1 text-center">
+          <div className="py-2 px-1 text-center">
             <h3 className="text-gray-800 font-bold text-[9px] md:text-[10px] leading-tight truncate px-1">
               {member.name}
             </h3>
@@ -157,111 +163,13 @@ const Organization = () => {
               Organizational structure to be updated.
             </p>
           </div>
-        ) : showProfile ? (
-          <div className="overflow-x-auto pb-10 cursor-grab active:cursor-grabbing scrollbar-hide">
+        ) : (
+          <div className="overflow-x-auto pb-10 cursor-grab active:cursor-grabbing scrollbar-hide flex justify-center">
             <div className="flex justify-center min-w-max p-4">
               {orgTree.map((root) => (
                 <MemberCard key={root.id} member={root} isRoot />
               ))}
             </div>
-          </div>
-        ) : (
-          <div className="max-w-6xl mx-auto">
-            {/* Level 1: Leadership */}
-            {leadership.length > 0 && (
-              <div className="flex flex-wrap justify-center gap-8 mb-12">
-                {leadership.map((member) => (
-                  <div
-                    key={member.id}
-                    className="bg-blue-900 text-white p-6 rounded-lg shadow-lg text-center w-full max-w-xs md:w-72 transform hover:scale-105 transition-transform"
-                  >
-                    <div className="w-24 h-24 mx-auto bg-white rounded-full mb-4 flex items-center justify-center overflow-hidden border-4 border-blue-400">
-                      {member.image_path ? (
-                        <img
-                          src={`${import.meta.env.VITE_API_URL || "http://localhost:8000"}${member.image_path}`}
-                          alt={member.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <DefaultAvatar />
-                      )}
-                    </div>
-                    <h3 className="font-bold text-xl">{member.name}</h3>
-                    <p className="text-blue-100 text-sm mt-1">{member.role}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Level 2: Management */}
-            {management.length > 0 && (
-              <>
-                <div className="hidden md:block w-1 h-8 bg-gray-300 mx-auto -mt-12 mb-8"></div>
-                <div className="flex flex-wrap justify-center gap-8 mb-12">
-                  {management.map((member) => (
-                    <div
-                      key={member.id}
-                      className="flex flex-col items-center w-full max-w-xs md:w-64"
-                    >
-                      <div className="bg-white border-2 border-gray-100 p-4 rounded-lg shadow-sm w-full hover:shadow-md transition-shadow text-center">
-                        <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full mb-3 flex items-center justify-center overflow-hidden">
-                          {member.image_path ? (
-                            <img
-                              src={`${import.meta.env.VITE_API_URL || "http://localhost:8000"}${member.image_path}`}
-                              alt={member.name}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <DefaultAvatar />
-                          )}
-                        </div>
-                        <h4 className="font-bold text-gray-800">
-                          {member.role}
-                        </h4>
-                        <p className="text-sm text-gray-600 mt-1">
-                          {member.name}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-
-            {/* Level 3: Staff */}
-            {staff.length > 0 && (
-              <>
-                <div className="hidden md:block w-1 h-8 bg-gray-300 mx-auto -mt-12 mb-8"></div>
-                <div className="flex flex-wrap justify-center gap-8">
-                  {staff.map((member) => (
-                    <div
-                      key={member.id}
-                      className="flex flex-col items-center w-full max-w-xs md:w-64"
-                    >
-                      <div className="bg-white border-2 border-gray-100 p-4 rounded-lg shadow-sm w-full hover:shadow-md transition-shadow text-center">
-                        <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full mb-3 flex items-center justify-center overflow-hidden">
-                          {member.image_path ? (
-                            <img
-                              src={`${import.meta.env.VITE_API_URL || "http://localhost:8000"}${member.image_path}`}
-                              alt={member.name}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <DefaultAvatar />
-                          )}
-                        </div>
-                        <h4 className="font-bold text-gray-800">
-                          {member.role}
-                        </h4>
-                        <p className="text-sm text-gray-600 mt-1">
-                          {member.name}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
           </div>
         )}
       </div>
