@@ -14,6 +14,7 @@ const OrganizationManager = () => {
     name: "",
     role: "",
     category: "staff",
+    parent_id: "",
     image: null,
     order: 0,
   });
@@ -63,6 +64,7 @@ const OrganizationManager = () => {
       name: "",
       role: "",
       category: "staff",
+      parent_id: "",
       image: null,
       order: 0,
     });
@@ -101,6 +103,7 @@ const OrganizationManager = () => {
       name: member.name,
       role: member.role,
       category: member.category,
+      parent_id: member.parent_id || "",
       image: null, // Don't set image initially, only if changed
       order: member.order,
     });
@@ -155,6 +158,14 @@ const OrganizationManager = () => {
     data.append("name", formData.name);
     data.append("role", formData.role);
     data.append("category", formData.category);
+
+    // Only append if it has a value, otherwise send an empty string which Laravel converts to null
+    if (formData.parent_id) {
+      data.append("parent_id", formData.parent_id);
+    } else {
+      data.append("parent_id", "");
+    }
+
     data.append("order", formData.order);
 
     if (formData.image instanceof File) {
@@ -331,6 +342,33 @@ const OrganizationManager = () => {
                 }
               />
             </div>
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Reports To (Manager / Supervisor)
+            </label>
+            <select
+              className="w-full p-2 border rounded"
+              value={formData.parent_id}
+              onChange={(e) =>
+                setFormData({ ...formData, parent_id: e.target.value })
+              }
+            >
+              <option value="">-- None (Top Level) --</option>
+              {members
+                .filter((m) => m.id !== editingId) // Prevent selecting self
+                .sort((a, b) => a.order - b.order)
+                .map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.name} ({m.role}) - {m.category}
+                  </option>
+                ))}
+            </select>
+            <p className="text-xs text-gray-500 mt-1">
+              Select the person this member reports directly to in the
+              organizational chart.
+            </p>
           </div>
 
           <div className="mb-4">
