@@ -7,6 +7,7 @@ use App\Models\InventoryItem;
 use App\Models\ProcurementRequest;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class DashboardController extends Controller
 {
@@ -18,24 +19,28 @@ class DashboardController extends Controller
 
         // 1. Low Stock Count
         $lowStockCount = $canViewInventory
-            ? InventoryItem::whereColumn('quantity', '<=', 'threshold')->count()
+            ? Cache::remember('dashboard.low_stock_count', 60, function () {
+                return InventoryItem::whereColumn('quantity', '<=', 'threshold')->count();
+            })
             : 0;
 
         // Machinery Stats
-        // Statuses: 'Stand By', 'Maintenance', 'Decommissioned', 'Lease', 'Active'
-        $machineryStats = [
-            'total' => \App\Models\Machinery::where('status', '!=', 'Decommissioned')->count(),
-            'available' => \App\Models\Machinery::where('status', 'Stand By')->count(),
-            'in_use' => \App\Models\Machinery::whereIn('status', ['Active', 'Lease'])->count(),
-            'maintenance' => \App\Models\Machinery::where('status', 'Maintenance')->count(),
-        ];
+        $machineryStats = Cache::remember('dashboard.machinery_stats', 60, function () {
+            return [
+                'total' => \App\Models\Machinery::where('status', '!=', 'Decommissioned')->count(),
+                'available' => \App\Models\Machinery::where('status', 'Stand By')->count(),
+                'in_use' => \App\Models\Machinery::whereIn('status', ['Active', 'Lease'])->count(),
+                'maintenance' => \App\Models\Machinery::where('status', 'Maintenance')->count(),
+            ];
+        });
 
         // Project Status Stats
-        $projectStats = [
-            'ongoing' => Project::where('status', 'ongoing')->count(),
-            'completed' => Project::where('status', 'completed')->count(),
-            // Add planning if you have that status, otherwise just these two
-        ];
+        $projectStats = Cache::remember('dashboard.project_stats', 60, function () {
+            return [
+                'ongoing' => Project::where('status', 'ongoing')->count(),
+                'completed' => Project::where('status', 'completed')->count(),
+            ];
+        });
 
         // 2. Pending Procurement Requests
         // Admin/Staff: See ALL pending
