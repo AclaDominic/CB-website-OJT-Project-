@@ -21,6 +21,7 @@ class OrganizationMemberController extends Controller
             'name' => 'required|string|max:255',
             'role' => 'required|string|max:255',
             'category' => 'required|string|max:255',
+            'parent_id' => 'nullable|exists:organization_members,id',
             'image' => 'nullable|image|max:2048', // Allow image upload
             'order' => [
                 'integer',
@@ -50,6 +51,7 @@ class OrganizationMemberController extends Controller
             'name' => 'sometimes|required|string|max:255',
             'role' => 'sometimes|required|string|max:255',
             'category' => 'sometimes|required|string|max:255',
+            'parent_id' => 'nullable|exists:organization_members,id',
             'image' => 'nullable|image|max:2048',
             'order' => [
                 'integer',
