@@ -75,14 +75,20 @@ class PageContentController extends Controller
             'page_name' => 'required|string',
             'section_name' => 'required|string',
             'content' => 'required',
+            'show_profile' => 'sometimes|boolean',
         ]);
+
+        $updateData = ['content' => $validated['content']];
+        if (array_key_exists('show_profile', $validated)) {
+            $updateData['show_profile'] = $validated['show_profile'];
+        }
 
         $content = PageContent::updateOrCreate(
             [
                 'page_name' => $validated['page_name'],
                 'section_name' => $validated['section_name']
             ],
-            ['content' => $validated['content']]
+            $updateData
         );
 
         return response()->json($content);

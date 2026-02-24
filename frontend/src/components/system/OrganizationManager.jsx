@@ -21,9 +21,30 @@ const OrganizationManager = () => {
   const [saving, setSaving] = useState(false);
   const { user } = useAuth();
 
+  const [showProfile, setShowProfile] = useState(false);
+  const [toggleSaving, setToggleSaving] = useState(false);
+
   useEffect(() => {
     fetchMembers();
+    fetchShowProfileSetting();
   }, []);
+
+  const fetchShowProfileSetting = async () => {
+    try {
+      const response = await axiosClient.get(
+        "/api/page-contents?page=organization&section=settings",
+      );
+      const setting = response.data.find((s) => s.section_name === "settings");
+      if (setting) {
+        // Since sqlite returns 1/0 for true/false sometimes, ensure strict boolean
+        setShowProfile(
+          Boolean(setting.show_profile || setting.show_profile === 1),
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching show profile setting:", error);
+    }
+  };
 
   const fetchMembers = async () => {
     setLoading(true);
@@ -48,6 +69,31 @@ const OrganizationManager = () => {
     setImagePreview(null);
     setEditingId(null);
     setIsAdding(false);
+  };
+
+  const handleToggleShowProfile = async () => {
+    if (!user?.all_permissions?.includes("cms.edit")) return;
+
+    setToggleSaving(true);
+    const newValue = !showProfile;
+
+    try {
+      await axiosClient.post("/api/page-contents", {
+        page_name: "organization",
+        section_name: "settings",
+        content: "{}", // Empty content, we only care about show_profile
+        show_profile: newValue,
+      });
+      setShowProfile(newValue);
+      toast.success(
+        `Organization Chart profile images ${newValue ? "enabled" : "disabled"}`,
+      );
+    } catch (error) {
+      console.error("Error saving show profile setting:", error);
+      toast.error("Failed to update display setting");
+    } finally {
+      setToggleSaving(false);
+    }
   };
 
   const handleEdit = (member) => {
@@ -172,14 +218,50 @@ const OrganizationManager = () => {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow mt-8">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-xl font-bold text-gray-800">
-          Organizational Structure
-        </h3>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <div>
+          <h3 className="text-xl font-bold text-gray-800">
+            Organizational Structure
+          </h3>
+
+          {/* Toggle Switch */}
+          {!isAdding && user?.all_permissions?.includes("cms.edit") && (
+            <div className="flex items-center gap-3 mt-3 ml-1">
+              <label
+                htmlFor="show-profile-toggle"
+                className="inline-flex items-center cursor-pointer"
+              >
+                <div className="relative">
+                  <input
+                    id="show-profile-toggle"
+                    type="checkbox"
+                    className="sr-only"
+                    checked={showProfile}
+                    onChange={handleToggleShowProfile}
+                    disabled={toggleSaving}
+                  />
+                  <div
+                    className={`block w-10 h-6 rounded-full transition-colors ${showProfile ? "bg-blue-500" : "bg-gray-300"}`}
+                  ></div>
+                  <div
+                    className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${showProfile ? "transform translate-x-4" : ""}`}
+                  ></div>
+                </div>
+                <div className="ml-3 text-sm font-medium text-gray-700 flex items-center gap-2">
+                  Show Profile
+                  {toggleSaving && (
+                    <Loader2 size={14} className="animate-spin text-gray-400" />
+                  )}
+                </div>
+              </label>
+            </div>
+          )}
+        </div>
+
         {!isAdding && user?.all_permissions?.includes("cms.edit") && (
           <button
             onClick={() => setIsAdding(true)}
-            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition h-fit"
           >
             <Plus size={18} /> Add Member
           </button>

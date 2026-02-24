@@ -4,20 +4,34 @@ import api from "../lib/axios";
 const Organization = () => {
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showProfile, setShowProfile] = useState(false);
 
   useEffect(() => {
-    const fetchMembers = async () => {
+    const fetchData = async () => {
       try {
-        const response = await api.get("/api/organization-members");
-        setMembers(response.data);
+        const [membersRes, settingsRes] = await Promise.all([
+          api.get("/api/organization-members"),
+          api.get("/api/page-contents?page=organization&section=settings"),
+        ]);
+
+        setMembers(membersRes.data);
+
+        const setting = settingsRes.data.find(
+          (s) => s.section_name === "settings",
+        );
+        if (setting) {
+          setShowProfile(
+            Boolean(setting.show_profile || setting.show_profile === 1),
+          );
+        }
       } catch (error) {
-        console.error("Error fetching organization members:", error);
+        console.error("Error fetching organization data:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMembers();
+    fetchData();
   }, []);
 
   const buildTree = (items, parentId = null) => {
@@ -30,6 +44,28 @@ const Organization = () => {
   };
 
   const orgTree = useMemo(() => buildTree(members), [members]);
+
+  const leadership = members
+    .filter((m) => m.category === "leadership")
+    .sort((a, b) => a.order - b.order);
+  const management = members
+    .filter((m) => m.category === "management")
+    .sort((a, b) => a.order - b.order);
+  const staff = members
+    .filter((m) => m.category === "staff")
+    .sort((a, b) => a.order - b.order);
+
+  const DefaultAvatar = () => (
+    <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">
+      <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 20 20">
+        <path
+          fillRule="evenodd"
+          d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+          clipRule="evenodd"
+        />
+      </svg>
+    </div>
+  );
 
   const MemberCard = ({ member, isRoot = false }) => {
     const isLeadership = member.category === "leadership";
@@ -48,8 +84,12 @@ const Organization = () => {
         {/* The Card */}
         <div className="relative z-10 w-32 md:w-36 bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-md">
           {/* Capsule Header */}
-          <div className={`mx-1 mt-1 rounded-full py-0.5 px-1.5 text-center ${isLeadership ? 'bg-blue-600' : 'bg-green-300'}`}>
-            <span className={`text-[7px] md:text-[8px] font-bold uppercase tracking-tight ${isLeadership ? 'text-white' : 'text-blue-900'}`}>
+          <div
+            className={`mx-1 mt-1 rounded-full py-0.5 px-1.5 text-center ${isLeadership ? "bg-blue-600" : "bg-green-300"}`}
+          >
+            <span
+              className={`text-[7px] md:text-[8px] font-bold uppercase tracking-tight ${isLeadership ? "text-white" : "text-blue-900"}`}
+            >
               {member.role}
             </span>
           </div>
@@ -75,7 +115,7 @@ const Organization = () => {
                 className="absolute top-0 h-[1px] bg-slate-300"
                 style={{
                   left: `${100 / (member.children.length * 2)}%`,
-                  right: `${100 / (member.children.length * 2)}%`
+                  right: `${100 / (member.children.length * 2)}%`,
                 }}
               />
             )}
@@ -92,7 +132,10 @@ const Organization = () => {
   };
 
   return (
-    <section className="font-sans py-12 bg-gray-50 overflow-hidden" id="organization">
+    <section
+      className="font-sans py-12 bg-gray-50 overflow-hidden"
+      id="organization"
+    >
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-10">
           <h2 className="text-3xl font-bold text-gray-800 mb-2 tracking-tight">
@@ -110,15 +153,115 @@ const Organization = () => {
           </div>
         ) : members.length === 0 ? (
           <div className="text-center py-10 bg-white rounded-2xl shadow-sm border border-gray-100">
-            <p className="text-gray-400 text-sm italic">Organizational structure to be updated.</p>
+            <p className="text-gray-400 text-sm italic">
+              Organizational structure to be updated.
+            </p>
           </div>
-        ) : (
+        ) : showProfile ? (
           <div className="overflow-x-auto pb-10 cursor-grab active:cursor-grabbing scrollbar-hide">
             <div className="flex justify-center min-w-max p-4">
               {orgTree.map((root) => (
                 <MemberCard key={root.id} member={root} isRoot />
               ))}
             </div>
+          </div>
+        ) : (
+          <div className="max-w-6xl mx-auto">
+            {/* Level 1: Leadership */}
+            {leadership.length > 0 && (
+              <div className="flex flex-wrap justify-center gap-8 mb-12">
+                {leadership.map((member) => (
+                  <div
+                    key={member.id}
+                    className="bg-blue-900 text-white p-6 rounded-lg shadow-lg text-center w-full max-w-xs md:w-72 transform hover:scale-105 transition-transform"
+                  >
+                    <div className="w-24 h-24 mx-auto bg-white rounded-full mb-4 flex items-center justify-center overflow-hidden border-4 border-blue-400">
+                      {member.image_path ? (
+                        <img
+                          src={`${import.meta.env.VITE_API_URL || "http://localhost:8000"}${member.image_path}`}
+                          alt={member.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <DefaultAvatar />
+                      )}
+                    </div>
+                    <h3 className="font-bold text-xl">{member.name}</h3>
+                    <p className="text-blue-100 text-sm mt-1">{member.role}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Level 2: Management */}
+            {management.length > 0 && (
+              <>
+                <div className="hidden md:block w-1 h-8 bg-gray-300 mx-auto -mt-12 mb-8"></div>
+                <div className="flex flex-wrap justify-center gap-8 mb-12">
+                  {management.map((member) => (
+                    <div
+                      key={member.id}
+                      className="flex flex-col items-center w-full max-w-xs md:w-64"
+                    >
+                      <div className="bg-white border-2 border-gray-100 p-4 rounded-lg shadow-sm w-full hover:shadow-md transition-shadow text-center">
+                        <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full mb-3 flex items-center justify-center overflow-hidden">
+                          {member.image_path ? (
+                            <img
+                              src={`${import.meta.env.VITE_API_URL || "http://localhost:8000"}${member.image_path}`}
+                              alt={member.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <DefaultAvatar />
+                          )}
+                        </div>
+                        <h4 className="font-bold text-gray-800">
+                          {member.role}
+                        </h4>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {member.name}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* Level 3: Staff */}
+            {staff.length > 0 && (
+              <>
+                <div className="hidden md:block w-1 h-8 bg-gray-300 mx-auto -mt-12 mb-8"></div>
+                <div className="flex flex-wrap justify-center gap-8">
+                  {staff.map((member) => (
+                    <div
+                      key={member.id}
+                      className="flex flex-col items-center w-full max-w-xs md:w-64"
+                    >
+                      <div className="bg-white border-2 border-gray-100 p-4 rounded-lg shadow-sm w-full hover:shadow-md transition-shadow text-center">
+                        <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full mb-3 flex items-center justify-center overflow-hidden">
+                          {member.image_path ? (
+                            <img
+                              src={`${import.meta.env.VITE_API_URL || "http://localhost:8000"}${member.image_path}`}
+                              alt={member.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <DefaultAvatar />
+                          )}
+                        </div>
+                        <h4 className="font-bold text-gray-800">
+                          {member.role}
+                        </h4>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {member.name}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>
@@ -128,8 +271,9 @@ const Organization = () => {
         <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm text-center">
           <h3 className="text-xl font-bold text-gray-800 mb-2">Our Manpower</h3>
           <p className="text-gray-600 leading-relaxed text-sm max-w-2xl mx-auto">
-            We employ a dedicated team of skilled professionals, engineers, equipment operators, and site workers
-            to ensure every project is executed with precision and efficiency.
+            We employ a dedicated team of skilled professionals, engineers,
+            equipment operators, and site workers to ensure every project is
+            executed with precision and efficiency.
           </p>
         </div>
       </div>
