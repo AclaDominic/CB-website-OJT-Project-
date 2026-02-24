@@ -204,7 +204,7 @@ class ContentSeeder extends Seeder
             'name' => 'Maria Bella Climaco',
             'role' => 'Vice President',
             'category' => 'leadership',
-            'order' => 1,
+            'order' => 2,
             'parent_id' => $president->id
         ]);
 
@@ -254,7 +254,7 @@ class ContentSeeder extends Seeder
             'name' => 'Genesis De Guzman',
             'role' => 'Project Manager',
             'category' => 'staff',
-            'order' => 1,
+            'order' => 2,
             'parent_id' => $siteOps->id
         ]);
 
@@ -262,7 +262,7 @@ class ContentSeeder extends Seeder
             'name' => 'Ivan Roy Climaco',
             'role' => 'Purchasing Officer',
             'category' => 'staff',
-            'order' => 1,
+            'order' => 3,
             'parent_id' => $purchasingHead->id
         ]);
 
@@ -270,7 +270,7 @@ class ContentSeeder extends Seeder
             'name' => 'Ian Climaco',
             'role' => 'HR Admin Officer',
             'category' => 'staff',
-            'order' => 1,
+            'order' => 4,
             'parent_id' => $hrLegalHead->id
         ]);
 
@@ -279,7 +279,7 @@ class ContentSeeder extends Seeder
             'name' => 'Rommel Matias',
             'role' => 'Field Agent',
             'category' => 'staff',
-            'order' => 1,
+            'order' => 5,
             'parent_id' => $accounting->id
         ]);
 
@@ -287,7 +287,7 @@ class ContentSeeder extends Seeder
             'name' => 'Col. Jose Caringal',
             'role' => 'Project Manager',
             'category' => 'staff',
-            'order' => 1,
+            'order' => 6,
             'parent_id' => $pmGenesis->id
         ]);
 
@@ -295,7 +295,7 @@ class ContentSeeder extends Seeder
             'name' => 'Atty. Paulo Punzalan',
             'role' => 'Legal Officer',
             'category' => 'staff',
-            'order' => 1,
+            'order' => 7,
             'parent_id' => $hrAdminOfficer->id
         ]);
 
@@ -304,7 +304,7 @@ class ContentSeeder extends Seeder
             'name' => 'Rheamie Alberastine',
             'role' => 'Engineering Manager',
             'category' => 'staff',
-            'order' => 1,
+            'order' => 8,
             'parent_id' => $pmCaringal->id
         ]);
 
@@ -312,7 +312,7 @@ class ContentSeeder extends Seeder
             'name' => 'Aldwin Miranda',
             'role' => 'Senior Engineer',
             'category' => 'staff',
-            'order' => 2,
+            'order' => 9,
             'parent_id' => $pmCaringal->id
         ]);
 
@@ -320,7 +320,7 @@ class ContentSeeder extends Seeder
             'name' => 'Atty. Dante Manguiat',
             'role' => 'Legal Officer',
             'category' => 'staff',
-            'order' => 1,
+            'order' => 10,
             'parent_id' => $legalOfficer1->id
         ]);
 
@@ -329,7 +329,7 @@ class ContentSeeder extends Seeder
             'name' => 'Lucas Martinez',
             'role' => 'Site Foreman',
             'category' => 'staff',
-            'order' => 1,
+            'order' => 11,
             'parent_id' => $engManager->id
         ]);
 
@@ -337,7 +337,7 @@ class ContentSeeder extends Seeder
             'name' => 'Rolisdio Climaco',
             'role' => 'Supervisor/Safety Officer',
             'category' => 'staff',
-            'order' => 1,
+            'order' => 12,
             'parent_id' => $seniorEng->id
         ]);
 
@@ -346,7 +346,7 @@ class ContentSeeder extends Seeder
             'name' => 'Renato Nebrida',
             'role' => 'Site Foreman',
             'category' => 'staff',
-            'order' => 1,
+            'order' => 13,
             'parent_id' => $foremanLucas->id
         ]);
 
@@ -354,7 +354,7 @@ class ContentSeeder extends Seeder
             'name' => 'Katleen Mae Martinez',
             'role' => 'QA / QC Engineer',
             'category' => 'staff',
-            'order' => 1,
+            'order' => 14,
             'parent_id' => $supervisorRolisdio->id
         ]);
 
@@ -363,7 +363,7 @@ class ContentSeeder extends Seeder
             'name' => 'Persues Sarte',
             'role' => 'Site Engineer',
             'category' => 'staff',
-            'order' => 1,
+            'order' => 15,
             'parent_id' => $qaqc->id
         ]);
     }
