@@ -428,7 +428,8 @@ const OrganizationManager = () => {
                           <img
                             src={`${import.meta.env.VITE_API_URL || "http://localhost:8000"}${member.image_path}`}
                             alt={member.name}
-                            className="w-12 h-12 rounded-full object-cover border"
+                            loading="lazy"
+                            className="w-full h-12 rounded-full object-cover border"
                           />
                         ) : (
                           <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold border">

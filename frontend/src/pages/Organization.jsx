@@ -91,6 +91,7 @@ const Organization = () => {
                 <img
                   src={`${import.meta.env.VITE_API_URL || "http://localhost:8000"}${member.image_path}`}
                   alt={member.name}
+                  loading="lazy"
                   className="w-full h-full object-cover"
                 />
               ) : (

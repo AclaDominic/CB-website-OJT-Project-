@@ -315,6 +315,7 @@ const MachineryList = () => {
                     : `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/storage/${item.image_url}`
                 }
                 alt={item.name}
+                loading="lazy"
                 className="w-full h-32 object-cover rounded mb-2"
               />
             )}
@@ -650,6 +651,7 @@ const SiteList = () => {
                     : `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/storage/${item.image_url}`
                 }
                 alt={item.name}
+                loading="lazy"
                 className="w-full h-48 object-cover"
               />
             )}

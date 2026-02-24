@@ -265,6 +265,7 @@ const ProjectManager = () => {
                     : `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/storage/${project.image}`
                 }
                 alt={project.name}
+                loading="lazy"
                 className="w-full h-32 object-cover rounded mb-2"
               />
             )}

@@ -1,33 +1,85 @@
-import React, { StrictMode } from "react";
+import React, { StrictMode, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import Layout from "./layouts/Layout";
 import SystemLayout from "./layouts/SystemLayout";
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import { About, Services, Projects, Contact, Resources } from "./pages/Pages";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-
-import AboutEditor from "./pages/system/cms/AboutEditor";
-import ContactEditor from "./pages/system/cms/ContactEditor";
-import ServiceManager from "./pages/system/cms/ServiceManager";
-import ProjectManager from "./pages/system/cms/ProjectManager";
-import SystemInquiries from "./pages/system/cms/SystemInquiries";
-import UserManager from "./pages/system/system/UserManager";
-import RoleManager from "./pages/system/system/RoleManager";
-import ResourceManager from "./pages/system/system/ResourceManager";
-import InventoryManager from "./pages/system/system/InventoryManager";
-
-import ProcurementManager from "./pages/system/system/ProcurementManager";
-import AccountSettings from "./pages/system/system/AccountSettings";
-import BackupManager from "./pages/system/BackupManager";
-import Dashboard from "./pages/system/Dashboard";
 
 import { LoadingProvider } from "./context/LoadingContext";
 import LoadingOverlay from "./components/LoadingOverlay";
 import ScrollToTop from "./components/ScrollToTop";
-
 import DynamicTitle from "./components/DynamicTitle";
+import PageLoader from "./components/PageLoader";
+
+// Lazy Loaded Pages
+const Home = React.lazy(() => import("./pages/Home"));
+const Login = React.lazy(() => import("./pages/Login"));
+const { About, Services, Projects, Contact, Resources } = React.lazy(() =>
+  import("./pages/Pages").then((module) => ({
+    default: module, // This handles default exports, but Pages likely uses named exports
+    About: module.About,
+    Services: module.Services,
+    Projects: module.Projects,
+    Contact: module.Contact,
+    Resources: module.Resources,
+  })),
+);
+
+// We need to properly handle named exports from Pages.js with React.lazy
+// React.lazy requires a default export, so we create intermediate components or adjust slightly.
+// The easiest way for named exports in React.lazy without changing Pages.js:
+const LazyAbout = React.lazy(() =>
+  import("./pages/Pages").then((module) => ({ default: module.About })),
+);
+const LazyServices = React.lazy(() =>
+  import("./pages/Pages").then((module) => ({ default: module.Services })),
+);
+const LazyProjects = React.lazy(() =>
+  import("./pages/Pages").then((module) => ({ default: module.Projects })),
+);
+const LazyContact = React.lazy(() =>
+  import("./pages/Pages").then((module) => ({ default: module.Contact })),
+);
+const LazyResources = React.lazy(() =>
+  import("./pages/Pages").then((module) => ({ default: module.Resources })),
+);
+
+// CMS Pages
+const AboutEditor = React.lazy(() => import("./pages/system/cms/AboutEditor"));
+const ContactEditor = React.lazy(
+  () => import("./pages/system/cms/ContactEditor"),
+);
+const ServiceManager = React.lazy(
+  () => import("./pages/system/cms/ServiceManager"),
+);
+const ProjectManager = React.lazy(
+  () => import("./pages/system/cms/ProjectManager"),
+);
+const SystemInquiries = React.lazy(
+  () => import("./pages/system/cms/SystemInquiries"),
+);
+
+// System Pages
+const UserManager = React.lazy(
+  () => import("./pages/system/system/UserManager"),
+);
+const RoleManager = React.lazy(
+  () => import("./pages/system/system/RoleManager"),
+);
+const ResourceManager = React.lazy(
+  () => import("./pages/system/system/ResourceManager"),
+);
+const InventoryManager = React.lazy(
+  () => import("./pages/system/system/InventoryManager"),
+);
+const ProcurementManager = React.lazy(
+  () => import("./pages/system/system/ProcurementManager"),
+);
+const AccountSettings = React.lazy(
+  () => import("./pages/system/system/AccountSettings"),
+);
+const BackupManager = React.lazy(() => import("./pages/system/BackupManager"));
+const Dashboard = React.lazy(() => import("./pages/system/Dashboard"));
 
 function App() {
   return (
@@ -36,36 +88,38 @@ function App() {
       <AuthProvider>
         <DynamicTitle />
         <ScrollToTop />
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
-            <Route path="about-us" element={<About />} />
-            <Route path="services" element={<Services />} />
-            <Route path="projects" element={<Projects />} />
-            <Route path="resources" element={<Resources />} />
-            <Route path="contact-us" element={<Contact />} />
-          </Route>
-
-          <Route path="/login" element={<Login />} />
-
-          <Route path="/system" element={<ProtectedRoute />}>
-            <Route element={<SystemLayout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="about" element={<AboutEditor />} />
-              <Route path="contact" element={<ContactEditor />} />
-              <Route path="services" element={<ServiceManager />} />
-              <Route path="projects" element={<ProjectManager />} />
-              <Route path="inquiries" element={<SystemInquiries />} />
-              <Route path="resources" element={<ResourceManager />} />
-              <Route path="inventory" element={<InventoryManager />} />
-              <Route path="procurement" element={<ProcurementManager />} />
-              <Route path="roles" element={<RoleManager />} />
-              <Route path="users" element={<UserManager />} />
-              <Route path="backups" element={<BackupManager />} />
-              <Route path="settings" element={<AccountSettings />} />
+        <Suspense fallback={<PageLoader fullScreen />}>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Home />} />
+              <Route path="about-us" element={<LazyAbout />} />
+              <Route path="services" element={<LazyServices />} />
+              <Route path="projects" element={<LazyProjects />} />
+              <Route path="resources" element={<LazyResources />} />
+              <Route path="contact-us" element={<LazyContact />} />
             </Route>
-          </Route>
-        </Routes>
+
+            <Route path="/login" element={<Login />} />
+
+            <Route path="/system" element={<ProtectedRoute />}>
+              <Route element={<SystemLayout />}>
+                <Route index element={<Dashboard />} />
+                <Route path="about" element={<AboutEditor />} />
+                <Route path="contact" element={<ContactEditor />} />
+                <Route path="services" element={<ServiceManager />} />
+                <Route path="projects" element={<ProjectManager />} />
+                <Route path="inquiries" element={<SystemInquiries />} />
+                <Route path="resources" element={<ResourceManager />} />
+                <Route path="inventory" element={<InventoryManager />} />
+                <Route path="procurement" element={<ProcurementManager />} />
+                <Route path="roles" element={<RoleManager />} />
+                <Route path="users" element={<UserManager />} />
+                <Route path="backups" element={<BackupManager />} />
+                <Route path="settings" element={<AccountSettings />} />
+              </Route>
+            </Route>
+          </Routes>
+        </Suspense>
       </AuthProvider>
     </LoadingProvider>
   );

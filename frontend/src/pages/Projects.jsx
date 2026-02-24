@@ -141,6 +141,7 @@ const ProjectCard = ({ project, onClick }) => (
             : "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
         }
         alt={project.name}
+        loading="lazy"
         className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
       />
 

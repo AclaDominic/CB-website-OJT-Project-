@@ -79,6 +79,7 @@ const ProjectGalleryModal = ({ project, isOpen, onClose }) => {
                       <img
                         src={`${import.meta.env.VITE_API_URL || "http://localhost:8000"}/storage/${item.before_image}`}
                         alt={`Before - ${project.name} ${index + 1}`}
+                        loading="lazy"
                         className="w-full h-64 md:h-80 object-cover group-hover:scale-105 transition-transform duration-700"
                       />
                     </div>
@@ -91,6 +92,7 @@ const ProjectGalleryModal = ({ project, isOpen, onClose }) => {
                       <img
                         src={`${import.meta.env.VITE_API_URL || "http://localhost:8000"}/storage/${item.after_image}`}
                         alt={`After - ${project.name} ${index + 1}`}
+                        loading="lazy"
                         className="w-full h-64 md:h-80 object-cover group-hover:scale-105 transition-transform duration-700"
                       />
                     </div>

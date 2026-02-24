@@ -4,6 +4,9 @@ import axiosClient from "../../../lib/axios";
 import { useAuth } from "../../../context/AuthContext";
 import ProcurementModal from "../../../components/procurement/ProcurementModal";
 import ProcurementDetailModal from "../../../components/procurement/ProcurementDetailModal"; // We will create this next
+import Pagination from "../../../components/Pagination";
+
+const REQUESTS_PER_PAGE = 15;
 
 const ProcurementManager = () => {
   const { user } = useAuth();
@@ -11,6 +14,12 @@ const ProcurementManager = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Reset page when search or tab changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, activeTab]);
 
   // Modal States
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -58,6 +67,11 @@ const ProcurementManager = () => {
       req.id.toString().includes(search) ||
       req.project?.name.toLowerCase().includes(search.toLowerCase()) ||
       req.user?.name.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  const paginatedRequests = filteredRequests.slice(
+    (currentPage - 1) * REQUESTS_PER_PAGE,
+    currentPage * REQUESTS_PER_PAGE,
   );
 
   const getStatusColor = (status) => {
@@ -175,7 +189,7 @@ const ProcurementManager = () => {
                 </td>
               </tr>
             ) : (
-              filteredRequests.map((req) => (
+              paginatedRequests.map((req) => (
                 <tr key={req.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 text-gray-800 font-medium">
                     #{req.id}
@@ -207,6 +221,18 @@ const ProcurementManager = () => {
             )}
           </tbody>
         </table>
+
+        {Math.ceil(filteredRequests.length / REQUESTS_PER_PAGE) > 1 && (
+          <div className="border-t border-gray-100 bg-gray-50 px-4 py-3 sm:px-6">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={Math.ceil(
+                filteredRequests.length / REQUESTS_PER_PAGE,
+              )}
+              onPageChange={setCurrentPage}
+            />
+          </div>
+        )}
       </div>
 
       {/* Modals */}

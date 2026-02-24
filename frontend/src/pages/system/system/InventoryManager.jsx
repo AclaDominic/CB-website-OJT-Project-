@@ -50,10 +50,20 @@ const InventoryManager = () => {
   );
 };
 
+import Pagination from "../../../components/Pagination";
+
+const ITEMS_PER_PAGE = 12;
+
 const ItemCatalog = ({ user }) => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [catalogPages, setCatalogPages] = useState({});
+
+  const handlePageChange = (categoryId, newPage) => {
+    setCatalogPages((prev) => ({ ...prev, [categoryId]: newPage }));
+  };
+
   // Item Modal state moved to StockManagement, but we might need viewing/editing here too?
   // User said "Add new item should be on Stock Management".
   // Assuming editing existing can stay here or move?
@@ -126,47 +136,67 @@ const ItemCatalog = ({ user }) => {
             </div>
             <div className="p-6">
               {category.items && category.items.length > 0 ? (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {category.items.map((item) => (
-                    <div
-                      key={item.id}
-                      className="border rounded-lg p-4 hover:shadow-md transition-shadow relative group"
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-bold">{item.name}</h4>
-                        <span className="bg-gray-100 text-xs px-2 py-1 rounded">
-                          Qty: {item.quantity} {item.unit}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-2">
-                        {item.description || "No description"}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        Threshold: {item.threshold}
-                      </p>
+                <>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {category.items
+                      .slice(
+                        ((catalogPages[category.id] || 1) - 1) * ITEMS_PER_PAGE,
+                        (catalogPages[category.id] || 1) * ITEMS_PER_PAGE,
+                      )
+                      .map((item) => (
+                        <div
+                          key={item.id}
+                          className="border rounded-lg p-4 hover:shadow-md transition-shadow relative group"
+                        >
+                          <div className="flex justify-between items-start mb-2">
+                            <h4 className="font-bold">{item.name}</h4>
+                            <span className="bg-gray-100 text-xs px-2 py-1 rounded">
+                              Qty: {item.quantity} {item.unit}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600 mb-2">
+                            {item.description || "No description"}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            Threshold: {item.threshold}
+                          </p>
 
-                      {user?.all_permissions?.includes("inventory.edit") && (
-                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                          <button
-                            onClick={() => {
-                              setEditingItem(item);
-                              setIsItemModalOpen(true);
-                            }}
-                            className="p-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200"
-                          >
-                            <Edit2 size={14} />
-                          </button>
-                          <button
-                            onClick={() => deleteItem(item.id)}
-                            className="p-1 bg-red-100 text-red-600 rounded hover:bg-red-200"
-                          >
-                            <Trash2 size={14} />
-                          </button>
+                          {user?.all_permissions?.includes(
+                            "inventory.edit",
+                          ) && (
+                            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                              <button
+                                onClick={() => {
+                                  setEditingItem(item);
+                                  setIsItemModalOpen(true);
+                                }}
+                                className="p-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200"
+                              >
+                                <Edit2 size={14} />
+                              </button>
+                              <button
+                                onClick={() => deleteItem(item.id)}
+                                className="p-1 bg-red-100 text-red-600 rounded hover:bg-red-200"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          )}
                         </div>
+                      ))}
+                  </div>
+                  {Math.ceil(category.items.length / ITEMS_PER_PAGE) > 1 && (
+                    <Pagination
+                      currentPage={catalogPages[category.id] || 1}
+                      totalPages={Math.ceil(
+                        category.items.length / ITEMS_PER_PAGE,
                       )}
-                    </div>
-                  ))}
-                </div>
+                      onPageChange={(page) =>
+                        handlePageChange(category.id, page)
+                      }
+                    />
+                  )}
+                </>
               ) : (
                 <p className="text-gray-500 italic text-center py-4">
                   No items in this category.
@@ -205,10 +235,17 @@ const ItemCatalog = ({ user }) => {
   );
 };
 
+const STOCK_ITEMS_PER_PAGE = 10;
+
 const StockManagement = ({ user }) => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [stockPages, setStockPages] = useState({});
+
+  const handlePageChange = (categoryId, newPage) => {
+    setStockPages((prev) => ({ ...prev, [categoryId]: newPage }));
+  };
   const [adjustmentType, setAdjustmentType] = useState(null); // 'add' or 'remove'
   const [quantity, setQuantity] = useState("");
   const [remarks, setRemarks] = useState("");
@@ -308,7 +345,12 @@ const StockManagement = ({ user }) => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {category.items?.map((item) => (
+                {(
+                  category.items?.slice(
+                    ((stockPages[category.id] || 1) - 1) * STOCK_ITEMS_PER_PAGE,
+                    (stockPages[category.id] || 1) * STOCK_ITEMS_PER_PAGE,
+                  ) || []
+                ).map((item) => (
                   <tr
                     key={item.id}
                     className={
@@ -374,6 +416,18 @@ const StockManagement = ({ user }) => {
                 )}
               </tbody>
             </table>
+            {category.items &&
+              Math.ceil(category.items.length / STOCK_ITEMS_PER_PAGE) > 1 && (
+                <div className="border-t border-gray-200 bg-gray-50 px-4 py-2">
+                  <Pagination
+                    currentPage={stockPages[category.id] || 1}
+                    totalPages={Math.ceil(
+                      category.items.length / STOCK_ITEMS_PER_PAGE,
+                    )}
+                    onPageChange={(page) => handlePageChange(category.id, page)}
+                  />
+                </div>
+              )}
           </div>
         </div>
       ))}
