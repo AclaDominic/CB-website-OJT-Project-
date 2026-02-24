@@ -61,6 +61,7 @@ const Services = () => {
                             : "https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
                         }
                         alt={service.title}
+                        loading="lazy"
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -98,6 +99,7 @@ const Services = () => {
                               : `${import.meta.env.VITE_API_URL}/storage/${service.image}`
                           }
                           alt={service.title}
+                          loading="lazy"
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
                       ) : (

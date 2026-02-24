@@ -39,8 +39,8 @@ export const AuthProvider = ({ children }) => {
     await csrf();
     setErrors([]);
     try {
-      await axiosClient.post("/login", { email, password });
-      await getUser();
+      const { data } = await axiosClient.post("/login", { email, password });
+      setUser(data);
       navigate("/system");
     } catch (e) {
       if (e.response && e.response.status === 422) {

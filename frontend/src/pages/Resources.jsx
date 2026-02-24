@@ -46,14 +46,14 @@ const Resources = () => {
   const displayedMachinery = showPlateNumbers
     ? activeMachinery
     : Object.values(
-      activeMachinery.reduce((acc, item) => {
-        const key = `${item.name}-${item.type}`;
-        if (!acc[key]) {
-          acc[key] = item;
-        }
-        return acc;
-      }, {}),
-    );
+        activeMachinery.reduce((acc, item) => {
+          const key = `${item.name}-${item.type}`;
+          if (!acc[key]) {
+            acc[key] = item;
+          }
+          return acc;
+        }, {}),
+      );
 
   return (
     <div className="font-sans pt-20">
@@ -89,6 +89,7 @@ const Resources = () => {
                           : "https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80"
                       }
                       alt={site.name}
+                      loading="lazy"
                       className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
