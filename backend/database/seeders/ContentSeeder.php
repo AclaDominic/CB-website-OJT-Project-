@@ -100,7 +100,7 @@ class ContentSeeder extends Seeder
                 'location' => 'Cabuyao, Laguna',
                 'year' => '2023',
                 'scope' => 'Site development and foundation works.',
-                'status' => 'Ongoing',
+                'status' => 'ongoing',
                 'is_public' => true,
                 'image' => 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
             ],
@@ -109,7 +109,7 @@ class ContentSeeder extends Seeder
                 'location' => 'Santa Rosa, Laguna',
                 'year' => '2022',
                 'scope' => 'Road construction and drainage systems.',
-                'status' => 'Completed',
+                'status' => 'completed',
                 'is_public' => true,
                 'image' => 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
             ],
@@ -118,7 +118,7 @@ class ContentSeeder extends Seeder
                 'location' => 'Calamba, Laguna',
                 'year' => '2021',
                 'scope' => 'Large scale earthmoving and leveling.',
-                'status' => 'Completed',
+                'status' => 'completed',
                 'is_public' => true,
                 'image' => 'https://images.unsplash.com/photo-1590486803833-1c5dc8ddd4c8?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
             ]
@@ -187,9 +187,15 @@ class ContentSeeder extends Seeder
         }
 
         // 6. Organization Members
-        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        \App\Models\OrganizationMember::truncate();
-        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        if (\Illuminate\Support\Facades\DB::getDriverName() === 'sqlite') {
+            \Illuminate\Support\Facades\DB::statement('PRAGMA foreign_keys = OFF;');
+            \App\Models\OrganizationMember::truncate();
+            \Illuminate\Support\Facades\DB::statement('PRAGMA foreign_keys = ON;');
+        } else {
+            \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+            \App\Models\OrganizationMember::truncate();
+            \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        }
 
         // Level 1
         $president = \App\Models\OrganizationMember::create([
