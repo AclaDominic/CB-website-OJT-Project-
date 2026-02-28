@@ -157,21 +157,21 @@ const UserManager = () => {
 
       <div className="bg-white rounded-lg shadow overflow-hidden overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="bg-blue-600">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
                 User
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
                 Email
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
                 Department
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
                 Assigned Role / Position
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-right text-xs font-bold text-white uppercase tracking-wider">
                 Actions
               </th>
             </tr>
@@ -213,13 +213,12 @@ const UserManager = () => {
                     </select>
                   ) : (
                     <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        user.roles &&
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.roles &&
                         user.roles.length > 0 &&
                         user.roles[0].name === "Admin"
-                          ? "bg-purple-100 text-purple-800"
-                          : "bg-green-100 text-green-800"
-                      }`}
+                        ? "bg-purple-100 text-purple-800"
+                        : "bg-green-100 text-green-800"
+                        }`}
                     >
                       {user.roles && user.roles.length > 0
                         ? user.roles[0].name
@@ -286,9 +285,8 @@ const UserManager = () => {
                     name="name"
                     value={newUser.name}
                     onChange={handleAddUserChange}
-                    className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border ${
-                      errors.name ? "border-red-500" : ""
-                    }`}
+                    className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border ${errors.name ? "border-red-500" : ""
+                      }`}
                     placeholder="John Doe"
                     required
                   />
@@ -308,9 +306,8 @@ const UserManager = () => {
                     name="email"
                     value={newUser.email}
                     onChange={handleAddUserChange}
-                    className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border ${
-                      errors.email ? "border-red-500" : ""
-                    }`}
+                    className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border ${errors.email ? "border-red-500" : ""
+                      }`}
                     placeholder="john@example.com"
                     required
                   />
@@ -330,9 +327,8 @@ const UserManager = () => {
                     name="password"
                     value={newUser.password}
                     onChange={handleAddUserChange}
-                    className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border ${
-                      errors.password ? "border-red-500" : ""
-                    }`}
+                    className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border ${errors.password ? "border-red-500" : ""
+                      }`}
                     placeholder="••••••••"
                     required
                   />
@@ -366,9 +362,8 @@ const UserManager = () => {
                     name="role"
                     value={newUser.role}
                     onChange={handleAddUserChange}
-                    className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border ${
-                      errors.role ? "border-red-500" : ""
-                    }`}
+                    className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border ${errors.role ? "border-red-500" : ""
+                      }`}
                     required
                   >
                     {roles.map((role) => (

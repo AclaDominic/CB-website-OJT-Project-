@@ -8,13 +8,13 @@ const SystemLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-gray-100 overflow-hidden">
+    <div className="flex h-screen bg-gradient-to-br from-sky-100 via-sky-50 to-green-100 overflow-hidden">
       <SystemSidebar
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
       />
 
-      <main className="flex-1 overflow-auto w-full">
+      <main className="flex-1 overflow-auto w-full flex flex-col">
         {/* Mobile Header */}
         <div className="md:hidden bg-white border-b border-gray-200 p-4 flex items-center">
           <button
@@ -28,7 +28,7 @@ const SystemLayout = () => {
           </span>
         </div>
 
-        <div className="p-4 md:p-8">
+        <div className="p-4 md:p-8 flex-1 flex flex-col">
           <Outlet />
         </div>
       </main>

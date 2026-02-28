@@ -103,7 +103,7 @@ const Dashboard = () => {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="p-6 space-y-8"
+      className="p-6 space-y-8 flex-1 flex flex-col"
     >
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
@@ -119,31 +119,28 @@ const Dashboard = () => {
               setIsAlertsModalOpen(true);
             }
           }}
-          className={`flex items-center gap-2 px-3 py-1 rounded-full border transition-colors ${
-            stats.system_status === "Critical Problem"
+          className={`flex items-center gap-2 px-3 py-1 rounded-full border transition-colors ${stats.system_status === "Critical Problem"
               ? "bg-red-50 border-red-200 hover:bg-red-100 cursor-pointer"
               : stats.system_status === "Minor Problem"
                 ? "bg-amber-50 border-amber-200 hover:bg-amber-100 cursor-pointer"
                 : "bg-green-50 border-green-100"
-          }`}
+            }`}
         >
           <div
-            className={`w-2 h-2 rounded-full animate-pulse ${
-              stats.system_status === "Critical Problem"
+            className={`w-2 h-2 rounded-full animate-pulse ${stats.system_status === "Critical Problem"
                 ? "bg-red-500"
                 : stats.system_status === "Minor Problem"
                   ? "bg-amber-500"
                   : "bg-green-500"
-            }`}
+              }`}
           ></div>
           <span
-            className={`text-sm font-medium ${
-              stats.system_status === "Critical Problem"
+            className={`text-sm font-medium ${stats.system_status === "Critical Problem"
                 ? "text-red-700"
                 : stats.system_status === "Minor Problem"
                   ? "text-amber-700"
                   : "text-green-700"
-            }`}
+              }`}
           >
             {stats.system_status || "System Operational"}
           </span>
@@ -156,7 +153,7 @@ const Dashboard = () => {
       </div>
 
       {/* Hero Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 shrink-0">
         <StatCard
           title="Active Projects"
           value={stats.active_projects_count}
@@ -192,11 +189,11 @@ const Dashboard = () => {
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
         {/* Left Column: Stats & Actions */}
-        <div className="space-y-6">
+        <div className="flex flex-col gap-6">
           {/* Resource Utilization */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col flex-1">
             <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
               <Activity size={20} className="text-emerald-500" /> Equipment
               Usage
@@ -234,7 +231,7 @@ const Dashboard = () => {
           </div>
 
           {/* Quick Actions */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-fit">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 shrink-0">
             <h3 className="text-lg font-bold text-gray-800 mb-4">
               Quick Actions
             </h3>
@@ -266,7 +263,7 @@ const Dashboard = () => {
         </div>
 
         {/* Right Column: Recent Activity */}
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden h-fit">
+        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col overflow-hidden h-full">
           <div className="p-6 border-b border-gray-100 flex justify-between items-center">
             <h3 className="text-lg font-bold text-gray-800">
               Recent Procurement Requests

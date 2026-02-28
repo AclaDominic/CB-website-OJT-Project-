@@ -77,7 +77,7 @@ const AboutEditor = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="w-[60%] mx-auto">
       <h2 className="text-2xl font-bold mb-6">Edit About Page</h2>
 
       {message && (
@@ -102,7 +102,7 @@ const AboutEditor = () => {
             )}
           </div>
           <textarea
-            className="w-full h-32 p-3 border rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full min-h-[200px] p-6 text-lg leading-[1.5] text-gray-800 border-gray-200 bg-gray-50/50 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all duration-300 resize-y"
             value={contents.mission}
             onChange={(e) => handleChange("mission", e.target.value)}
             placeholder="Enter mission statement..."
@@ -124,7 +124,7 @@ const AboutEditor = () => {
             )}
           </div>
           <textarea
-            className="w-full h-32 p-3 border rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full min-h-[200px] p-6 text-lg leading-[1.5] text-gray-800 border-gray-200 bg-gray-50/50 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all duration-300 resize-y"
             value={contents.vision}
             onChange={(e) => handleChange("vision", e.target.value)}
             placeholder="Enter vision statement..."
@@ -146,7 +146,7 @@ const AboutEditor = () => {
             )}
           </div>
           <textarea
-            className="w-full h-64 p-3 border rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full min-h-[400px] p-6 text-lg leading-[1.5] text-gray-800 border-gray-200 bg-gray-50/50 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all duration-300 resize-y"
             value={contents.background}
             onChange={(e) => handleChange("background", e.target.value)}
             placeholder="Enter company background..."

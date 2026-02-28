@@ -23,6 +23,7 @@ import {
   Database,
 } from "lucide-react";
 import axiosClient from "../lib/axios";
+import logo from "../assets/logo.svg";
 import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "../context/AuthContext";
 
@@ -47,8 +48,8 @@ const SystemSidebar = ({ isOpen, onClose }) => {
   const isActive = (path) => {
     return location.pathname === path ||
       location.pathname.startsWith(`${path}/`)
-      ? "bg-gray-800 text-white"
-      : "text-gray-400 hover:bg-gray-800 hover:text-white";
+      ? "bg-blue-50 text-blue-700"
+      : "text-gray-600 hover:bg-gray-50 hover:text-blue-600";
   };
 
   const handleLogout = async () => {
@@ -193,30 +194,30 @@ const SystemSidebar = ({ isOpen, onClose }) => {
       items: [
         ...(user?.all_permissions?.includes("system.manage_users")
           ? [
-              {
-                path: "/system/users",
-                label: "User Management",
-                icon: <Users size={18} />,
-              },
-            ]
+            {
+              path: "/system/users",
+              label: "User Management",
+              icon: <Users size={18} />,
+            },
+          ]
           : []),
         ...(user?.all_permissions?.includes("system.manage_roles")
           ? [
-              {
-                path: "/system/roles",
-                label: "Roles & Permissions",
-                icon: <Shield size={18} />,
-              },
-            ]
+            {
+              path: "/system/roles",
+              label: "Roles & Permissions",
+              icon: <Shield size={18} />,
+            },
+          ]
           : []),
         ...(user?.all_permissions?.includes("view_backups")
           ? [
-              {
-                path: "/system/backups",
-                label: "System Backups",
-                icon: <Database size={18} />,
-              },
-            ]
+            {
+              path: "/system/backups",
+              label: "System Backups",
+              icon: <Database size={18} />,
+            },
+          ]
           : []),
       ],
     },
@@ -231,7 +232,7 @@ const SystemSidebar = ({ isOpen, onClose }) => {
       {item.icon}
       <span>{item.label}</span>
       {/* Active Indicator for aesthetics */}
-      {isActive(item.path).includes("bg-gray-800") && (
+      {isActive(item.path).includes("bg-blue-50") && (
         <div className="ml-auto w-1.5 h-1.5 rounded-full bg-company-blue"></div>
       )}
     </Link>
@@ -250,23 +251,28 @@ const SystemSidebar = ({ isOpen, onClose }) => {
       {/* Sidebar */}
       <div
         className={`
-                bg-gray-900 w-64 min-h-screen flex flex-col border-r border-gray-800
+                bg-white w-64 min-h-screen flex flex-col border-r border-gray-200
                 fixed md:static inset-y-0 left-0 z-30 transition-transform duration-300 ease-in-out
                 ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
             `}
       >
-        <div className="p-6 border-b border-gray-800 flex justify-between items-center relative">
-          <h1 className="text-xl font-bold text-white flex items-center gap-2">
-            <LayoutDashboard className="text-company-blue" />
-            <span className="tracking-tight">{displayLabel}</span>
-          </h1>
+        <div className="p-4 border-b border-gray-200 flex justify-between items-center relative">
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="bg-gray-100 p-1.5 rounded-xl group-hover:bg-gray-200 transition-colors">
+              <img src={logo} alt="Cliberduche Logo" className="h-8 w-auto filter drop-shadow-sm" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-bold text-gray-900 tracking-tight uppercase leading-none">{displayLabel}</span>
+              <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Management</span>
+            </div>
+          </Link>
 
           <div className="flex items-center gap-2">
             {/* Notification Bell */}
             <div className="relative">
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
-                className="relative text-gray-400 hover:text-white transition-colors p-1"
+                className="relative text-gray-500 hover:text-gray-900 transition-colors p-1"
               >
                 <Bell size={20} />
                 {unreadCount > 0 && (
@@ -328,7 +334,7 @@ const SystemSidebar = ({ isOpen, onClose }) => {
 
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-white md:hidden"
+              className="text-gray-500 hover:text-gray-900 md:hidden"
             >
               <X size={24} />
             </button>
@@ -355,7 +361,7 @@ const SystemSidebar = ({ isOpen, onClose }) => {
               <div key={group.title} className="mb-1">
                 <button
                   onClick={() => toggleGroup(group.title)}
-                  className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:text-gray-300 transition-colors"
+                  className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider hover:text-gray-900 transition-colors"
                 >
                   <div className="flex items-center gap-2">
                     {group.icon}
@@ -369,7 +375,7 @@ const SystemSidebar = ({ isOpen, onClose }) => {
                 </button>
 
                 {expandedGroups[group.title] && (
-                  <div className="mt-1 space-y-1 ml-1 pl-2 border-l border-gray-800 animate-in slide-in-from-left-2 duration-200">
+                  <div className="mt-1 space-y-1 ml-1 pl-2 border-l border-gray-200 animate-in slide-in-from-left-2 duration-200">
                     {group.items.map((item) => (
                       <SidebarItem key={item.path} item={item} />
                     ))}
@@ -380,7 +386,7 @@ const SystemSidebar = ({ isOpen, onClose }) => {
           })}
         </nav>
 
-        <div className="p-4 border-t border-gray-800 space-y-2">
+        <div className="p-4 border-t border-gray-200 space-y-2">
           <Link
             to="/system/settings"
             onClick={() => onClose && onClose()}
@@ -391,7 +397,7 @@ const SystemSidebar = ({ isOpen, onClose }) => {
           </Link>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-2.5 text-red-400 hover:bg-gray-800/50 hover:text-red-300 rounded-lg transition-colors text-sm font-medium"
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors text-sm font-medium"
           >
             <svg
               className="w-5 h-5"

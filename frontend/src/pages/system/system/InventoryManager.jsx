@@ -126,11 +126,11 @@ const ItemCatalog = ({ user }) => {
             key={category.id}
             className="bg-white rounded-lg shadow overflow-hidden"
           >
-            <div className="bg-gray-50 px-6 py-4 border-b flex justify-between items-center">
-              <h3 className="text-lg font-bold text-gray-800">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-4 border-b flex justify-between items-center rounded-t-lg">
+              <h3 className="text-lg font-bold text-white">
                 {category.name}
               </h3>
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-blue-100">
                 {category.description}
               </span>
             </div>
@@ -164,24 +164,24 @@ const ItemCatalog = ({ user }) => {
                           {user?.all_permissions?.includes(
                             "inventory.edit",
                           ) && (
-                            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                              <button
-                                onClick={() => {
-                                  setEditingItem(item);
-                                  setIsItemModalOpen(true);
-                                }}
-                                className="p-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200"
-                              >
-                                <Edit2 size={14} />
-                              </button>
-                              <button
-                                onClick={() => deleteItem(item.id)}
-                                className="p-1 bg-red-100 text-red-600 rounded hover:bg-red-200"
-                              >
-                                <Trash2 size={14} />
-                              </button>
-                            </div>
-                          )}
+                              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                                <button
+                                  onClick={() => {
+                                    setEditingItem(item);
+                                    setIsItemModalOpen(true);
+                                  }}
+                                  className="p-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200"
+                                >
+                                  <Edit2 size={14} />
+                                </button>
+                                <button
+                                  onClick={() => deleteItem(item.id)}
+                                  className="p-1 bg-red-100 text-red-600 rounded hover:bg-red-200"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
+                            )}
                         </div>
                       ))}
                   </div>
@@ -323,23 +323,23 @@ const StockManagement = ({ user }) => {
           key={category.id}
           className="bg-white rounded-lg shadow overflow-hidden overflow-x-auto"
         >
-          <div className="bg-gray-50 px-6 py-4 border-b">
-            <h3 className="text-lg font-bold text-gray-800">{category.name}</h3>
+          <div className="bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-4 border-b rounded-t-lg">
+            <h3 className="text-lg font-bold text-white">{category.name}</h3>
           </div>
           <div>
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+              <thead className="bg-blue-600">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
                     Item
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
                     SKU
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
                     Current Stock
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-bold text-white uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>

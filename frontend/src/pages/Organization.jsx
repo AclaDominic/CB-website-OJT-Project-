@@ -72,7 +72,7 @@ const Organization = () => {
         )}
 
         {/* The Card */}
-        <div className="relative z-10 w-32 md:w-36 bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-md">
+        <div className="relative z-10 w-28 sm:w-32 md:w-36 bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-md">
           {/* Capsule Header */}
           <div
             className={`mx-1 mt-1 rounded-full py-0.5 px-1.5 text-center ${isLeadership ? "bg-blue-600" : "bg-green-300"}`}
@@ -115,11 +115,11 @@ const Organization = () => {
 
         {/* Children Container */}
         {hasChildren && (
-          <div className="flex justify-center relative px-1">
-            {/* Horizontal Crossbar line */}
+          <div className="flex flex-col justify-center relative px-1">
+            {/* Horizontal Crossbar line - Desktop Only */}
             {member.children.length > 1 && (
               <div
-                className="absolute top-0 h-[1px] bg-slate-300"
+                className="absolute top-0 h-[1px] bg-slate-300 hidden sm:block"
                 style={{
                   left: `${100 / (member.children.length * 2)}%`,
                   right: `${100 / (member.children.length * 2)}%`,
@@ -127,7 +127,7 @@ const Organization = () => {
               />
             )}
 
-            <div className="flex flex-row justify-center gap-x-1.5 md:gap-x-2">
+            <div className="flex flex-col sm:flex-row justify-center gap-y-4 sm:gap-y-0 sm:gap-x-1.5 md:gap-x-2">
               {member.children.map((child) => (
                 <MemberCard key={child.id} member={child} />
               ))}
@@ -140,7 +140,7 @@ const Organization = () => {
 
   return (
     <section
-      className="font-sans py-12 bg-gray-50 overflow-hidden"
+      className="font-sans py-12 bg-transparent overflow-hidden"
       id="organization"
     >
       <div className="max-w-7xl mx-auto px-4">
@@ -165,8 +165,8 @@ const Organization = () => {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto pb-10 cursor-grab active:cursor-grabbing scrollbar-hide flex justify-center">
-            <div className="flex justify-center min-w-max p-4">
+          <div className="overflow-x-auto pb-10 cursor-grab active:cursor-grabbing scrollbar-hide">
+            <div className="flex flex-col sm:flex-row justify-center items-center sm:items-start min-w-max p-4">
               {orgTree.map((root) => (
                 <MemberCard key={root.id} member={root} isRoot />
               ))}

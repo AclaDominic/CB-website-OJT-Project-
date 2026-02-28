@@ -115,11 +115,10 @@ const ProcurementManager = () => {
             onClick={() => setActiveTab("active")}
             className={`
                             whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
-                            ${
-                              activeTab === "active"
-                                ? "border-green-500 text-green-600"
-                                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                            }
+                            ${activeTab === "active"
+                ? "border-green-500 text-green-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }
                         `}
           >
             Active (Draft, Submitted, Processing)
@@ -128,11 +127,10 @@ const ProcurementManager = () => {
             onClick={() => setActiveTab("completed")}
             className={`
                             whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
-                            ${
-                              activeTab === "completed"
-                                ? "border-green-500 text-green-600"
-                                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                            }
+                            ${activeTab === "completed"
+                ? "border-green-500 text-green-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }
                         `}
           >
             Completed & Archived
@@ -161,16 +159,16 @@ const ProcurementManager = () => {
       {/* Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
         <table className="w-full text-left">
-          <thead className="bg-gray-50 border-b border-gray-100">
+          <thead className="bg-blue-600 border-b border-gray-100">
             <tr>
-              <th className="px-6 py-4 font-semibold text-gray-600">ID</th>
-              <th className="px-6 py-4 font-semibold text-gray-600">Project</th>
-              <th className="px-6 py-4 font-semibold text-gray-600">
+              <th className="px-6 py-4 font-bold text-white">ID</th>
+              <th className="px-6 py-4 font-bold text-white">Project</th>
+              <th className="px-6 py-4 font-bold text-white">
                 Requester
               </th>
-              <th className="px-6 py-4 font-semibold text-gray-600">Date</th>
-              <th className="px-6 py-4 font-semibold text-gray-600">Status</th>
-              <th className="px-6 py-4 font-semibold text-gray-600 text-right">
+              <th className="px-6 py-4 font-bold text-white">Date</th>
+              <th className="px-6 py-4 font-bold text-white">Status</th>
+              <th className="px-6 py-4 font-bold text-white text-right">
                 Actions
               </th>
             </tr>
