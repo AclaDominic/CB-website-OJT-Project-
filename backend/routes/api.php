@@ -24,7 +24,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/machineries/{id}/release-project', [\App\Http\Controllers\Api\System\MachineryController::class, 'releaseProject']);
     Route::apiResource('development-sites', \App\Http\Controllers\Api\System\DevelopmentSiteController::class)->except(['index', 'show']);
     Route::apiResource('organization-members', \App\Http\Controllers\Api\OrganizationMemberController::class)->except(['index', 'show']);
-    Route::apiResource('organization-members', \App\Http\Controllers\Api\OrganizationMemberController::class)->except(['index', 'show']);
     Route::post('/organization-members/reorder', [\App\Http\Controllers\Api\OrganizationMemberController::class, 'reorder']);
 
     Route::apiResource('procurement', \App\Http\Controllers\Api\System\ProcurementController::class);
