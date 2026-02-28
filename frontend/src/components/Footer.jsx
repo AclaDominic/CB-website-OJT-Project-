@@ -3,12 +3,18 @@ import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
-    <footer className="bg-company-dark text-white pt-12 pb-8">
+    <footer
+      className="bg-[#0d1117] text-white pt-12 pb-8"
+      style={{
+        borderTop: "4px solid transparent",
+        borderImage: "linear-gradient(to right, #1e3a8a, #0d9488, #84cc16) 1",
+      }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
           <div>
-            <h3 className="text-2xl font-bold mb-4">
+            <h3 className="text-2xl font-bold mb-4 text-white">
               Cliberduche<span className="text-company-green">Corp</span>
             </h3>
             <p className="text-gray-400">
@@ -17,7 +23,9 @@ const Footer = () => {
           </div>
           {/* Quick Links */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+            <h4 className="text-lg font-semibold mb-4 text-white">
+              Quick Links
+            </h4>
             <ul className="space-y-2">
               {[
                 { name: "Home", path: "/" },
@@ -40,7 +48,9 @@ const Footer = () => {
           </div>
           {/* Contact Info */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Contact Us</h4>
+            <h4 className="text-lg font-semibold mb-4 text-white">
+              Contact Us
+            </h4>
             <p className="text-gray-400 mb-2">
               Lot 3739 National Highway, 3/F CBD Building
               <br />

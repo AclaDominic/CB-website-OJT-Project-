@@ -8,6 +8,7 @@ export default {
           blue: "#5fa5f9",
           green: "#84cc16",
           dark: "#1e293b",
+          footer: "#1a2e5a",
           light: "#f0f9ff",
           "gradient-start": "#e0f2fe",
           "gradient-end": "#dcfce7",
