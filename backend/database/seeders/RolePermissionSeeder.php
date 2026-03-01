@@ -117,7 +117,7 @@ class RolePermissionSeeder extends Seeder
                 ]
             );
             $user->assignRole($roleName);
-        }
+        }    
 
         // Assign roles based on the old 'role' column for other users
         $users = User::all();
