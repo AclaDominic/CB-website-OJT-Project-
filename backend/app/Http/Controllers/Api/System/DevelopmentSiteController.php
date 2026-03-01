@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api\System;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\System\StoreDevelopmentSiteRequest;
+use App\Http\Requests\System\UpdateDevelopmentSiteRequest;
 use App\Models\DevelopmentSite;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class DevelopmentSiteController extends Controller
 {
@@ -19,17 +21,9 @@ class DevelopmentSiteController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreDevelopmentSiteRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string',
-            'location' => 'required|string',
-            'capacity' => 'required|string',
-            'description' => 'nullable|string',
-            'image_url' => 'nullable|string',
-            'image' => 'nullable|image|max:5120', // Accept 'image'
-            'image_file' => 'nullable|image|max:5120', // Keep 'image_file' for backward compatibility
-        ]);
+        $validated = $request->validated();
 
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('sites', 'public');
@@ -57,29 +51,20 @@ class DevelopmentSiteController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateDevelopmentSiteRequest $request, string $id)
     {
         $site = DevelopmentSite::findOrFail($id);
-
-        $validated = $request->validate([
-            'name' => 'string',
-            'location' => 'string',
-            'capacity' => 'string',
-            'description' => 'nullable|string',
-            'image_url' => 'nullable|string',
-            'image' => 'nullable|image|max:5120',
-            'image_file' => 'nullable|image|max:5120',
-        ]);
+        $validated = $request->validated();
 
         if ($request->hasFile('image')) {
             if ($site->image_url && !filter_var($site->image_url, FILTER_VALIDATE_URL)) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($site->image_url);
+                Storage::disk('public')->delete($site->image_url);
             }
             $path = $request->file('image')->store('sites', 'public');
             $validated['image_url'] = $path;
         } elseif ($request->hasFile('image_file')) {
             if ($site->image_url && !filter_var($site->image_url, FILTER_VALIDATE_URL)) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($site->image_url);
+                Storage::disk('public')->delete($site->image_url);
             }
             $path = $request->file('image_file')->store('sites', 'public');
             $validated['image_url'] = $path;

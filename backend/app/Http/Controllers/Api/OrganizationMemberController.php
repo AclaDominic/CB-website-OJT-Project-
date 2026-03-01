@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Organization\StoreOrganizationMemberRequest;
+use App\Http\Requests\Organization\UpdateOrganizationMemberRequest;
+use App\Http\Requests\Organization\ReorderMembersRequest;
 use App\Models\OrganizationMember;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 
 class OrganizationMemberController extends Controller
 {
@@ -15,22 +16,9 @@ class OrganizationMemberController extends Controller
         return OrganizationMember::orderBy('order')->get();
     }
 
-    public function store(Request $request)
+    public function store(StoreOrganizationMemberRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'role' => 'required|string|max:255',
-            'category' => 'required|string|max:255',
-            'parent_id' => 'nullable|exists:organization_members,id',
-            'image' => 'nullable|image|max:2048', // Allow image upload
-            'order' => [
-                'integer',
-                'min:0',
-                Rule::unique('organization_members')->where(function ($query) use ($request) {
-                    return $query->where('category', $request->category);
-                }),
-            ],
-        ]);
+        $validated = $request->validated();
 
         $data = $validated;
         unset($data['image']); // Remove image from data array before creating (handled separately)
@@ -45,28 +33,9 @@ class OrganizationMemberController extends Controller
         return response()->json($member, 201);
     }
 
-    public function update(Request $request, OrganizationMember $organizationMember)
+    public function update(UpdateOrganizationMemberRequest $request, OrganizationMember $organizationMember)
     {
-        $validated = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'role' => 'sometimes|required|string|max:255',
-            'category' => 'sometimes|required|string|max:255',
-            'parent_id' => 'nullable|exists:organization_members,id',
-            'image' => 'nullable|image|max:2048',
-            'order' => [
-                'integer',
-                'min:0',
-                Rule::unique('organization_members')->where(function ($query) use ($request) {
-                    // If category is being updated, use new category, otherwise use existing
-                    $category = $request->input('category', $request->category);
-                    // Actually $request->category might only be present if sent. 
-                    // Better to rely on input or model.
-                    // If 'category' is in request, use it. If not, use model's category.
-                    $categoryToCheck = $request->has('category') ? $request->category : $request->route('organization_member')->category;
-                    return $query->where('category', $categoryToCheck);
-                })->ignore($organizationMember->id),
-            ],
-        ]);
+        $validated = $request->validated();
 
         $data = $validated;
         unset($data['image']);
@@ -100,15 +69,11 @@ class OrganizationMemberController extends Controller
         return response()->json(null, 204);
     }
 
-    public function reorder(Request $request)
+    public function reorder(ReorderMembersRequest $request)
     {
-        $request->validate([
-            'members' => 'required|array',
-            'members.*.id' => 'required|exists:organization_members,id',
-            'members.*.order' => 'required|integer',
-        ]);
+        $validated = $request->validated();
 
-        foreach ($request->members as $item) {
+        foreach ($validated['members'] as $item) {
             OrganizationMember::where('id', $item['id'])->update(['order' => $item['order']]);
         }
 

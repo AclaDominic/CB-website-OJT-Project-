@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Cms;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Cms\StoreInquiryRequest;
 use App\Models\Inquiry;
 use Illuminate\Http\Request;
 
@@ -10,8 +11,6 @@ class InquiryController extends Controller
 {
     public function __construct()
     {
-        // View (index, show) might be protected by cms.view or just authenticated
-        // But specifically archive and delete need cms.edit
         $this->middleware('permission:cms.edit')->only(['archive', 'destroy']);
     }
 
@@ -45,14 +44,9 @@ class InquiryController extends Controller
         return $query->latest()->get();
     }
 
-    public function store(Request $request)
+    public function store(StoreInquiryRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required',
-            'email' => 'required|email',
-            'message' => 'required',
-            'subject' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         try {
             return Inquiry::create($validated);

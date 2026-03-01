@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-
+use App\Http\Requests\Inventory\StoreInventoryCategoryRequest;
+use App\Http\Requests\Inventory\UpdateInventoryCategoryRequest;
 use App\Models\InventoryCategory;
 use Illuminate\Http\Request;
 
@@ -21,12 +22,9 @@ class InventoryCategoryController extends Controller
         return response()->json(InventoryCategory::with('items')->withCount('items')->get());
     }
 
-    public function store(Request $request)
+    public function store(StoreInventoryCategoryRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:inventory_categories',
-            'description' => 'nullable|string'
-        ]);
+        $validated = $request->validated();
 
         $category = InventoryCategory::create($validated);
         return response()->json($category, 201);
@@ -37,14 +35,10 @@ class InventoryCategoryController extends Controller
         return response()->json(InventoryCategory::with('items')->findOrFail($id));
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateInventoryCategoryRequest $request, $id)
     {
         $category = InventoryCategory::findOrFail($id);
-
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:inventory_categories,name,' . $id,
-            'description' => 'nullable|string'
-        ]);
+        $validated = $request->validated();
 
         $category->update($validated);
         return response()->json($category);

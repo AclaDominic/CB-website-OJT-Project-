@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Api\Cms;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Cms\StoreServiceRequest;
+use App\Http\Requests\Cms\UpdateServiceRequest;
 use App\Models\Service;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class ServiceController extends Controller
@@ -24,14 +25,9 @@ class ServiceController extends Controller
         return $service;
     }
 
-    public function store(Request $request)
+    public function store(StoreServiceRequest $request)
     {
-        $validated = $request->validate([
-            'title' => 'required',
-            'description' => 'required',
-            'type' => 'required|in:primary,secondary',
-            'image' => 'nullable|image',
-        ]);
+        $validated = $request->validated();
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('services', 'public');
@@ -40,14 +36,9 @@ class ServiceController extends Controller
         return Service::create($validated);
     }
 
-    public function update(Request $request, Service $service)
+    public function update(UpdateServiceRequest $request, Service $service)
     {
-        $validated = $request->validate([
-            'title' => 'sometimes|required',
-            'description' => 'sometimes|required',
-            'type' => 'sometimes|required|in:primary,secondary',
-            'image' => 'nullable|image',
-        ]);
+        $validated = $request->validated();
 
         if ($request->hasFile('image')) {
             if ($service->image) {
