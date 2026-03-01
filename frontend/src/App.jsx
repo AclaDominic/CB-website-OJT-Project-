@@ -1,4 +1,4 @@
-import React, { StrictMode, Suspense } from "react";
+import React, { StrictMode, Suspense, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import Layout from "./layouts/Layout";
 import SystemLayout from "./layouts/SystemLayout";
@@ -11,38 +11,19 @@ import ScrollToTop from "./components/ScrollToTop";
 import DynamicTitle from "./components/DynamicTitle";
 import PageLoader from "./components/PageLoader";
 
+// Need to import the clear cache function
+import { clearCache } from "./lib/axios";
+
 // Lazy Loaded Pages
 const Home = React.lazy(() => import("./pages/Home"));
 const Login = React.lazy(() => import("./pages/Login"));
-const { About, Services, Projects, Contact, Resources } = React.lazy(() =>
-  import("./pages/Pages").then((module) => ({
-    default: module, // This handles default exports, but Pages likely uses named exports
-    About: module.About,
-    Services: module.Services,
-    Projects: module.Projects,
-    Contact: module.Contact,
-    Resources: module.Resources,
-  })),
-);
-
-// We need to properly handle named exports from Pages.js with React.lazy
-// React.lazy requires a default export, so we create intermediate components or adjust slightly.
-// The easiest way for named exports in React.lazy without changing Pages.js:
-const LazyAbout = React.lazy(() =>
-  import("./pages/Pages").then((module) => ({ default: module.About })),
-);
-const LazyServices = React.lazy(() =>
-  import("./pages/Pages").then((module) => ({ default: module.Services })),
-);
-const LazyProjects = React.lazy(() =>
-  import("./pages/Pages").then((module) => ({ default: module.Projects })),
-);
+const LazyAbout = React.lazy(() => import("./pages/About"));
+const LazyServices = React.lazy(() => import("./pages/Services"));
+const LazyProjects = React.lazy(() => import("./pages/Projects"));
 const LazyContact = React.lazy(() =>
-  import("./pages/Pages").then((module) => ({ default: module.Contact })),
+  import("./pages/Contact").then((module) => ({ default: module.Contact })),
 );
-const LazyResources = React.lazy(() =>
-  import("./pages/Pages").then((module) => ({ default: module.Resources })),
-);
+const LazyResources = React.lazy(() => import("./pages/Resources"));
 
 // CMS Pages
 const AboutEditor = React.lazy(() => import("./pages/system/cms/AboutEditor"));
@@ -81,7 +62,20 @@ const AccountSettings = React.lazy(
 const BackupManager = React.lazy(() => import("./pages/system/BackupManager"));
 const Dashboard = React.lazy(() => import("./pages/system/Dashboard"));
 
-function App() {
+const App = () => {
+  useEffect(() => {
+    // Clear the localStorage API cache when the user closes the tab
+    const handleBeforeUnload = () => {
+      clearCache();
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+
   return (
     <LoadingProvider>
       <LoadingOverlay />
@@ -123,6 +117,6 @@ function App() {
       </AuthProvider>
     </LoadingProvider>
   );
-}
+};
 
 export default App;
