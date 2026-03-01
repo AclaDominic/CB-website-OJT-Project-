@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\Cms;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Cms\StorePageContentRequest;
+use App\Http\Requests\Cms\UpdatePageContentRequest;
 use App\Models\PageContent;
 use Illuminate\Http\Request;
 
@@ -69,14 +71,9 @@ class PageContentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StorePageContentRequest $request)
     {
-        $validated = $request->validate([
-            'page_name' => 'required|string',
-            'section_name' => 'required|string',
-            'content' => 'required',
-            'show_profile' => 'sometimes|boolean',
-        ]);
+        $validated = $request->validated();
 
         $updateData = ['content' => $validated['content']];
         if (array_key_exists('show_profile', $validated)) {
@@ -105,10 +102,10 @@ class PageContentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdatePageContentRequest $request, string $id)
     {
         $content = PageContent::findOrFail($id);
-        $content->update($request->all());
+        $content->update($request->validated());
         return response()->json($content);
     }
 

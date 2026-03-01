@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Inventory\StoreInventoryItemRequest;
+use App\Http\Requests\Inventory\UpdateInventoryItemRequest;
+use App\Http\Requests\Inventory\StockRequest;
 use App\Models\InventoryItem;
 use App\Models\InventoryCategory;
 use App\Models\InventoryTransaction;
@@ -28,17 +31,9 @@ class InventoryItemController extends Controller
         return response()->json($query->get());
     }
 
-    public function store(Request $request)
+    public function store(StoreInventoryItemRequest $request)
     {
-        $validated = $request->validate([
-            'category_id' => 'required|exists:inventory_categories,id',
-            'name' => 'required|string|max:255',
-            'sku' => 'nullable|string|unique:inventory_items',
-            'description' => 'nullable|string',
-            'threshold' => 'required|integer|min:0',
-            'unit' => 'nullable|string',
-            'initial_stock' => 'nullable|integer|min:0'
-        ]);
+        $validated = $request->validated();
 
         return DB::transaction(function () use ($validated, $request) {
             $item = InventoryItem::create([
@@ -65,18 +60,10 @@ class InventoryItemController extends Controller
         });
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateInventoryItemRequest $request, $id)
     {
         $item = InventoryItem::findOrFail($id);
-
-        $validated = $request->validate([
-            'category_id' => 'exists:inventory_categories,id',
-            'name' => 'string|max:255',
-            'sku' => 'nullable|string|unique:inventory_items,sku,' . $id,
-            'description' => 'nullable|string',
-            'threshold' => 'integer|min:0',
-            'unit' => 'nullable|string'
-        ]);
+        $validated = $request->validated();
 
         $item->update($validated);
         return response()->json($item);
@@ -89,17 +76,14 @@ class InventoryItemController extends Controller
         return response()->json(null, 204);
     }
 
-    public function addStock(Request $request, $id)
+    public function addStock(StockRequest $request, $id)
     {
-        $request->validate([
-            'quantity' => 'required|integer|min:1',
-            'remarks' => 'nullable|string'
-        ]);
+        $validated = $request->validated();
 
-        return DB::transaction(function () use ($request, $id) {
+        return DB::transaction(function () use ($validated, $request, $id) {
             // Lock the row to prevent race conditions
             $item = InventoryItem::lockForUpdate()->findOrFail($id);
-            $quantity = $request->quantity;
+            $quantity = $validated['quantity'];
 
             $item->increment('quantity', $quantity);
 
@@ -108,24 +92,21 @@ class InventoryItemController extends Controller
                 'user_id' => $request->user()?->id,
                 'type' => 'in',
                 'quantity' => $quantity,
-                'remarks' => $request->remarks
+                'remarks' => $validated['remarks'] ?? null
             ]);
 
             return response()->json($item->refresh());
         });
     }
 
-    public function removeStock(Request $request, $id)
+    public function removeStock(StockRequest $request, $id)
     {
-        $request->validate([
-            'quantity' => 'required|integer|min:1',
-            'remarks' => 'nullable|string'
-        ]);
+        $validated = $request->validated();
 
-        return DB::transaction(function () use ($request, $id) {
+        return DB::transaction(function () use ($validated, $request, $id) {
             // Lock the row to prevent race conditions and ensure stock check is valid
             $item = InventoryItem::lockForUpdate()->findOrFail($id);
-            $quantity = $request->quantity;
+            $quantity = $validated['quantity'];
 
             if ($item->quantity < $quantity) {
                 return response()->json(['error' => 'Insufficient stock'], 400);
@@ -138,7 +119,7 @@ class InventoryItemController extends Controller
                 'user_id' => $request->user()?->id,
                 'type' => 'out',
                 'quantity' => $quantity,
-                'remarks' => $request->remarks
+                'remarks' => $validated['remarks'] ?? null
             ]);
 
             return response()->json($item->refresh());

@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Api\System;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\System\StoreUserRequest;
+use App\Http\Requests\System\UpdateUserRoleRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
@@ -19,14 +20,9 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|confirmed|min:8',
-            'role' => 'required|string|exists:roles,name',
-        ]);
+        $validated = $request->validated();
 
         $user = User::create([
             'name' => $validated['name'],
@@ -42,18 +38,11 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(UpdateUserRoleRequest $request, User $user)
     {
-        $validated = $request->validate([
-            'role' => 'required|string|exists:roles,name',
-        ]);
+        $validated = $request->validated();
 
         $user->syncRoles([$validated['role']]);
-
-        // Also update the legacy 'role' column for backward compatibility?
-        // $user->update(['role' => $validated['role']]); 
-        // Or keep them separate. Spatie uses 'model_has_roles'.
-        // For now, syncing Spatie roles is enough.
 
         return response()->json($user->load('roles'));
     }

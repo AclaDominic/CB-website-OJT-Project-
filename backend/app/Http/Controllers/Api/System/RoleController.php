@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Api\System;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\System\StoreRoleRequest;
+use App\Http\Requests\System\UpdateRoleRequest;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
@@ -20,13 +21,9 @@ class RoleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreRoleRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|unique:roles,name',
-            'permissions' => 'array',
-            'permissions.*' => 'string|exists:permissions,name',
-        ]);
+        $validated = $request->validated();
 
         $role = Role::create(['name' => $validated['name']]);
 
@@ -48,7 +45,7 @@ class RoleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateRoleRequest $request, string $id)
     {
         $role = Role::findOrFail($id);
 
@@ -56,11 +53,7 @@ class RoleController extends Controller
             return response()->json(['message' => 'The core Admin role cannot be modified.'], 403);
         }
 
-        $validated = $request->validate([
-            'name' => 'required|string|unique:roles,name,' . $id,
-            'permissions' => 'array',
-            'permissions.*' => 'string|exists:permissions,name',
-        ]);
+        $validated = $request->validated();
 
         $role->update(['name' => $validated['name']]);
 

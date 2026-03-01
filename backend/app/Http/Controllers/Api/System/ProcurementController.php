@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\System;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\System\StoreProcurementFormRequest;
+use App\Http\Requests\System\UpdateProcurementFormRequest;
 use App\Models\ProcurementRequest;
 use App\Models\ProcurementItem;
 use App\Models\Project;
@@ -18,17 +20,8 @@ class ProcurementController extends Controller
         $user = Auth::user();
         $query = ProcurementRequest::with(['items', 'project', 'user'])->latest();
 
-        // Admin/Staff can view all, PM/SE view only their own (or project based? usually their own requests or project requests)
-        // For now, let's allow PM/SE to view all requests for projects they are assigned to, or just their own.
-        // Simplified: PM/SE see their own requests.
-        // Actually, user requirement: "Who can edit Draft? The Project Manager or Site Engineer".
-        // "Page Structure... Tab 1 - Active... Tab 2 - Completed"
-
         if ($user->hasRole(['Project Manager', 'Site Engineer'])) {
-            // Ideally filters by project, but for simplicity/MVP, show own requests + maybe requests for their projects.
-            // Let's stick to "User's requests" for now as the prompt implies "They... Make Request".
-            // However, "Visible to Staff for processing".
-            // Let's return all for now, frontend can filter or we can add filters.
+            // PM/SE can view all requests — frontend handles filtering
         }
 
         if ($request->has('status')) {
@@ -54,7 +47,7 @@ class ProcurementController extends Controller
         return response()->json($query->get());
     }
 
-    public function store(Request $request)
+    public function store(StoreProcurementFormRequest $request)
     {
         // Enforce Role: PM or SE (Strict check as Admin shouldn't create)
         if (!Auth::user()->hasRole(['Project Manager', 'Site Engineer'])) {
@@ -65,18 +58,7 @@ class ProcurementController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $validated = $request->validate([
-            'project_id' => [
-                'required',
-                Rule::exists('projects', 'id')->where('status', 'ongoing'), // Ensure project is ongoing
-            ],
-            'remarks' => 'nullable|string',
-            'items' => 'required|array|min:1',
-            'items.*.name' => 'required|string',
-            'items.*.quantity' => 'required|numeric|min:0.01',
-            'items.*.unit' => 'required|string',
-            'items.*.notes' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         DB::beginTransaction();
         try {
@@ -110,7 +92,7 @@ class ProcurementController extends Controller
         return response()->json($procurement);
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateProcurementFormRequest $request, $id)
     {
         $procurement = ProcurementRequest::findOrFail($id);
 
@@ -124,15 +106,7 @@ class ProcurementController extends Controller
             return response()->json(['message' => 'Cannot edit a request that is not in draft status'], 400);
         }
 
-        $validated = $request->validate([
-            'project_id' => 'sometimes|exists:projects,id',
-            'remarks' => 'nullable|string',
-            'items' => 'sometimes|array|min:1',
-            'items.*.name' => 'required_with:items|string',
-            'items.*.quantity' => 'required_with:items|numeric|min:0.01',
-            'items.*.unit' => 'required_with:items|string',
-            'items.*.notes' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         DB::beginTransaction();
         try {
@@ -162,14 +136,6 @@ class ProcurementController extends Controller
         }
 
         if ($procurement->user_id !== Auth::id()) {
-            // Option: Decide if PM/SE can delete OTHERS' drafts? 
-            // Guideline: "Allow drafts to be deleted by PM and SE".
-            // Implementation: Let's allow deletion if they have permission, regardless of owner, OR restrict to owner.
-            // Safe bet: Restrict to owner for now, unless implicit requirement suggests "Managing" all drafts.
-            // Given "PM and SE", and they are creators, usually they delete their own.
-            // But if PM wants to clean up SE's draft?
-            // Let's stick to OWNER ONLY for safety as requested "safer". 
-            // "make an rbac for that so that its safer" -> likely means restrict to role + owner.
             return response()->json(['message' => 'Unauthorized. You can only delete your own requests.'], 403);
         }
 
@@ -190,13 +156,10 @@ class ProcurementController extends Controller
         // Validation Logic for Transitions
         switch ($newStatus) {
             case ProcurementRequest::STATUS_SUBMITTED:
-                // From: Draft -> To: Submitted
-                // Who: PM or SE (Must be owner or have generic submit permission? Usually owner)
                 if ($procurement->status !== ProcurementRequest::STATUS_DRAFT) {
                     return response()->json(['message' => 'Invalid status transition'], 400);
                 }
 
-                // Strict Role Check
                 if (!$user->hasRole(['Project Manager', 'Site Engineer'])) {
                     return response()->json(['message' => 'Unauthorized. Only Project Managers and Site Engineers can submit requests.'], 403);
                 }
@@ -204,15 +167,12 @@ class ProcurementController extends Controller
                 if (!$user->can('procurement.submit')) {
                     return response()->json(['message' => 'Unauthorized to submit'], 403);
                 }
-                if ($procurement->user_id !== $user->id) { // Only owner can submit their draft?
-                    // Verify if generic "submit" allows submitting others' drafts. Usually no.
+                if ($procurement->user_id !== $user->id) {
                     return response()->json(['message' => 'Only the creator can submit this request'], 403);
                 }
                 break;
 
             case ProcurementRequest::STATUS_PROCESSING:
-                // From: Submitted -> To: Processing
-                // Who: Staff
                 if ($procurement->status !== ProcurementRequest::STATUS_SUBMITTED) {
                     return response()->json(['message' => 'Invalid status transition'], 400);
                 }
@@ -222,8 +182,6 @@ class ProcurementController extends Controller
                 break;
 
             case ProcurementRequest::STATUS_COMPLETED:
-                // From: Processing -> To: Completed
-                // Who: Staff
                 if ($procurement->status !== ProcurementRequest::STATUS_PROCESSING) {
                     return response()->json(['message' => 'Invalid status transition'], 400);
                 }
@@ -233,8 +191,6 @@ class ProcurementController extends Controller
                 break;
 
             case ProcurementRequest::STATUS_ARCHIVED:
-                // From: Completed -> To: Archived
-                // Who: Staff
                 if ($procurement->status !== ProcurementRequest::STATUS_COMPLETED) {
                     return response()->json(['message' => 'Invalid status transition'], 400);
                 }
