@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import api from "../lib/axios";
 import PublicPageLayout from "../components/PublicPageLayout";
 import {
@@ -14,14 +15,21 @@ import {
 } from "lucide-react";
 
 export const Contact = () => {
+  const location = useLocation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     subject: "",
-    message: "",
+    message: location.state?.message || "",
   });
   const [status, setStatus] = useState("");
   const [officeInfo, setOfficeInfo] = useState({});
+
+  useEffect(() => {
+    if (location.state?.message) {
+      setFormData((prev) => ({ ...prev, message: location.state.message }));
+    }
+  }, [location.state?.message]);
 
   useEffect(() => {
     const fetchContent = async () => {

@@ -16,6 +16,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::apiResource('services', \App\Http\Controllers\Api\Cms\ServiceController::class)->except(['index', 'show']);
     Route::apiResource('projects', \App\Http\Controllers\Api\Cms\ProjectController::class)->except(['index', 'show']);
+    Route::apiResource('faqs', \App\Http\Controllers\Api\Cms\FaqController::class)->except(['index', 'show']);
     Route::apiResource('inquiries', \App\Http\Controllers\Api\Cms\InquiryController::class);
     Route::put('/inquiries/{inquiry}/archive', [\App\Http\Controllers\Api\Cms\InquiryController::class, 'archive']);
 
@@ -78,6 +79,8 @@ Route::get('/services/{service}', [\App\Http\Controllers\Api\Cms\ServiceControll
 
 Route::get('/projects', [\App\Http\Controllers\Api\Cms\ProjectController::class, 'index']);
 Route::get('/projects/{project}', [\App\Http\Controllers\Api\Cms\ProjectController::class, 'show']);
+
+Route::get('/faqs', [\App\Http\Controllers\Api\Cms\FaqController::class, 'index']);
 
 Route::get('/machineries', [\App\Http\Controllers\Api\System\MachineryController::class, 'index']);
 Route::get('/machineries/{machinery}', [\App\Http\Controllers\Api\System\MachineryController::class, 'show']);
