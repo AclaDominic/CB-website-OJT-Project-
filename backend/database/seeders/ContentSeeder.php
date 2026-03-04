@@ -102,7 +102,8 @@ class ContentSeeder extends Seeder
                 'scope' => 'Site development and foundation works.',
                 'status' => 'ongoing',
                 'is_public' => true,
-                'image' => 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
+                'image' => 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+                'before_afters' => []
             ],
             [
                 'name' => 'Santa Rosa Heights',
@@ -111,7 +112,13 @@ class ContentSeeder extends Seeder
                 'scope' => 'Road construction and drainage systems.',
                 'status' => 'completed',
                 'is_public' => true,
-                'image' => 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
+                'image' => 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+                'before_afters' => [
+                    [
+                        'before_image' => 'https://tse4.mm.bing.net/th/id/OIP.NPR79U33gvRWiXMu0OJweQHaFj?rs=1&pid=ImgDetMain&o=7&rm=3',
+                        'after_image' => 'https://www.realestate.com.au/blog/images/800x600-fit,progressive/2021/09/17155637/image-15.jpeg'
+                    ]
+                ]
             ],
             [
                 'name' => 'Calamba Industrial Park',
@@ -120,12 +127,29 @@ class ContentSeeder extends Seeder
                 'scope' => 'Large scale earthmoving and leveling.',
                 'status' => 'completed',
                 'is_public' => true,
-                'image' => 'https://images.unsplash.com/photo-1590486803833-1c5dc8ddd4c8?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
+                'image' => 'https://images.unsplash.com/photo-1590486803833-1c5dc8ddd4c8?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+                'before_afters' => [
+                    [
+                        'before_image' => 'https://tse4.mm.bing.net/th/id/OIP.NPR79U33gvRWiXMu0OJweQHaFj?rs=1&pid=ImgDetMain&o=7&rm=3',
+                        'after_image' => 'https://www.realestate.com.au/blog/images/800x600-fit,progressive/2021/09/17155637/image-15.jpeg'
+                    ]
+                ]
             ]
         ];
 
-        foreach ($projects as $project) {
-            Project::firstOrCreate(['name' => $project['name']], $project);
+        foreach ($projects as $projectData) {
+            $beforeAfters = $projectData['before_afters'] ?? [];
+            unset($projectData['before_afters']);
+
+            $project = Project::firstOrCreate(['name' => $projectData['name']], $projectData);
+
+            foreach ($beforeAfters as $ba) {
+                \App\Models\ProjectBeforeAfter::firstOrCreate([
+                    'project_id' => $project->id,
+                    'before_image' => $ba['before_image'],
+                    'after_image' => $ba['after_image']
+                ]);
+            }
         }
 
         // 4. Machinery
