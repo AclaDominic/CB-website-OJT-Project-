@@ -30,6 +30,7 @@ const AboutEditor = React.lazy(() => import("./pages/system/cms/AboutEditor"));
 const ContactEditor = React.lazy(
   () => import("./pages/system/cms/ContactEditor"),
 );
+const FaqManager = React.lazy(() => import("./pages/system/cms/FaqManager"));
 const ServiceManager = React.lazy(
   () => import("./pages/system/cms/ServiceManager"),
 );
@@ -100,6 +101,7 @@ const App = () => {
                 <Route index element={<Dashboard />} />
                 <Route path="about" element={<AboutEditor />} />
                 <Route path="contact" element={<ContactEditor />} />
+                <Route path="faqs" element={<FaqManager />} />
                 <Route path="services" element={<ServiceManager />} />
                 <Route path="projects" element={<ProjectManager />} />
                 <Route path="inquiries" element={<SystemInquiries />} />

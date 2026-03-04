@@ -20,7 +20,7 @@ import {
   Layers,
   Settings,
   ClipboardList,
-  Database,
+  HelpCircle,
 } from "lucide-react";
 import axiosClient from "../lib/axios";
 import logo from "../assets/logo.svg";
@@ -165,6 +165,11 @@ const SystemSidebar = ({ isOpen, onClose }) => {
           label: "Contact Info",
           icon: <Phone size={18} />,
         },
+        {
+          path: "/system/faqs",
+          label: "FAQ Content",
+          icon: <HelpCircle size={18} />,
+        },
       ],
     },
     {
@@ -194,30 +199,30 @@ const SystemSidebar = ({ isOpen, onClose }) => {
       items: [
         ...(user?.all_permissions?.includes("system.manage_users")
           ? [
-            {
-              path: "/system/users",
-              label: "User Management",
-              icon: <Users size={18} />,
-            },
-          ]
+              {
+                path: "/system/users",
+                label: "User Management",
+                icon: <Users size={18} />,
+              },
+            ]
           : []),
         ...(user?.all_permissions?.includes("system.manage_roles")
           ? [
-            {
-              path: "/system/roles",
-              label: "Roles & Permissions",
-              icon: <Shield size={18} />,
-            },
-          ]
+              {
+                path: "/system/roles",
+                label: "Roles & Permissions",
+                icon: <Shield size={18} />,
+              },
+            ]
           : []),
         ...(user?.all_permissions?.includes("view_backups")
           ? [
-            {
-              path: "/system/backups",
-              label: "System Backups",
-              icon: <Database size={18} />,
-            },
-          ]
+              {
+                path: "/system/backups",
+                label: "System Backups",
+                icon: <Database size={18} />,
+              },
+            ]
           : []),
       ],
     },
@@ -259,11 +264,19 @@ const SystemSidebar = ({ isOpen, onClose }) => {
         <div className="p-4 border-b border-gray-200 flex justify-between items-center relative">
           <Link to="/" className="flex items-center gap-3 group">
             <div className="bg-gray-100 p-1.5 rounded-xl group-hover:bg-gray-200 transition-colors">
-              <img src={logo} alt="Cliberduche Logo" className="h-8 w-auto filter drop-shadow-sm" />
+              <img
+                src={logo}
+                alt="Cliberduche Logo"
+                className="h-8 w-auto filter drop-shadow-sm"
+              />
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-bold text-gray-900 tracking-tight uppercase leading-none">{displayLabel}</span>
-              <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Management</span>
+              <span className="text-sm font-bold text-gray-900 tracking-tight uppercase leading-none">
+                {displayLabel}
+              </span>
+              <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">
+                Management
+              </span>
             </div>
           </Link>
 

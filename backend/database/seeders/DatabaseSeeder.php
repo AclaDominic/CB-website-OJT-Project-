@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
             ContentSeeder::class,
             InventorySeeder::class,
             ProcurementSeeder::class,
+            FaqSeeder::class,
         ]);
     }
 }
