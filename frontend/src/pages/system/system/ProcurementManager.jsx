@@ -11,16 +11,32 @@ const REQUESTS_PER_PAGE = 15;
 
 const ProcurementManager = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState("active"); // active, completed
-  const [requests, setRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [activeTab, setActiveTab] = useState("active"); // active, completed, report
 
-  // Reset page when search or tab changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [search, activeTab]);
+  const [tabData, setTabData] = useState({
+    active: { items: [], loaded: false },
+    completed: { items: [], loaded: false },
+  });
+  const [searchQueries, setSearchQueries] = useState({
+    active: "",
+    completed: "",
+  });
+  const [pages, setPages] = useState({ active: 1, completed: 1 });
+
+  const [loading, setLoading] = useState(true);
+
+  const requests = activeTab in tabData ? tabData[activeTab].items : [];
+  const search = activeTab in searchQueries ? searchQueries[activeTab] : "";
+  const currentPage = activeTab in pages ? pages[activeTab] : 1;
+
+  const setSearch = (val) => {
+    setSearchQueries((prev) => ({ ...prev, [activeTab]: val }));
+    setPages((prev) => ({ ...prev, [activeTab]: 1 }));
+  };
+
+  const setCurrentPage = (val) => {
+    setPages((prev) => ({ ...prev, [activeTab]: val }));
+  };
 
   // Modal States
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -38,7 +54,9 @@ const ProcurementManager = () => {
     if (activeTab === "report") {
       if (projects.length === 0) fetchProjects();
     } else {
-      fetchRequests();
+      if (!tabData[activeTab]?.loaded) {
+        fetchRequests(activeTab);
+      }
     }
   }, [activeTab]);
 
@@ -95,13 +113,19 @@ const ProcurementManager = () => {
     }
   };
 
-  const fetchRequests = async () => {
+  const fetchRequests = async (targetTab = activeTab) => {
     setLoading(true);
     try {
       const response = await axiosClient.get(
-        `/api/procurement?tab=${activeTab}`,
+        `/api/procurement?tab=${targetTab}`,
       );
-      setRequests(response.data.data || response.data);
+      setTabData((prev) => ({
+        ...prev,
+        [targetTab]: {
+          items: response.data.data || response.data,
+          loaded: true,
+        },
+      }));
     } catch (error) {
       console.error("Failed to fetch procurement requests", error);
     } finally {
@@ -110,7 +134,11 @@ const ProcurementManager = () => {
   };
 
   const handleCreateSuccess = () => {
-    fetchRequests();
+    setTabData({
+      active: { items: [], loaded: false },
+      completed: { items: [], loaded: false },
+    });
+    fetchRequests("active");
     setIsCreateModalOpen(false);
   };
 
@@ -123,7 +151,9 @@ const ProcurementManager = () => {
     setIsDetailModalOpen(false);
     setSelectedRequest(null);
     if (shouldRefresh) {
-      fetchRequests();
+      if (activeTab !== "report") {
+        fetchRequests(activeTab);
+      }
     }
   };
 
