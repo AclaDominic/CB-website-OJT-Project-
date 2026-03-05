@@ -45,6 +45,7 @@ class RolePermissionSeeder extends Seeder
         Permission::findOrCreate('procurement.complete');
         Permission::findOrCreate('procurement.archive');
         Permission::findOrCreate('procurement.delete');
+        Permission::findOrCreate('procurement.report');
 
         // --- Roles ---
 
@@ -90,6 +91,7 @@ class RolePermissionSeeder extends Seeder
             'procurement.process',
             'procurement.complete',
             'procurement.archive',
+            'procurement.report',
         ]);
 
         // --- Assign Roles to Existing Users ---
@@ -117,7 +119,7 @@ class RolePermissionSeeder extends Seeder
                 ]
             );
             $user->assignRole($roleName);
-        }    
+        }
 
         // Assign roles based on the old 'role' column for other users
         $users = User::all();

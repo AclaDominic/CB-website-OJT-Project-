@@ -218,4 +218,58 @@ class ProcurementController extends Controller
 
         return response()->json($procurement);
     }
+
+    public function generateReport(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user->can('procurement.report')) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $query = ProcurementRequest::with(['items', 'project', 'user'])->latest();
+
+        // Project filter
+        $projectName = null;
+        if ($request->has('project_id') && !empty($request->project_id)) {
+            $query->where('project_id', $request->project_id);
+            $project = Project::find($request->project_id);
+            if ($project) {
+                $projectName = $project->name;
+            }
+        }
+
+        // Date range filter
+        $filterLabel = 'All Time';
+        if ($request->has('date_range') && !empty($request->date_range)) {
+            switch ($request->date_range) {
+                case 'last_30_days':
+                    $query->where('created_at', '>=', now()->subDays(30));
+                    $filterLabel = 'Last 30 Days';
+                    break;
+                case 'current_year':
+                    $query->whereYear('created_at', now()->year);
+                    $filterLabel = 'Current Year (' . now()->year . ')';
+                    break;
+                case 'last_year':
+                    $lastYear = now()->subYear()->year;
+                    $query->whereYear('created_at', $lastYear);
+                    $filterLabel = 'Last Year (' . $lastYear . ')';
+                    break;
+            }
+        }
+
+        $requests = $query->get();
+
+        if ($requests->isEmpty()) {
+            return response()->json(['message' => 'No procurement requests found for the selected criteria.'], 404);
+        }
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.procurement-report', [
+            'requests' => $requests,
+            'filterLabel' => $filterLabel,
+            'projectName' => $projectName
+        ]);
+
+        return $pdf->download('procurement-report-' . now()->format('Ymd') . '.pdf');
+    }
 }
