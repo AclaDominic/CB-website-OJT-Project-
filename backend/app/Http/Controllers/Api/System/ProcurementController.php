@@ -221,7 +221,8 @@ class ProcurementController extends Controller
 
         $procurement->save();
 
-        return response()->json($procurement);
+        $procurement->load(['items', 'project', 'user']);
+        return new ProcurementRequestResource($procurement);
     }
 
     public function generateReport(Request $request)

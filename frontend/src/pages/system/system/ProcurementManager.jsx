@@ -101,7 +101,7 @@ const ProcurementManager = () => {
       const response = await axiosClient.get(
         `/api/procurement?tab=${activeTab}`,
       );
-      setRequests(response.data);
+      setRequests(response.data.data || response.data);
     } catch (error) {
       console.error("Failed to fetch procurement requests", error);
     } finally {
