@@ -20,6 +20,26 @@ const InventoryManager = () => {
   const [activeTab, setActiveTab] = useState("catalog"); // 'catalog' or 'stock'
   const { user } = useAuth();
 
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosClient.get("/api/inventory-categories");
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      toast.error("Failed to load inventory data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-6">
@@ -42,9 +62,19 @@ const InventoryManager = () => {
       </div>
 
       {activeTab === "catalog" ? (
-        <ItemCatalog user={user} />
+        <ItemCatalog
+          user={user}
+          categories={categories}
+          loading={loading}
+          refresh={fetchData}
+        />
       ) : (
-        <StockManagement user={user} />
+        <StockManagement
+          user={user}
+          categories={categories}
+          loading={loading}
+          refresh={fetchData}
+        />
       )}
     </div>
   );
@@ -54,9 +84,7 @@ import Pagination from "../../../components/Pagination";
 
 const ITEMS_PER_PAGE = 12;
 
-const ItemCatalog = ({ user }) => {
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+const ItemCatalog = ({ user, categories, loading, refresh }) => {
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [catalogPages, setCatalogPages] = useState({});
 
@@ -71,23 +99,6 @@ const ItemCatalog = ({ user }) => {
   const [isItemModalOpen, setIsItemModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const response = await axiosClient.get("/api/inventory-categories");
-      setCategories(response.data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      toast.error("Failed to load inventory data");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const deleteItem = async (id) => {
     if (
       !window.confirm(
@@ -98,7 +109,7 @@ const ItemCatalog = ({ user }) => {
     try {
       await axiosClient.delete(`/api/inventory-items/${id}`);
       toast.success("Item deleted");
-      fetchData();
+      refresh();
     } catch (error) {
       console.error(error);
       toast.error("Failed to delete item");
@@ -127,9 +138,7 @@ const ItemCatalog = ({ user }) => {
             className="bg-white rounded-lg shadow overflow-hidden"
           >
             <div className="bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-4 border-b flex justify-between items-center rounded-t-lg">
-              <h3 className="text-lg font-bold text-white">
-                {category.name}
-              </h3>
+              <h3 className="text-lg font-bold text-white">{category.name}</h3>
               <span className="text-sm text-blue-100">
                 {category.description}
               </span>
@@ -164,24 +173,24 @@ const ItemCatalog = ({ user }) => {
                           {user?.all_permissions?.includes(
                             "inventory.edit",
                           ) && (
-                              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                                <button
-                                  onClick={() => {
-                                    setEditingItem(item);
-                                    setIsItemModalOpen(true);
-                                  }}
-                                  className="p-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200"
-                                >
-                                  <Edit2 size={14} />
-                                </button>
-                                <button
-                                  onClick={() => deleteItem(item.id)}
-                                  className="p-1 bg-red-100 text-red-600 rounded hover:bg-red-200"
-                                >
-                                  <Trash2 size={14} />
-                                </button>
-                              </div>
-                            )}
+                            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                              <button
+                                onClick={() => {
+                                  setEditingItem(item);
+                                  setIsItemModalOpen(true);
+                                }}
+                                className="p-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200"
+                              >
+                                <Edit2 size={14} />
+                              </button>
+                              <button
+                                onClick={() => deleteItem(item.id)}
+                                className="p-1 bg-red-100 text-red-600 rounded hover:bg-red-200"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          )}
                         </div>
                       ))}
                   </div>
@@ -220,7 +229,7 @@ const ItemCatalog = ({ user }) => {
           onClose={() => setIsItemModalOpen(false)}
           item={editingItem}
           categories={categories}
-          refresh={fetchData}
+          refresh={refresh}
         />
       )}
 
@@ -228,7 +237,7 @@ const ItemCatalog = ({ user }) => {
         <CategoryManagerModal
           isOpen={isCategoryModalOpen}
           onClose={() => setIsCategoryModalOpen(false)}
-          refresh={fetchData}
+          refresh={refresh}
         />
       )}
     </div>
@@ -237,9 +246,7 @@ const ItemCatalog = ({ user }) => {
 
 const STOCK_ITEMS_PER_PAGE = 10;
 
-const StockManagement = ({ user }) => {
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+const StockManagement = ({ user, categories, loading, refresh }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [stockPages, setStockPages] = useState({});
 
@@ -254,22 +261,6 @@ const StockManagement = ({ user }) => {
   // Item Modal logic for "Add New Item" here
   const [isItemModalOpen, setIsItemModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const response = await axiosClient.get("/api/inventory-categories");
-      setCategories(response.data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleAdjustment = async (e) => {
     e.preventDefault();
@@ -291,7 +282,7 @@ const StockManagement = ({ user }) => {
       setSelectedItem(null);
       setQuantity("");
       setRemarks("");
-      fetchData();
+      refresh();
     } catch (error) {
       console.error(error);
       toast.error(error.response?.data?.error || "Failed to adjust stock");
@@ -504,7 +495,7 @@ const StockManagement = ({ user }) => {
           onClose={() => setIsItemModalOpen(false)}
           item={editingItem}
           categories={categories}
-          refresh={fetchData}
+          refresh={refresh}
         />
       )}
     </div>
