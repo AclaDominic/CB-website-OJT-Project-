@@ -50,8 +50,10 @@ class RolePermissionSeeder extends Seeder
         // --- Roles ---
 
         // 1. Admin (Super User)
+        // Give all permissions except procurement.create so they don't see the make request button
         $admin = Role::findOrCreate('Admin');
-        $admin->givePermissionTo(Permission::all());
+        $permissions = Permission::where('name', '!=', 'procurement.create')->get();
+        $admin->givePermissionTo($permissions);
 
         // 2. Project Manager
         $pm = Role::findOrCreate('Project Manager');

@@ -3,8 +3,13 @@ import { X, Plus, Trash } from "lucide-react";
 import axiosClient from "../../lib/axios";
 import { toast } from "react-hot-toast";
 
-const ProcurementModal = ({ isOpen, onClose, onSuccess }) => {
-  const [projects, setProjects] = useState([]);
+const ProcurementModal = ({
+  isOpen,
+  onClose,
+  onSuccess,
+  projects: preloadedProjects = [],
+}) => {
+  const [localProjects, setLocalProjects] = useState([]);
   const [formData, setFormData] = useState({
     project_id: "",
     remarks: "",
@@ -14,16 +19,24 @@ const ProcurementModal = ({ isOpen, onClose, onSuccess }) => {
 
   useEffect(() => {
     if (isOpen) {
-      fetchProjects();
+      if (preloadedProjects && preloadedProjects.length > 0) {
+        setLocalProjects(
+          preloadedProjects.filter((p) => p.status === "ongoing"),
+        );
+      } else {
+        fetchProjects();
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, preloadedProjects]);
 
   const fetchProjects = async () => {
     try {
-      // Ideally validation on backend handles "ongoing", but UX wise we should filter here too.
-      // Assuming /api/projects returns all, we might need to filter or backend provides options.
       const response = await axiosClient.get("/api/projects");
-      setProjects(response.data.filter((p) => p.status === "ongoing"));
+      setLocalProjects(
+        (response.data.data || response.data).filter(
+          (p) => p.status === "ongoing",
+        ),
+      );
     } catch (error) {
       console.error("Failed to fetch projects");
     }
@@ -105,7 +118,7 @@ const ProcurementModal = ({ isOpen, onClose, onSuccess }) => {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
             >
               <option value="">Select Project</option>
-              {projects.map((project) => (
+              {localProjects.map((project) => (
                 <option key={project.id} value={project.id}>
                   {project.name}
                 </option>

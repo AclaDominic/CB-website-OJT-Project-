@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
             InventorySeeder::class,
             ProcurementSeeder::class,
             FaqSeeder::class,
+            InquirySeeder::class,
         ]);
     }
 }

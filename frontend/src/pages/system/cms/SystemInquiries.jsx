@@ -133,6 +133,18 @@ const SystemInquiries = () => {
     });
   };
 
+  // Inquiry Modal State
+  const [selectedInquiry, setSelectedInquiry] = useState(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+
+  const handleRowClick = (inquiry) => {
+    // Only open if they have permission, otherwise it's just a raw table
+    if (user?.all_permissions?.includes("cms.edit")) {
+      setSelectedInquiry(inquiry);
+      setIsViewModalOpen(true);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold text-gray-900">Inquiries</h1>
@@ -260,7 +272,11 @@ const SystemInquiries = () => {
                 </tr>
               ) : (
                 inquiries.map((inquiry) => (
-                  <tr key={inquiry.id} className="hover:bg-gray-50">
+                  <tr
+                    key={inquiry.id}
+                    onClick={() => handleRowClick(inquiry)}
+                    className="hover:bg-gray-50 cursor-pointer transition-colors"
+                  >
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {new Date(inquiry.created_at).toLocaleDateString()}
                       <div className="text-xs text-gray-400">
@@ -285,7 +301,7 @@ const SystemInquiries = () => {
                     </td>
                     <td
                       className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate"
-                      title={inquiry.message}
+                      title="Click to view full message"
                     >
                       {inquiry.message}
                     </td>
@@ -300,28 +316,24 @@ const SystemInquiries = () => {
                       {activeTab === "inbox" ? (
                         <>
                           {user?.all_permissions?.includes("cms.edit") && (
-                            <>
-                              <a
-                                href={`https://mail.google.com/mail/?view=cm&fs=1&to=${inquiry.email}&su=${encodeURIComponent(inquiry.subject || "Inquiry Reply")}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded border border-blue-200 inline-block"
-                              >
-                                Reply
-                              </a>
-                              <button
-                                onClick={() => openArchiveModal(inquiry.id)}
-                                className="text-amber-600 hover:text-amber-900 bg-amber-50 px-3 py-1 rounded border border-amber-200"
-                              >
-                                Archive
-                              </button>
-                            </>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openArchiveModal(inquiry.id);
+                              }}
+                              className="text-amber-600 hover:text-amber-900 bg-amber-50 px-3 py-1 rounded border border-amber-200"
+                            >
+                              Archive
+                            </button>
                           )}
                         </>
                       ) : (
                         user?.all_permissions?.includes("cms.edit") && (
                           <button
-                            onClick={() => openDeleteModal(inquiry.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openDeleteModal(inquiry.id);
+                            }}
                             className="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded border border-red-200"
                           >
                             Delete
@@ -334,6 +346,103 @@ const SystemInquiries = () => {
               )}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Inquiry Detail Modal */}
+      {isViewModalOpen && selectedInquiry && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
+          onClick={() => setIsViewModalOpen(false)}
+        >
+          <div
+            className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+              <h2 className="text-xl font-bold text-gray-800">
+                Inquiry Details
+              </h2>
+              <button
+                onClick={() => setIsViewModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600 focus:outline-none"
+              >
+                <span className="text-2xl leading-none">&times;</span>
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto flex-1 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">
+                    Sender
+                  </h3>
+                  <div className="text-gray-900 font-medium">
+                    {selectedInquiry.name}
+                  </div>
+                  <div className="text-blue-600 text-sm mt-0.5">
+                    <a
+                      href={`mailto:${selectedInquiry.email}`}
+                      className="hover:underline"
+                    >
+                      {selectedInquiry.email}
+                    </a>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">
+                    Date Received
+                  </h3>
+                  <div className="text-gray-900 font-medium">
+                    {new Date(selectedInquiry.created_at).toLocaleDateString()}
+                  </div>
+                  <div className="text-gray-500 text-sm mt-0.5">
+                    {new Date(selectedInquiry.created_at).toLocaleTimeString()}
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">
+                  Subject
+                </h3>
+                <div className="text-gray-900 font-medium bg-gray-50 p-3 rounded-lg border border-gray-100">
+                  {selectedInquiry.subject || (
+                    <span className="text-gray-400 italic">
+                      No subject provided
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                  Message
+                </h3>
+                <div className="text-gray-800 bg-gray-50 p-4 rounded-lg border border-gray-200 whitespace-pre-wrap leading-relaxed">
+                  {selectedInquiry.message}
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+              <button
+                onClick={() => setIsViewModalOpen(false)}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+              >
+                Close
+              </button>
+              <a
+                href={`https://mail.google.com/mail/?view=cm&fs=1&to=${selectedInquiry.email}&su=${encodeURIComponent(selectedInquiry.subject || "Inquiry Reply")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition shadow-sm"
+              >
+                Reply via Email
+              </a>
+            </div>
+          </div>
         </div>
       )}
 

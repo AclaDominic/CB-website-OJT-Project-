@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Api\Cms;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Cms\StoreInquiryRequest;
 use App\Models\Inquiry;
+use App\Models\User;
+use App\Notifications\InquiryReceivedNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 
 class InquiryController extends Controller
 {
@@ -49,7 +52,15 @@ class InquiryController extends Controller
         $validated = $request->validated();
 
         try {
-            return Inquiry::create($validated);
+            $inquiry = Inquiry::create($validated);
+
+            // Notify users with cms.edit permission
+            $users = User::permission('cms.edit')->get();
+            if ($users->isNotEmpty()) {
+                Notification::send($users, new InquiryReceivedNotification($inquiry));
+            }
+
+            return response()->json($inquiry, 201);
         } catch (\Exception $e) {
             \App\Models\SystemAlert::create([
                 'type' => 'minor',

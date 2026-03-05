@@ -51,14 +51,21 @@ const ProcurementManager = () => {
   const [generatingReport, setGeneratingReport] = useState(false);
 
   useEffect(() => {
-    if (activeTab === "report") {
-      if (projects.length === 0) fetchProjects();
-    } else {
+    // Preload projects if the user can create requests, or if on report tab
+    if (
+      (user?.all_permissions?.includes("procurement.create") ||
+        activeTab === "report") &&
+      projects.length === 0
+    ) {
+      fetchProjects();
+    }
+
+    if (activeTab !== "report") {
       if (!tabData[activeTab]?.loaded) {
         fetchRequests(activeTab);
       }
     }
-  }, [activeTab]);
+  }, [activeTab, user]);
 
   const fetchProjects = async () => {
     try {
@@ -425,6 +432,7 @@ const ProcurementManager = () => {
           isOpen={isCreateModalOpen}
           onClose={() => setIsCreateModalOpen(false)}
           onSuccess={handleCreateSuccess}
+          projects={projects}
         />
       )}
 

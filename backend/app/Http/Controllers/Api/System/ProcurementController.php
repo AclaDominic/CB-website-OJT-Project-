@@ -13,6 +13,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use App\Models\User;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\ProcurementRequestedNotification;
 
 class ProcurementController extends Controller
 {
@@ -220,6 +223,11 @@ class ProcurementController extends Controller
         }
 
         $procurement->save();
+
+        if ($newStatus === ProcurementRequest::STATUS_SUBMITTED) {
+            $processors = User::permission('procurement.process')->get();
+            Notification::send($processors, new ProcurementRequestedNotification($procurement));
+        }
 
         $procurement->load(['items', 'project', 'user']);
         return new ProcurementRequestResource($procurement);
