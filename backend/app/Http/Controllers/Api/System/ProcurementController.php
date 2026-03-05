@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\System;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\System\StoreProcurementFormRequest;
 use App\Http\Requests\System\UpdateProcurementFormRequest;
+use App\Http\Resources\ProcurementRequestResource;
 use App\Models\ProcurementRequest;
 use App\Models\ProcurementItem;
 use App\Models\Project;
@@ -44,7 +45,7 @@ class ProcurementController extends Controller
             }
         }
 
-        return response()->json($query->get());
+        return ProcurementRequestResource::collection($query->get());
     }
 
     public function store(StoreProcurementFormRequest $request)
@@ -74,7 +75,10 @@ class ProcurementController extends Controller
             }
 
             DB::commit();
-            return response()->json($procurement->load('items'), 201);
+
+            $procurement->load(['items', 'project', 'user']);
+            return new ProcurementRequestResource($procurement);
+
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['message' => 'Failed to create request', 'error' => $e->getMessage()], 500);
@@ -89,7 +93,7 @@ class ProcurementController extends Controller
         }
 
         $procurement = ProcurementRequest::with(['items', 'project', 'user'])->findOrFail($id);
-        return response()->json($procurement);
+        return new ProcurementRequestResource($procurement);
     }
 
     public function update(UpdateProcurementFormRequest $request, $id)
@@ -120,7 +124,8 @@ class ProcurementController extends Controller
             }
 
             DB::commit();
-            return response()->json($procurement->load('items'));
+            $procurement->load(['items', 'project', 'user']);
+            return new ProcurementRequestResource($procurement);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['message' => 'Update failed', 'error' => $e->getMessage()], 500);
