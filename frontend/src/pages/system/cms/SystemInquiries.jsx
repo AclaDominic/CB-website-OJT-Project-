@@ -27,13 +27,26 @@ const SystemInquiries = () => {
   const { dateFrom, dateTo, archivedFrom, archivedTo } = currentFilters;
 
   const updateFilter = (key, value) => {
+    const newTabFilters = { ...filters[activeTab], [key]: value };
     setFilters((prev) => ({
       ...prev,
-      [activeTab]: {
-        ...prev[activeTab],
-        [key]: value,
-      },
+      [activeTab]: newTabFilters,
     }));
+    fetchInquiries(activeTab, newTabFilters);
+  };
+
+  const clearFilters = () => {
+    const defaultFilters = {
+      dateFrom: "",
+      dateTo: "",
+      archivedFrom: "",
+      archivedTo: "",
+    };
+    setFilters((prev) => ({
+      ...prev,
+      [activeTab]: defaultFilters,
+    }));
+    fetchInquiries(activeTab, defaultFilters);
   };
 
   // Modal State
@@ -48,20 +61,17 @@ const SystemInquiries = () => {
 
   useEffect(() => {
     if (!tabData[activeTab].loaded) {
-      fetchInquiries(activeTab);
+      fetchInquiries(activeTab, filters[activeTab]);
     }
   }, [activeTab]);
 
-  useEffect(() => {
-    if (tabData[activeTab].loaded) {
-      fetchInquiries(activeTab);
-    }
-  }, [filters[activeTab]]);
-
-  const fetchInquiries = async (tabToFetch = activeTab) => {
+  const fetchInquiries = async (
+    tabToFetch = activeTab,
+    specificFilters = null,
+  ) => {
     setLoading(true);
     try {
-      const tabFilters = filters[tabToFetch] || {};
+      const tabFilters = specificFilters || filters[tabToFetch] || {};
       const params = {
         archived: tabToFetch === "archived" ? 1 : 0,
         ...(tabFilters.dateFrom && { date_from: tabFilters.dateFrom }),
@@ -201,17 +211,7 @@ const SystemInquiries = () => {
 
         {(dateFrom || dateTo || archivedFrom || archivedTo) && (
           <button
-            onClick={() => {
-              setFilters((prev) => ({
-                ...prev,
-                [activeTab]: {
-                  dateFrom: "",
-                  dateTo: "",
-                  archivedFrom: "",
-                  archivedTo: "",
-                },
-              }));
-            }}
+            onClick={clearFilters}
             className="text-sm text-gray-500 hover:text-gray-700 underline mb-2 ml-auto"
           >
             Clear Filters
