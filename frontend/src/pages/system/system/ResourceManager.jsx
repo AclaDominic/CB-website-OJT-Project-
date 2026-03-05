@@ -53,7 +53,7 @@ const ResourceManager = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="w-full">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Manage Resources</h2>
 
