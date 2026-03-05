@@ -8,16 +8,33 @@ import ConfirmModal from "../../../components/system/ConfirmModal";
 import PageLoader from "../../../components/PageLoader";
 
 const SystemInquiries = () => {
-  const [inquiries, setInquiries] = useState([]);
+  const [tabData, setTabData] = useState({
+    inbox: { items: [], loaded: false },
+    archived: { items: [], loaded: false },
+  });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("inbox");
   const { user } = useAuth();
 
   // Filters
-  const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
-  const [archivedFrom, setArchivedFrom] = useState("");
-  const [archivedTo, setArchivedTo] = useState("");
+  const [filters, setFilters] = useState({
+    inbox: { dateFrom: "", dateTo: "" },
+    archived: { dateFrom: "", dateTo: "", archivedFrom: "", archivedTo: "" },
+  });
+
+  const inquiries = tabData[activeTab]?.items || [];
+  const currentFilters = filters[activeTab] || {};
+  const { dateFrom, dateTo, archivedFrom, archivedTo } = currentFilters;
+
+  const updateFilter = (key, value) => {
+    setFilters((prev) => ({
+      ...prev,
+      [activeTab]: {
+        ...prev[activeTab],
+        [key]: value,
+      },
+    }));
+  };
 
   // Modal State
   const [confirmModal, setConfirmModal] = useState({
@@ -30,22 +47,36 @@ const SystemInquiries = () => {
   });
 
   useEffect(() => {
-    fetchInquiries();
-  }, [activeTab, dateFrom, dateTo, archivedFrom, archivedTo]);
+    if (!tabData[activeTab].loaded) {
+      fetchInquiries(activeTab);
+    }
+  }, [activeTab]);
 
-  const fetchInquiries = async () => {
+  useEffect(() => {
+    if (tabData[activeTab].loaded) {
+      fetchInquiries(activeTab);
+    }
+  }, [filters[activeTab]]);
+
+  const fetchInquiries = async (tabToFetch = activeTab) => {
     setLoading(true);
     try {
+      const tabFilters = filters[tabToFetch] || {};
       const params = {
-        archived: activeTab === "archived" ? 1 : 0,
-        ...(dateFrom && { date_from: dateFrom }),
-        ...(dateTo && { date_to: dateTo }),
-        ...(archivedFrom && { archived_from: archivedFrom }),
-        ...(archivedTo && { archived_to: archivedTo }),
+        archived: tabToFetch === "archived" ? 1 : 0,
+        ...(tabFilters.dateFrom && { date_from: tabFilters.dateFrom }),
+        ...(tabFilters.dateTo && { date_to: tabFilters.dateTo }),
+        ...(tabFilters.archivedFrom && {
+          archived_from: tabFilters.archivedFrom,
+        }),
+        ...(tabFilters.archivedTo && { archived_to: tabFilters.archivedTo }),
       };
 
       const response = await api.get("/api/inquiries", { params });
-      setInquiries(response.data);
+      setTabData((prev) => ({
+        ...prev,
+        [tabToFetch]: { items: response.data, loaded: true },
+      }));
     } catch (error) {
       console.error("Error fetching inquiries", error);
       toast.error("Failed to fetch inquiries");
@@ -102,8 +133,6 @@ const SystemInquiries = () => {
           className={`py-2 px-4 font-medium transition-colors ${activeTab === "inbox" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-500 hover:text-gray-700"}`}
           onClick={() => {
             setActiveTab("inbox");
-            setArchivedFrom("");
-            setArchivedTo("");
           }}
         >
           Inbox
@@ -125,8 +154,8 @@ const SystemInquiries = () => {
           </label>
           <input
             type="date"
-            value={dateFrom}
-            onChange={(e) => setDateFrom(e.target.value)}
+            value={dateFrom || ""}
+            onChange={(e) => updateFilter("dateFrom", e.target.value)}
             className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>
@@ -136,8 +165,8 @@ const SystemInquiries = () => {
           </label>
           <input
             type="date"
-            value={dateTo}
-            onChange={(e) => setDateTo(e.target.value)}
+            value={dateTo || ""}
+            onChange={(e) => updateFilter("dateTo", e.target.value)}
             className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>
@@ -151,8 +180,8 @@ const SystemInquiries = () => {
               </label>
               <input
                 type="date"
-                value={archivedFrom}
-                onChange={(e) => setArchivedFrom(e.target.value)}
+                value={archivedFrom || ""}
+                onChange={(e) => updateFilter("archivedFrom", e.target.value)}
                 className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
@@ -162,8 +191,8 @@ const SystemInquiries = () => {
               </label>
               <input
                 type="date"
-                value={archivedTo}
-                onChange={(e) => setArchivedTo(e.target.value)}
+                value={archivedTo || ""}
+                onChange={(e) => updateFilter("archivedTo", e.target.value)}
                 className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
@@ -173,10 +202,15 @@ const SystemInquiries = () => {
         {(dateFrom || dateTo || archivedFrom || archivedTo) && (
           <button
             onClick={() => {
-              setDateFrom("");
-              setDateTo("");
-              setArchivedFrom("");
-              setArchivedTo("");
+              setFilters((prev) => ({
+                ...prev,
+                [activeTab]: {
+                  dateFrom: "",
+                  dateTo: "",
+                  archivedFrom: "",
+                  archivedTo: "",
+                },
+              }));
             }}
             className="text-sm text-gray-500 hover:text-gray-700 underline mb-2 ml-auto"
           >

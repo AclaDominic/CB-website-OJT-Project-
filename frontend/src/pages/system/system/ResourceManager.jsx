@@ -123,7 +123,12 @@ const ResourceManager = () => {
         </button>
       </div>
 
-      {activeTab === "machinery" ? <MachineryList /> : <SiteList />}
+      <div className={activeTab === "machinery" ? "block" : "hidden"}>
+        <MachineryList />
+      </div>
+      <div className={activeTab === "sites" ? "block" : "hidden"}>
+        <SiteList />
+      </div>
     </div>
   );
 };
