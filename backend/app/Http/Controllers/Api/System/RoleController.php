@@ -25,10 +25,11 @@ class RoleController extends Controller
     {
         $validated = $request->validated();
 
-        $role = Role::create(['name' => $validated['name']]);
+        $role = Role::create(['name' => $validated['name'], 'guard_name' => 'web']);
 
         if (!empty($validated['permissions'])) {
-            $role->syncPermissions($validated['permissions']);
+            $permissions = Permission::whereIn('name', $validated['permissions'])->where('guard_name', 'web')->get();
+            $role->syncPermissions($permissions);
         }
 
         return response()->json($role->load('permissions'), 201);
@@ -58,7 +59,8 @@ class RoleController extends Controller
         $role->update(['name' => $validated['name']]);
 
         if (isset($validated['permissions'])) {
-            $role->syncPermissions($validated['permissions']);
+            $permissions = Permission::whereIn('name', $validated['permissions'])->where('guard_name', 'web')->get();
+            $role->syncPermissions($permissions);
         }
 
         return response()->json($role->load('permissions'));
