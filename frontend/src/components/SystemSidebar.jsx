@@ -124,6 +124,10 @@ const SystemSidebar = ({ isOpen, onClose }) => {
     }
   };
 
+  // Helper to check if user has any of the given permissions
+  const hasAny = (...perms) =>
+    perms.some((p) => user?.all_permissions?.includes(p));
+
   // Navigation Structure
   const navigationGroups = [
     {
@@ -140,64 +144,92 @@ const SystemSidebar = ({ isOpen, onClose }) => {
       title: "Content Management",
       icon: <Layers size={18} />,
       items: [
-        {
-          path: "/system/projects",
-          label: "Projects",
-          icon: <FolderKanban size={18} />,
-        },
-        {
-          path: "/system/services",
-          label: "Services",
-          icon: <Briefcase size={18} />,
-        },
-        {
-          path: "/system/resources",
-          label: "Resources",
-          icon: <Truck size={18} />,
-        },
-        {
-          path: "/system/about",
-          label: "About Us",
-          icon: <FileText size={18} />,
-        },
-        {
-          path: "/system/contact",
-          label: "Contact Info",
-          icon: <Phone size={18} />,
-        },
-        {
-          path: "/system/faqs",
-          label: "FAQ Content",
-          icon: <HelpCircle size={18} />,
-        },
+        ...(hasAny("projects.view", "projects.create", "projects.edit")
+          ? [
+              {
+                path: "/system/projects",
+                label: "Projects",
+                icon: <FolderKanban size={18} />,
+              },
+            ]
+          : []),
+        ...(hasAny("cms.view", "cms.edit")
+          ? [
+              {
+                path: "/system/services",
+                label: "Services",
+                icon: <Briefcase size={18} />,
+              },
+            ]
+          : []),
+        ...(hasAny("cms.view", "cms.edit")
+          ? [
+              {
+                path: "/system/resources",
+                label: "Resources",
+                icon: <Truck size={18} />,
+              },
+            ]
+          : []),
+        ...(hasAny("cms.view", "cms.edit")
+          ? [
+              {
+                path: "/system/about",
+                label: "About Us",
+                icon: <FileText size={18} />,
+              },
+              {
+                path: "/system/contact",
+                label: "Contact Info",
+                icon: <Phone size={18} />,
+              },
+              {
+                path: "/system/faqs",
+                label: "FAQ Content",
+                icon: <HelpCircle size={18} />,
+              },
+            ]
+          : []),
       ],
     },
     {
       title: "Operations",
       icon: <ClipboardList size={18} />,
       items: [
-        {
-          path: "/system/inventory",
-          label: "Inventory",
-          icon: <Package size={18} />,
-        },
-        {
-          path: "/system/procurement",
-          label: "Procurement",
-          icon: <ShoppingCart size={18} />,
-        },
-        {
-          path: "/system/inquiries",
-          label: "Inquiries",
-          icon: <Mail size={18} />,
-        },
+        ...(hasAny("inventory.view", "inventory.edit")
+          ? [
+              {
+                path: "/system/inventory",
+                label: "Inventory",
+                icon: <Package size={18} />,
+              },
+            ]
+          : []),
+        ...(hasAny("procurement.view", "procurement.create")
+          ? [
+              {
+                path: "/system/procurement",
+                label: "Procurement",
+                icon: <ShoppingCart size={18} />,
+              },
+            ]
+          : []),
+        ...(hasAny("cms.view", "cms.edit")
+          ? [
+              {
+                path: "/system/inquiries",
+                label: "Inquiries",
+                icon: <Mail size={18} />,
+              },
+            ]
+          : []),
       ],
     },
     {
       title: "System Administration",
       icon: <Settings size={18} />,
       items: [
-        ...(user?.all_permissions?.includes("system.manage_users")
+        ...(hasAny("system.manage_users")
           ? [
               {
                 path: "/system/users",
@@ -206,7 +238,7 @@ const SystemSidebar = ({ isOpen, onClose }) => {
               },
             ]
           : []),
-        ...(user?.all_permissions?.includes("system.manage_roles")
+        ...(hasAny("system.manage_roles")
           ? [
               {
                 path: "/system/roles",
@@ -215,7 +247,7 @@ const SystemSidebar = ({ isOpen, onClose }) => {
               },
             ]
           : []),
-        ...(user?.all_permissions?.includes("view_backups")
+        ...(hasAny("view_backups")
           ? [
               {
                 path: "/system/backups",
