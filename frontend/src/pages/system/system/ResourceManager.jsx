@@ -4,6 +4,7 @@ import { Plus, Trash2, Edit2, X, Truck, MapPin, Loader2 } from "lucide-react";
 import ImagePicker from "../../../components/ImagePicker";
 import { useAuth } from "../../../context/AuthContext";
 import PageLoader from "../../../components/PageLoader";
+import ConfirmModal from "../../../components/system/ConfirmModal";
 
 const ResourceManager = () => {
   const [activeTab, setActiveTab] = useState("machinery"); // 'machinery' or 'sites'
@@ -136,8 +137,13 @@ const ResourceManager = () => {
 const MachineryList = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    message: "",
+    action: null,
+  });
   const { user } = useAuth();
 
   // Image State
@@ -239,16 +245,20 @@ const MachineryList = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure?")) {
-      try {
-        await axiosClient.delete(`/api/machineries/${id}`, {
-          skipLoading: true,
-        });
-        fetchItems();
-      } catch (error) {
-        console.error("Error deleting machinery:", error);
-      }
-    }
+    setConfirmModal({
+      isOpen: true,
+      message: "Are you sure you want to delete this equipment?",
+      action: async () => {
+        try {
+          await axiosClient.delete(`/api/machineries/${id}`, {
+            skipLoading: true,
+          });
+          fetchItems();
+        } catch (error) {
+          console.error("Error deleting machinery:", error);
+        }
+      },
+    });
   };
 
   const openModal = (item = null) => {
@@ -484,6 +494,14 @@ const MachineryList = () => {
           </div>
         </div>
       )}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+        onConfirm={confirmModal.action || (() => {})}
+        title="Confirm Delete"
+        message={confirmModal.message}
+        isDestructive={true}
+      />
     </div>
   );
 };
@@ -491,8 +509,13 @@ const MachineryList = () => {
 const SiteList = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    message: "",
+    action: null,
+  });
   const { user } = useAuth();
 
   // Image State
@@ -578,16 +601,20 @@ const SiteList = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure?")) {
-      try {
-        await axiosClient.delete(`/api/development-sites/${id}`, {
-          skipLoading: true,
-        });
-        fetchItems();
-      } catch (error) {
-        console.error("Error deleting site:", error);
-      }
-    }
+    setConfirmModal({
+      isOpen: true,
+      message: "Are you sure you want to delete this site?",
+      action: async () => {
+        try {
+          await axiosClient.delete(`/api/development-sites/${id}`, {
+            skipLoading: true,
+          });
+          fetchItems();
+        } catch (error) {
+          console.error("Error deleting site:", error);
+        }
+      },
+    });
   };
 
   const openModal = (item = null) => {
@@ -784,6 +811,14 @@ const SiteList = () => {
           </div>
         </div>
       )}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+        onConfirm={confirmModal.action || (() => {})}
+        title="Confirm Delete"
+        message={confirmModal.message}
+        isDestructive={true}
+      />
     </div>
   );
 };

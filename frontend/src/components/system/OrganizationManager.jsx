@@ -4,6 +4,7 @@ import { Plus, Edit, Trash2, Save, X, Loader2 } from "lucide-react";
 import ImagePicker from "../ImagePicker";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
+import ConfirmModal from "./ConfirmModal";
 
 const OrganizationManager = () => {
   const [members, setMembers] = useState([]);
@@ -24,6 +25,11 @@ const OrganizationManager = () => {
 
   const [showProfile, setShowProfile] = useState(false);
   const [toggleSaving, setToggleSaving] = useState(false);
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    message: "",
+    action: null,
+  });
 
   useEffect(() => {
     fetchMembers();
@@ -113,16 +119,20 @@ const OrganizationManager = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this member?")) return;
-
-    try {
-      await axiosClient.delete(`/api/organization-members/${id}`);
-      setMembers(members.filter((m) => m.id !== id));
-      toast.success("Member deleted successfully");
-    } catch (error) {
-      console.error("Error deleting member:", error);
-      toast.error("Failed to delete member");
-    }
+    setConfirmModal({
+      isOpen: true,
+      message: "Are you sure you want to delete this member?",
+      action: async () => {
+        try {
+          await axiosClient.delete(`/api/organization-members/${id}`);
+          setMembers(members.filter((m) => m.id !== id));
+          toast.success("Member deleted successfully");
+        } catch (error) {
+          console.error("Error deleting member:", error);
+          toast.error("Failed to delete member");
+        }
+      },
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -471,6 +481,14 @@ const OrganizationManager = () => {
           </div>
         ))}
       </div>
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+        onConfirm={confirmModal.action || (() => {})}
+        title="Confirm Delete"
+        message={confirmModal.message}
+        isDestructive={true}
+      />
     </div>
   );
 };

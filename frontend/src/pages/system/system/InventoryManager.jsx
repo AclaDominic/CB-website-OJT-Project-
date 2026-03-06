@@ -15,6 +15,7 @@ import {
 import { useAuth } from "../../../context/AuthContext";
 import { toast } from "react-hot-toast";
 import PageLoader from "../../../components/PageLoader";
+import ConfirmModal from "../../../components/system/ConfirmModal";
 
 const InventoryManager = () => {
   const [activeTab, setActiveTab] = useState("catalog"); // 'catalog' or 'stock'
@@ -98,22 +99,27 @@ const ItemCatalog = ({ user, categories, loading, refresh }) => {
   // Let's keep editing here for now but remove "Add New Item".
   const [isItemModalOpen, setIsItemModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    message: "",
+    action: null,
+  });
 
   const deleteItem = async (id) => {
-    if (
-      !window.confirm(
-        "Are you sure? This will delete the item and all its history.",
-      )
-    )
-      return;
-    try {
-      await axiosClient.delete(`/api/inventory-items/${id}`);
-      toast.success("Item deleted");
-      refresh();
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to delete item");
-    }
+    setConfirmModal({
+      isOpen: true,
+      message: "Are you sure? This will delete the item and all its history.",
+      action: async () => {
+        try {
+          await axiosClient.delete(`/api/inventory-items/${id}`);
+          toast.success("Item deleted");
+          refresh();
+        } catch (error) {
+          console.error(error);
+          toast.error("Failed to delete item");
+        }
+      },
+    });
   };
 
   if (loading) return <PageLoader />;
@@ -240,6 +246,15 @@ const ItemCatalog = ({ user, categories, loading, refresh }) => {
           refresh={refresh}
         />
       )}
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+        onConfirm={confirmModal.action || (() => {})}
+        title="Confirm Delete"
+        message={confirmModal.message}
+        isDestructive={true}
+      />
     </div>
   );
 };
@@ -680,6 +695,11 @@ const CategoryManagerModal = ({ isOpen, onClose, refresh }) => {
   const [categories, setCategories] = useState([]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    message: "",
+    action: null,
+  });
 
   useEffect(() => {
     fetchData();
@@ -709,17 +729,21 @@ const CategoryManagerModal = ({ isOpen, onClose, refresh }) => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this category? Items in it will be deleted."))
-      return;
-    try {
-      await axiosClient.delete(`/api/inventory-categories/${id}`);
-      fetchData();
-      refresh();
-      toast.success("Category deleted");
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to delete category");
-    }
+    setConfirmModal({
+      isOpen: true,
+      message: "Delete this category? Items in it will be deleted.",
+      action: async () => {
+        try {
+          await axiosClient.delete(`/api/inventory-categories/${id}`);
+          fetchData();
+          refresh();
+          toast.success("Category deleted");
+        } catch (error) {
+          console.error(error);
+          toast.error("Failed to delete category");
+        }
+      },
+    });
   };
 
   return (
@@ -786,6 +810,15 @@ const CategoryManagerModal = ({ isOpen, onClose, refresh }) => {
           ))}
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+        onConfirm={confirmModal.action || (() => {})}
+        title="Confirm Delete"
+        message={confirmModal.message}
+        isDestructive={true}
+      />
     </div>
   );
 };

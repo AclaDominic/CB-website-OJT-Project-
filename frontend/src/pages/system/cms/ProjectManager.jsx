@@ -4,14 +4,18 @@ import { Plus, Edit2, Trash2, X, Loader2 } from "lucide-react";
 import ImagePicker from "../../../components/ImagePicker";
 import { useAuth } from "../../../context/AuthContext";
 import PageLoader from "../../../components/PageLoader";
-
+import ConfirmModal from "../../../components/system/ConfirmModal";
 const ProjectManager = () => {
   const { user } = useAuth();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
-
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    message: "",
+    action: null,
+  });
   // Image State
   const [imageType, setImageType] = useState("url");
   const [selectedFile, setSelectedFile] = useState(null);
@@ -148,16 +152,20 @@ const ProjectManager = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this project?")) {
-      try {
-        await axiosClient.delete(`/api/projects/${id}`, {
-          skipLoading: true,
-        });
-        fetchProjects();
-      } catch (error) {
-        console.error("Error deleting project:", error);
-      }
-    }
+    setConfirmModal({
+      isOpen: true,
+      message: "Are you sure you want to delete this project?",
+      action: async () => {
+        try {
+          await axiosClient.delete(`/api/projects/${id}`, {
+            skipLoading: true,
+          });
+          fetchProjects();
+        } catch (error) {
+          console.error("Error deleting project:", error);
+        }
+      },
+    });
   };
 
   const handleToggleVisibility = async (project) => {
@@ -551,6 +559,15 @@ const ProjectManager = () => {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+        onConfirm={confirmModal.action || (() => {})}
+        title="Confirm Delete"
+        message={confirmModal.message}
+        isDestructive={true}
+      />
     </div>
   );
 };

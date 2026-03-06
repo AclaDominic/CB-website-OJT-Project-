@@ -11,6 +11,7 @@ import { backupApi } from "../../api/backup";
 import PageLoader from "../../components/PageLoader";
 import { useAuth } from "../../context/AuthContext";
 import axiosClient from "../../lib/axios";
+import ConfirmModal from "../../components/system/ConfirmModal";
 
 const BackupManager = () => {
   const [backups, setBackups] = useState([]);
@@ -18,6 +19,11 @@ const BackupManager = () => {
   const [isBackingUp, setIsBackingUp] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    message: "",
+    action: null,
+  });
 
   const { hasPermission } = useAuth();
   const canView = hasPermission("view_backups");
@@ -63,19 +69,20 @@ const BackupManager = () => {
   };
 
   const handleDelete = async (fileName) => {
-    if (
-      !window.confirm(
+    setConfirmModal({
+      isOpen: true,
+      message:
         "Are you sure you want to delete this backup archive? This cannot be undone.",
-      )
-    )
-      return;
-    try {
-      await backupApi.deleteBackup(fileName);
-      setSuccess("Backup deleted successfully.");
-      fetchBackups();
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to delete backup.");
-    }
+      action: async () => {
+        try {
+          await backupApi.deleteBackup(fileName);
+          setSuccess("Backup deleted successfully.");
+          fetchBackups();
+        } catch (err) {
+          setError(err.response?.data?.message || "Failed to delete backup.");
+        }
+      },
+    });
   };
 
   const handleDownload = async (fileName) => {
@@ -262,6 +269,14 @@ const BackupManager = () => {
           </ol>
         </div>
       )}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+        onConfirm={confirmModal.action || (() => {})}
+        title="Confirm Delete"
+        message={confirmModal.message}
+        isDestructive={true}
+      />
     </div>
   );
 };

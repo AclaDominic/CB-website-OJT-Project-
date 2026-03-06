@@ -3,7 +3,7 @@ import axiosClient from "../../../lib/axios";
 import { Plus, Edit2, Trash2, X, Search } from "lucide-react";
 import { useAuth } from "../../../context/AuthContext";
 import PageLoader from "../../../components/PageLoader";
-
+import ConfirmModal from "../../../components/system/ConfirmModal";
 const FaqManager = () => {
   const { user } = useAuth();
   const [faqs, setFaqs] = useState([]);
@@ -11,7 +11,11 @@ const FaqManager = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingFaq, setEditingFaq] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    message: "",
+    action: null,
+  });
   const [formData, setFormData] = useState({
     question: "",
     answer: "",
@@ -56,16 +60,20 @@ const FaqManager = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this FAQ?")) {
-      try {
-        await axiosClient.delete(`/api/faqs/${id}`, {
-          skipLoading: true,
-        });
-        fetchFaqs();
-      } catch (error) {
-        console.error("Error deleting FAQ:", error);
-      }
-    }
+    setConfirmModal({
+      isOpen: true,
+      message: "Are you sure you want to delete this FAQ?",
+      action: async () => {
+        try {
+          await axiosClient.delete(`/api/faqs/${id}`, {
+            skipLoading: true,
+          });
+          fetchFaqs();
+        } catch (error) {
+          console.error("Error deleting FAQ:", error);
+        }
+      },
+    });
   };
 
   const openModal = (faq = null) => {
@@ -257,6 +265,15 @@ const FaqManager = () => {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+        onConfirm={confirmModal.action || (() => {})}
+        title="Confirm Delete"
+        message={confirmModal.message}
+        isDestructive={true}
+      />
     </div>
   );
 };
