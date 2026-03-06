@@ -79,6 +79,26 @@ const SystemSidebar = ({ isOpen, onClose }) => {
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const notificationRef = React.useRef(null);
+
+  // Close notifications when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target)
+      ) {
+        setShowNotifications(false);
+      }
+    };
+
+    if (showNotifications) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showNotifications]);
 
   useEffect(() => {
     fetchNotifications();
@@ -314,7 +334,7 @@ const SystemSidebar = ({ isOpen, onClose }) => {
 
           <div className="flex items-center gap-2">
             {/* Notification Bell */}
-            <div className="relative">
+            <div className="relative" ref={notificationRef}>
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
                 className="relative text-gray-500 hover:text-gray-900 transition-colors p-1"
