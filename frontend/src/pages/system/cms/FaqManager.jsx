@@ -133,7 +133,7 @@ const FaqManager = () => {
 
       {/* Table */}
       <div className="bg-white shadow rounded-lg overflow-hidden overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
+        <table className="w-full table-fixed divide-y divide-gray-200">
           <thead className="bg-blue-600">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider w-1/3">
