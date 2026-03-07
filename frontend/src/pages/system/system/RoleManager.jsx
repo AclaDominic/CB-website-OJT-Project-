@@ -6,6 +6,46 @@ import { Navigate } from "react-router-dom";
 import PageLoader from "../../../components/PageLoader";
 import ConfirmModal from "../../../components/system/ConfirmModal";
 
+// Human-readable labels for permissions
+const PERMISSION_LABELS = {
+  // Inventory
+  "inventory.view": "View Inventory",
+  "inventory.create": "Add Inventory Items",
+  "inventory.edit": "Edit Inventory",
+  "inventory.delete": "Delete Inventory Items",
+
+  // CMS
+  "cms.view": "View Website Content",
+  "cms.edit": "Manage Website Content",
+
+  // System
+  "system.view": "Access System Backend",
+  "system.manage_users": "Manage System Users",
+  "system.manage_roles": "Manage Roles & Permissions",
+
+  // Projects
+  "projects.view": "View Projects",
+  "projects.create": "Create Projects",
+  "projects.edit": "Edit Projects",
+  "projects.delete": "Delete Projects",
+
+  // Procurement
+  "procurement.view": "View Procurement Requests",
+  "procurement.create": "Create Procurement Requests",
+  "procurement.submit": "Submit Requests for Approval",
+  "procurement.process": "Process/Approve Requests",
+  "procurement.complete": "Mark Requests as Completed",
+  "procurement.archive": "Archive Requests",
+  "procurement.delete": "Delete Requests",
+  "procurement.report": "Generate Procurement Reports",
+
+  // Backups
+  view_backups: "View System Backups",
+  create_backups: "Generate New Backups",
+  download_backups: "Download Backup Archives",
+  delete_backups: "Delete Backup Archives",
+};
+
 /**
  * RoleManager Component
  * Allows admins to manage Roles and assign Permissions.
@@ -190,8 +230,9 @@ const RoleManager = () => {
                   <span
                     key={p.id}
                     className="text-xs border border-gray-200 px-2 py-1 rounded text-gray-600"
+                    title={p.name}
                   >
-                    {p.name}
+                    {PERMISSION_LABELS[p.name] || p.name}
                   </span>
                 ))}
                 {role.permissions?.length > 5 && (
@@ -303,7 +344,7 @@ const RoleManager = () => {
                                   />
                                 </div>
                                 <span className="text-sm text-gray-600">
-                                  {perm.name}
+                                  {PERMISSION_LABELS[perm.name] || perm.name}
                                 </span>
                               </label>
                             ))}
