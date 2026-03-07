@@ -34,6 +34,31 @@ class ProjectController extends Controller
         return $project;
     }
 
+    /**
+     * Resolve a gallery image value from request data.
+     * Checks for file upload first, then falls back to URL string.
+     */
+    private function resolveGalleryImage(array $data, string $field, ?string $existingPath = null): ?string
+    {
+        // File upload takes priority
+        if (isset($data[$field]) && $data[$field] instanceof \Illuminate\Http\UploadedFile) {
+            if ($existingPath && !str_starts_with($existingPath, 'http')) {
+                Storage::disk('public')->delete($existingPath);
+            }
+            return $data[$field]->store('projects/gallery', 'public');
+        }
+
+        // URL string
+        if (isset($data[$field . '_url']) && !empty($data[$field . '_url'])) {
+            if ($existingPath && !str_starts_with($existingPath, 'http')) {
+                Storage::disk('public')->delete($existingPath);
+            }
+            return $data[$field . '_url'];
+        }
+
+        return $existingPath;
+    }
+
     public function store(StoreProjectRequest $request)
     {
         $validated = $request->validated();

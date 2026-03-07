@@ -41,6 +41,7 @@ const ProjectManager = () => {
         id: null, // New item
         before: { type: "url", value: "" },
         after: { type: "url", value: "" },
+        dirty: false,
       },
     ]);
   };
@@ -54,6 +55,7 @@ const ProjectManager = () => {
   const handleGalleryChange = (index, field, { type, value }) => {
     const newItems = [...galleryItems];
     newItems[index][field] = { type, value };
+    newItems[index].dirty = true; // Mark as modified
     setGalleryItems(newItems);
   };
 
@@ -82,6 +84,16 @@ const ProjectManager = () => {
       setSelectedFile(null);
     } else {
       setSelectedFile(value);
+    }
+  };
+
+  // Helper: append a gallery image field to FormData (handles both file and URL)
+  const appendGalleryField = (data, prefix, field, imageData) => {
+    if (!imageData.value) return;
+    if (imageData.type === "file") {
+      data.append(`${prefix}[${field}]`, imageData.value);
+    } else if (imageData.type === "url" && imageData.value) {
+      data.append(`${prefix}[${field}_url]`, imageData.value);
     }
   };
 
@@ -226,6 +238,7 @@ const ProjectManager = () => {
             id: item.id,
             before: { type: "url", value: item.before_image },
             after: { type: "url", value: item.after_image },
+            dirty: false,
           })),
         );
       } else {
@@ -578,7 +591,7 @@ const ProjectManager = () => {
       <ConfirmModal
         isOpen={confirmModal.isOpen}
         onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
-        onConfirm={confirmModal.action || (() => { })}
+        onConfirm={confirmModal.action || (() => {})}
         title="Confirm Delete"
         message={confirmModal.message}
         isDestructive={true}
