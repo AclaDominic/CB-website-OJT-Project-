@@ -77,7 +77,11 @@ const ProjectGalleryModal = ({ project, isOpen, onClose }) => {
                         Before
                       </div>
                       <img
-                        src={`${import.meta.env.VITE_API_URL || "http://localhost:8000"}/storage/${item.before_image}`}
+                        src={
+                          item.before_image?.startsWith("http")
+                            ? item.before_image
+                            : `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/storage/${item.before_image}`
+                        }
                         alt={`Before - ${project.name} ${index + 1}`}
                         loading="lazy"
                         className="w-full h-64 md:h-80 object-cover group-hover:scale-105 transition-transform duration-700"
@@ -90,7 +94,11 @@ const ProjectGalleryModal = ({ project, isOpen, onClose }) => {
                         After
                       </div>
                       <img
-                        src={`${import.meta.env.VITE_API_URL || "http://localhost:8000"}/storage/${item.after_image}`}
+                        src={
+                          item.after_image?.startsWith("http")
+                            ? item.after_image
+                            : `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/storage/${item.after_image}`
+                        }
                         alt={`After - ${project.name} ${index + 1}`}
                         loading="lazy"
                         className="w-full h-64 md:h-80 object-cover group-hover:scale-105 transition-transform duration-700"
