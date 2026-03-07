@@ -102,7 +102,6 @@ const ProjectManager = () => {
       data.append("image", selectedFile);
     }
 
-    // Process Gallery
     // 1. Collect IDs of items that are kept (have an ID)
     const keptIds = galleryItems
       .filter((item) => item.id !== null)
@@ -110,21 +109,37 @@ const ProjectManager = () => {
 
     keptIds.forEach((id) => data.append("kept_gallery_ids[]", id));
 
-    // 2. Append new items (those without ID) as files
-    // Note: We only support uploading new files for now as per controller logic.
-    // Ideally update controller to handle URLs too if mixed.
-    // But for "Before/After", it's usually uploaded files.
-    // If user enters URL for new item, we might need controller update.
-    // Let's assume user uploads files for new items for now, or just send what we have.
-    // The controller logic expects 'new_gallery' array of files.
+    // 2. Append existing items with potentially updated images/urls
+    const existingItems = galleryItems.filter((item) => item.id !== null);
+    existingItems.forEach((item, index) => {
+      data.append(`updated_gallery[${index}][id]`, item.id);
 
+      if (item.before.type === "file" && item.before.value) {
+        data.append(`updated_gallery[${index}][before]`, item.before.value);
+      } else if (item.before.type === "url" && item.before.value) {
+        data.append(`updated_gallery[${index}][before_url]`, item.before.value);
+      }
+
+      if (item.after.type === "file" && item.after.value) {
+        data.append(`updated_gallery[${index}][after]`, item.after.value);
+      } else if (item.after.type === "url" && item.after.value) {
+        data.append(`updated_gallery[${index}][after_url]`, item.after.value);
+      }
+    });
+
+    // 3. Append new items (those without ID) as files or URLs
     const newItems = galleryItems.filter((item) => item.id === null);
     newItems.forEach((item, index) => {
       if (item.before.type === "file" && item.before.value) {
         data.append(`new_gallery[${index}][before]`, item.before.value);
+      } else if (item.before.type === "url" && item.before.value) {
+        data.append(`new_gallery[${index}][before_url]`, item.before.value);
       }
+
       if (item.after.type === "file" && item.after.value) {
         data.append(`new_gallery[${index}][after]`, item.after.value);
+      } else if (item.after.type === "url" && item.after.value) {
+        data.append(`new_gallery[${index}][after_url]`, item.after.value);
       }
     });
 
@@ -563,7 +578,7 @@ const ProjectManager = () => {
       <ConfirmModal
         isOpen={confirmModal.isOpen}
         onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
-        onConfirm={confirmModal.action || (() => {})}
+        onConfirm={confirmModal.action || (() => { })}
         title="Confirm Delete"
         message={confirmModal.message}
         isDestructive={true}

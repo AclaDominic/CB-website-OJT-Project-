@@ -16,14 +16,10 @@ class ProcurementItemResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'name' => $this->name,
             'quantity' => $this->quantity,
-            'remarks' => $this->remarks,
-            'item_details' => [
-                'id' => $this->item_id,
-                'name' => $this->item ? $this->item->name : null,
-                'sku' => $this->item ? $this->item->sku : null,
-                'unit' => $this->item ? $this->item->unit : null,
-            ],
+            'unit' => $this->unit,
+            'notes' => $this->notes,
         ];
     }
 }

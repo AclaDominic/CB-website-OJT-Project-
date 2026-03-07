@@ -21,6 +21,7 @@ class StoreProjectRequest extends FormRequest
             'status' => 'required|in:ongoing,completed',
             'is_public' => 'boolean',
             'image' => 'nullable|image',
+            'image_url' => 'nullable|url',
         ];
     }
 }

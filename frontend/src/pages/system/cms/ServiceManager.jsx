@@ -4,6 +4,7 @@ import { Plus, Edit2, Trash2, X, Loader2 } from "lucide-react";
 import ImagePicker from "../../../components/ImagePicker";
 import { useAuth } from "../../../context/AuthContext";
 import PageLoader from "../../../components/PageLoader";
+import ConfirmModal from "../../../components/system/ConfirmModal";
 
 const ServiceManager = () => {
   const { user } = useAuth();
@@ -51,9 +52,13 @@ const ServiceManager = () => {
     }
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
 
+    setIsSubmitting(true);
     const data = new FormData();
     data.append("title", formData.title);
     data.append("type", formData.type);
@@ -85,20 +90,32 @@ const ServiceManager = () => {
       closeModal();
     } catch (error) {
       console.error("Error saving service:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    message: "",
+    action: null,
+  });
+
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this service?")) {
-      try {
-        await axiosClient.delete(`/api/services/${id}`, {
-          skipLoading: true,
-        });
-        fetchServices();
-      } catch (error) {
-        console.error("Error deleting service:", error);
-      }
-    }
+    setConfirmModal({
+      isOpen: true,
+      message: "Are you sure you want to delete this service?",
+      action: async () => {
+        try {
+          await axiosClient.delete(`/api/services/${id}`, {
+            skipLoading: true,
+          });
+          fetchServices();
+        } catch (error) {
+          console.error("Error deleting service:", error);
+        }
+      },
+    });
   };
 
   const openModal = (service = null) => {
@@ -321,21 +338,32 @@ const ServiceManager = () => {
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
+                  disabled={isSubmitting}
+                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  disabled={isSubmitting}
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
                 >
-                  Save
+                  {isSubmitting ? "Saving..." : "Save"}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+        onConfirm={confirmModal.action || (() => { })}
+        title="Confirm Delete"
+        message={confirmModal.message}
+        isDestructive={true}
+      />
     </div>
   );
 };

@@ -43,28 +43,38 @@ class ProjectController extends Controller
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('projects', 'public');
+        } elseif ($request->has('image_url')) {
+            $validated['image'] = $request->input('image_url');
         }
 
         $project = Project::create($validated);
 
-        if ($request->has('before_afters')) {
-            foreach ($request->file('before_afters', []) as $index => $files) {
-                $beforePath = null;
-                $afterPath = null;
+        $newGalleryInputs = $request->input('new_gallery', []);
+        $newGalleryFiles = $request->file('new_gallery', []);
 
-                if (isset($files['before'])) {
-                    $beforePath = $files['before']->store('projects/gallery', 'public');
-                }
-                if (isset($files['after'])) {
-                    $afterPath = $files['after']->store('projects/gallery', 'public');
-                }
+        $indices = array_unique(array_merge(array_keys($newGalleryInputs), array_keys($newGalleryFiles)));
 
-                if ($beforePath || $afterPath) {
-                    $project->beforeAfters()->create([
-                        'before_image' => $beforePath,
-                        'after_image' => $afterPath,
-                    ]);
-                }
+        foreach ($indices as $index) {
+            $beforePath = null;
+            $afterPath = null;
+
+            if (isset($newGalleryFiles[$index]['before'])) {
+                $beforePath = $newGalleryFiles[$index]['before']->store('projects/gallery', 'public');
+            } elseif (isset($newGalleryInputs[$index]['before_url'])) {
+                $beforePath = $newGalleryInputs[$index]['before_url'];
+            }
+
+            if (isset($newGalleryFiles[$index]['after'])) {
+                $afterPath = $newGalleryFiles[$index]['after']->store('projects/gallery', 'public');
+            } elseif (isset($newGalleryInputs[$index]['after_url'])) {
+                $afterPath = $newGalleryInputs[$index]['after_url'];
+            }
+
+            if ($beforePath || $afterPath) {
+                $project->beforeAfters()->create([
+                    'before_image' => $beforePath,
+                    'after_image' => $afterPath,
+                ]);
             }
         }
 
@@ -76,10 +86,15 @@ class ProjectController extends Controller
         $validated = $request->validated();
 
         if ($request->hasFile('image')) {
-            if ($project->image) {
+            if ($project->image && !str_starts_with($project->image, 'http')) {
                 Storage::disk('public')->delete($project->image);
             }
             $validated['image'] = $request->file('image')->store('projects', 'public');
+        } elseif ($request->has('image_url')) {
+            if ($project->image && !str_starts_with($project->image, 'http') && $project->image !== $request->input('image_url')) {
+                Storage::disk('public')->delete($project->image);
+            }
+            $validated['image'] = $request->input('image_url');
         }
 
         if (isset($validated['status']) && $validated['status'] === 'completed') {
@@ -95,32 +110,85 @@ class ProjectController extends Controller
 
             $toDelete = $project->beforeAfters()->whereNotIn('id', $keptIds)->get();
             foreach ($toDelete as $item) {
-                if ($item->before_image)
+                if ($item->before_image && !str_starts_with($item->before_image, 'http'))
                     Storage::disk('public')->delete($item->before_image);
-                if ($item->after_image)
+                if ($item->after_image && !str_starts_with($item->after_image, 'http'))
                     Storage::disk('public')->delete($item->after_image);
                 $item->delete();
             }
         }
 
-        if ($request->file('new_gallery')) {
-            foreach ($request->file('new_gallery') as $files) {
-                $beforePath = null;
-                $afterPath = null;
+        $updatedGalleryInputs = $request->input('updated_gallery', []);
+        $updatedGalleryFiles = $request->file('updated_gallery', []);
+        $updatedIndices = array_unique(array_merge(array_keys($updatedGalleryInputs), array_keys($updatedGalleryFiles)));
 
-                if (isset($files['before'])) {
-                    $beforePath = $files['before']->store('projects/gallery', 'public');
-                }
-                if (isset($files['after'])) {
-                    $afterPath = $files['after']->store('projects/gallery', 'public');
-                }
+        foreach ($updatedIndices as $index) {
+            $id = $updatedGalleryInputs[$index]['id'] ?? null;
+            if (!$id)
+                continue;
 
-                if ($beforePath || $afterPath) {
-                    $project->beforeAfters()->create([
-                        'before_image' => $beforePath,
-                        'after_image' => $afterPath,
-                    ]);
+            $galleryItem = $project->beforeAfters()->find($id);
+            if (!$galleryItem)
+                continue;
+
+            $beforePath = $galleryItem->before_image;
+            $afterPath = $galleryItem->after_image;
+
+            if (isset($updatedGalleryFiles[$index]['before'])) {
+                if ($beforePath && !str_starts_with($beforePath, 'http')) {
+                    Storage::disk('public')->delete($beforePath);
                 }
+                $beforePath = $updatedGalleryFiles[$index]['before']->store('projects/gallery', 'public');
+            } elseif (isset($updatedGalleryInputs[$index]['before_url'])) {
+                if ($beforePath && !str_starts_with($beforePath, 'http') && $beforePath !== $updatedGalleryInputs[$index]['before_url']) {
+                    Storage::disk('public')->delete($beforePath);
+                }
+                $beforePath = $updatedGalleryInputs[$index]['before_url'];
+            }
+
+            if (isset($updatedGalleryFiles[$index]['after'])) {
+                if ($afterPath && !str_starts_with($afterPath, 'http')) {
+                    Storage::disk('public')->delete($afterPath);
+                }
+                $afterPath = $updatedGalleryFiles[$index]['after']->store('projects/gallery', 'public');
+            } elseif (isset($updatedGalleryInputs[$index]['after_url'])) {
+                if ($afterPath && !str_starts_with($afterPath, 'http') && $afterPath !== $updatedGalleryInputs[$index]['after_url']) {
+                    Storage::disk('public')->delete($afterPath);
+                }
+                $afterPath = $updatedGalleryInputs[$index]['after_url'];
+            }
+
+            $galleryItem->update([
+                'before_image' => $beforePath,
+                'after_image' => $afterPath,
+            ]);
+        }
+
+        $newGalleryInputs = $request->input('new_gallery', []);
+        $newGalleryFiles = $request->file('new_gallery', []);
+        $newIndices = array_unique(array_merge(array_keys($newGalleryInputs), array_keys($newGalleryFiles)));
+
+        foreach ($newIndices as $index) {
+            $beforePath = null;
+            $afterPath = null;
+
+            if (isset($newGalleryFiles[$index]['before'])) {
+                $beforePath = $newGalleryFiles[$index]['before']->store('projects/gallery', 'public');
+            } elseif (isset($newGalleryInputs[$index]['before_url'])) {
+                $beforePath = $newGalleryInputs[$index]['before_url'];
+            }
+
+            if (isset($newGalleryFiles[$index]['after'])) {
+                $afterPath = $newGalleryFiles[$index]['after']->store('projects/gallery', 'public');
+            } elseif (isset($newGalleryInputs[$index]['after_url'])) {
+                $afterPath = $newGalleryInputs[$index]['after_url'];
+            }
+
+            if ($beforePath || $afterPath) {
+                $project->beforeAfters()->create([
+                    'before_image' => $beforePath,
+                    'after_image' => $afterPath,
+                ]);
             }
         }
 
@@ -130,7 +198,7 @@ class ProjectController extends Controller
 
     public function destroy(Project $project)
     {
-        if ($project->image) {
+        if ($project->image && !str_starts_with($project->image, 'http')) {
             Storage::disk('public')->delete($project->image);
         }
         $project->delete();

@@ -28,8 +28,8 @@ const Services = () => {
 
   const getServiceIcon = (title) => {
     const lowerTitle = title.toLowerCase();
-    if (lowerTitle.includes("clearing")) return <Trees size={32} />;
-    if (lowerTitle.includes("demolition")) return <Hammer size={32} />;
+    if (lowerTitle.includes("land development")) return <Trees size={32} />;
+    if (lowerTitle.includes("project management consultation")) return <Hammer size={32} />;
     if (lowerTitle.includes("excavation")) return <Shovel size={32} />;
     return <Zap size={32} />;
   };
@@ -47,7 +47,7 @@ const Services = () => {
           <div className="mb-24">
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-                Primary Services
+                Primary Function
               </h2>
               <div className="w-20 h-1.5 bg-green-500 mx-auto rounded-full"></div>
             </div>
@@ -93,7 +93,7 @@ const Services = () => {
           <div>
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-                Specialized Solutions
+                Secondary Function
               </h2>
               <div className="w-20 h-1.5 bg-green-500 mx-auto rounded-full"></div>
             </div>
