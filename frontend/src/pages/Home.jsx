@@ -1,51 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import HeroCarousel from '../components/HeroCarousel';
 
 const Home = () => {
     return (
         <div className="w-full font-sans">
-            {/* Hero Section */}
-            <div className="relative h-[85vh] flex items-center">
-                {/* Background Image with Gradient Overlay */}
-                <div className="absolute inset-0 z-0">
-                    <img
-                        src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
-                        alt="Construction Site"
-                        className="w-full h-full object-cover"
-                    />
-                    {/* Gradient Overlay: Blue/White to Transparent/Greenish */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-sky-100/90 via-sky-50/80 to-green-100/40 dark:from-gray-900/95 dark:via-gray-900/80 dark:to-gray-800/60 transition-colors duration-200"></div>
-                </div>
-
-                {/* Content */}
-                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-                    <div className="max-w-3xl">
-                        <h1 className="text-5xl md:text-7xl font-bold text-gray-800 dark:text-white leading-tight mb-6 transition-colors duration-200">
-                            Building <br />
-                            Excellence, <br />
-                            Constructing <br />
-                            Tomorrow
-                        </h1>
-                        <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-200 mb-10 leading-relaxed max-w-2xl transition-colors duration-200">
-                            Cliberduche Corporation is a premier construction company committed to delivering exceptional quality, innovation, and sustainability in every project we undertake.
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-4">
-                            <Link
-                                to="/services"
-                                className="bg-gradient-to-r from-blue-400 to-green-500 hover:from-blue-500 hover:to-green-600 text-white font-bold py-4 px-8 rounded shadow-lg text-lg text-center transition-all transform hover:scale-105"
-                            >
-                                Our Services
-                            </Link>
-                            <Link
-                                to="/contact-us"
-                                className="bg-transparent border-2 border-blue-400 text-blue-500 hover:bg-blue-50 font-bold py-4 px-8 rounded text-lg text-center transition-all"
-                            >
-                                Get a Quote
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <HeroCarousel />
 
             {/* Why Choose Us Section (Keeping previous section for content completeness) */}
             <section className="py-20 bg-white dark:!bg-gray-900 transition-colors duration-200">
