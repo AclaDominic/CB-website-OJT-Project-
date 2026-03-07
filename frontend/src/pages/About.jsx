@@ -62,28 +62,28 @@ const About = () => {
           {/* Mission & Vision Section */}
           <div className="grid md:grid-cols-2 gap-6 md:gap-12 mb-24 md:mb-32">
             {/* Mission Card */}
-            <div className="bg-[#f0f7ff] p-8 md:p-10 rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.03)] border border-blue-100/50 flex flex-col items-start text-left">
-              <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center mb-6 text-blue-500 shadow-sm">
+            <div className="bg-[#f0f7ff] dark:!bg-gray-800 p-8 md:p-10 rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.03)] border border-blue-100/50 dark:border-gray-700 flex flex-col items-start text-left transition-colors duration-200">
+              <div className="w-12 h-12 bg-white dark:!bg-gray-700 rounded-lg flex items-center justify-center mb-6 text-blue-500 dark:text-blue-400 shadow-sm transition-colors duration-200">
                 <Zap size={24} fill="currentColor" fillOpacity="0.2" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4 transition-colors duration-200">
                 Our Mission
               </h2>
-              <p className="text-gray-600 leading-relaxed text-base md:text-lg whitespace-pre-wrap">
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-base md:text-lg whitespace-pre-wrap transition-colors duration-200">
                 {content.mission ||
                   "We (Cliberduche Corporation) are a responsible land development company that provides high-quality backfill materials for land development projects and other infrastructures... adhering to environmental regulations of the Philippines while delivering value to our communities, partners, and stakeholders."}
               </p>
             </div>
 
             {/* Vision Card */}
-            <div className="bg-[#f8fff4] p-8 md:p-10 rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.03)] border border-green-100/50 flex flex-col items-start text-left">
-              <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center mb-6 text-green-500 shadow-sm">
+            <div className="bg-[#f8fff4] dark:!bg-gray-800 p-8 md:p-10 rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.03)] border border-green-100/50 dark:border-gray-700 flex flex-col items-start text-left transition-colors duration-200">
+              <div className="w-12 h-12 bg-white dark:!bg-gray-700 rounded-lg flex items-center justify-center mb-6 text-green-500 dark:text-green-400 shadow-sm transition-colors duration-200">
                 <Eye size={24} fill="currentColor" fillOpacity="0.2" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4 transition-colors duration-200">
                 Our Vision
               </h2>
-              <p className="text-gray-600 leading-relaxed text-base md:text-lg whitespace-pre-wrap">
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-base md:text-lg whitespace-pre-wrap transition-colors duration-200">
                 {content.vision ||
                   "To be a highly respected, world-class natural resource land development company committed to international standards, environmental conservation, and sustainable projects."}
               </p>
@@ -93,7 +93,7 @@ const About = () => {
           {/* Core Values Section */}
           <div className="mb-24 md:mb-40">
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-200">
                 Our Core Values
               </h2>
               <div className="w-20 h-1.5 bg-green-500 mx-auto rounded-full"></div>
@@ -101,42 +101,42 @@ const About = () => {
 
             <div className="grid md:grid-cols-3 gap-6 md:gap-8">
               {/* Quality */}
-              <div className="bg-white p-8 md:p-10 rounded-2xl shadow-[0_4px_25px_rgba(0,0,0,0.05)] border border-gray-50 flex flex-col items-center text-center">
-                <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-6 text-blue-500 shadow-inner">
+              <div className="bg-white dark:!bg-gray-800 p-8 md:p-10 rounded-2xl shadow-[0_4px_25px_rgba(0,0,0,0.05)] border border-gray-50 dark:border-gray-700 flex flex-col items-center text-center transition-colors duration-200">
+                <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/50 rounded-full flex items-center justify-center mb-6 text-blue-500 dark:text-blue-400 shadow-inner">
                   <CheckCircle size={32} />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-4">
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-4 transition-colors duration-200">
                   Quality
                 </h3>
-                <p className="text-gray-600 text-base md:text-lg">
+                <p className="text-gray-600 dark:text-gray-300 text-base md:text-lg transition-colors duration-200">
                   High-quality projects aligned with national and local
                   standards.
                 </p>
               </div>
 
               {/* Safety */}
-              <div className="bg-white p-8 md:p-10 rounded-2xl shadow-[0_4px_25px_rgba(0,0,0,0.05)] border border-gray-50 flex flex-col items-center text-center">
-                <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mb-6 text-green-500 shadow-inner">
+              <div className="bg-white dark:!bg-gray-800 p-8 md:p-10 rounded-2xl shadow-[0_4px_25px_rgba(0,0,0,0.05)] border border-gray-50 dark:border-gray-700 flex flex-col items-center text-center transition-colors duration-200">
+                <div className="w-16 h-16 bg-green-50 dark:bg-green-900/50 rounded-full flex items-center justify-center mb-6 text-green-500 dark:text-green-400 shadow-inner">
                   <Shield size={32} />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-4">
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-4 transition-colors duration-200">
                   Safety
                 </h3>
-                <p className="text-gray-600 text-base md:text-lg">
+                <p className="text-gray-600 dark:text-gray-300 text-base md:text-lg transition-colors duration-200">
                   Strict safety practices before, during, and after project
                   execution.
                 </p>
               </div>
 
               {/* Integrity */}
-              <div className="bg-white p-8 md:p-10 rounded-2xl shadow-[0_4px_25px_rgba(0,0,0,0.05)] border border-gray-50 flex flex-col items-center text-center">
-                <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-6 text-blue-500 shadow-inner">
+              <div className="bg-white dark:!bg-gray-800 p-8 md:p-10 rounded-2xl shadow-[0_4px_25px_rgba(0,0,0,0.05)] border border-gray-50 dark:border-gray-700 flex flex-col items-center text-center transition-colors duration-200">
+                <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/50 rounded-full flex items-center justify-center mb-6 text-blue-500 dark:text-blue-400 shadow-inner">
                   <FlaskConical size={32} />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-4">
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-4 transition-colors duration-200">
                   Integrity
                 </h3>
-                <p className="text-gray-600 text-base md:text-lg">
+                <p className="text-gray-600 dark:text-gray-300 text-base md:text-lg transition-colors duration-200">
                   Compliance with construction laws, reliability, and timely
                   delivery.
                 </p>
@@ -147,7 +147,7 @@ const About = () => {
           {/* Company Background Section */}
           <div className="mb-24">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4 tracking-tight">
+              <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight transition-colors duration-200">
                 Company Background
               </h2>
               <div className="w-20 h-1.5 bg-green-500 mx-auto rounded-full"></div>
@@ -156,65 +156,65 @@ const About = () => {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {content.background
                 ? content.background.split("\n").map((line, index) => {
-                    const parts = line.split(":");
-                    if (parts.length > 1) {
-                      const label = parts[0].trim();
-                      const value = parts.slice(1).join(":").trim();
+                  const parts = line.split(":");
+                  if (parts.length > 1) {
+                    const label = parts[0].trim();
+                    const value = parts.slice(1).join(":").trim();
 
-                      let icon = <Info size={24} />;
-                      let bgClass = "bg-blue-50";
-                      let iconClass = "text-blue-500";
+                    let icon = <Info size={24} />;
+                    let bgClass = "bg-blue-50";
+                    let iconClass = "text-blue-500";
 
-                      if (label.toLowerCase().includes("established")) {
-                        icon = <Calendar size={24} />;
-                      } else if (label.toLowerCase().includes("registration")) {
-                        icon = <ShieldCheck size={24} />;
-                        bgClass = "bg-green-50";
-                        iconClass = "text-green-500";
-                      } else if (label.toLowerCase().includes("industry")) {
-                        icon = <Building2 size={24} />;
-                      } else if (label.toLowerCase().includes("areas")) {
-                        icon = <MapPin size={24} />;
-                        bgClass = "bg-green-50";
-                        iconClass = "text-green-500";
-                      } else if (label.toLowerCase().includes("origin")) {
-                        icon = <Info size={24} />;
-                      } else if (label.toLowerCase().includes("services")) {
-                        icon = <Wrench size={24} />;
-                        bgClass = "bg-green-50";
-                        iconClass = "text-green-500";
-                      }
-
-                      return (
-                        <div
-                          key={index}
-                          className="flex items-center p-8 bg-white rounded-2xl shadow-[0_2px_15px_rgba(0,0,0,0.03)] border border-gray-100 hover:shadow-lg transition-all duration-300"
-                        >
-                          <div
-                            className={`w-12 h-12 rounded-xl flex items-center justify-center mr-6 ${bgClass} ${iconClass} shrink-0`}
-                          >
-                            {icon}
-                          </div>
-                          <div>
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
-                              {label}
-                            </p>
-                            <p className="text-gray-800 font-bold text-lg leading-tight">
-                              {value}
-                            </p>
-                          </div>
-                        </div>
-                      );
+                    if (label.toLowerCase().includes("established")) {
+                      icon = <Calendar size={24} />;
+                    } else if (label.toLowerCase().includes("registration")) {
+                      icon = <ShieldCheck size={24} />;
+                      bgClass = "bg-green-50";
+                      iconClass = "text-green-500";
+                    } else if (label.toLowerCase().includes("industry")) {
+                      icon = <Building2 size={24} />;
+                    } else if (label.toLowerCase().includes("areas")) {
+                      icon = <MapPin size={24} />;
+                      bgClass = "bg-green-50";
+                      iconClass = "text-green-500";
+                    } else if (label.toLowerCase().includes("origin")) {
+                      icon = <Info size={24} />;
+                    } else if (label.toLowerCase().includes("services")) {
+                      icon = <Wrench size={24} />;
+                      bgClass = "bg-green-50";
+                      iconClass = "text-green-500";
                     }
-                    return line.trim() ? (
+
+                    return (
                       <div
                         key={index}
-                        className="md:col-span-2 lg:col-span-3 p-8 bg-gray-50/50 rounded-2xl text-gray-600 text-center italic text-lg"
+                        className="flex items-center p-8 bg-white dark:!bg-gray-800 rounded-2xl shadow-[0_2px_15px_rgba(0,0,0,0.03)] border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-all duration-300"
                       >
-                        {line}
+                        <div
+                          className={`w-12 h-12 rounded-xl flex items-center justify-center mr-6 ${bgClass} ${iconClass} shrink-0 dark:bg-opacity-20`}
+                        >
+                          {icon}
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                            {label}
+                          </p>
+                          <p className="text-gray-800 dark:text-gray-200 font-bold text-lg leading-tight transition-colors duration-200">
+                            {value}
+                          </p>
+                        </div>
                       </div>
-                    ) : null;
-                  })
+                    );
+                  }
+                  return line.trim() ? (
+                    <div
+                      key={index}
+                      className="md:col-span-2 lg:col-span-3 p-8 bg-gray-50/50 dark:!bg-gray-800 rounded-2xl text-gray-600 dark:text-gray-300 text-center italic text-lg transition-colors duration-200"
+                    >
+                      {line}
+                    </div>
+                  ) : null;
+                })
                 : "Loading background..."}
             </div>
           </div>

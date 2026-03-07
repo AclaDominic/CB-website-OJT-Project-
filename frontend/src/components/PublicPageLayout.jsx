@@ -8,42 +8,42 @@ const PublicPageLayout = ({
   children,
 }) => {
   return (
-    <div className="font-sans bg-slate-50 overflow-hidden relative min-h-screen">
+    <div className="font-sans bg-slate-50 dark:!bg-gray-900 overflow-hidden relative min-h-screen transition-colors duration-200">
       {/* Dynamic Background Elements */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
         {/* Soft Background Gradient Base */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 via-white/50 to-green-50/80"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 via-white/50 to-green-50/80 dark:from-gray-900/80 dark:via-gray-800/50 dark:to-gray-900/80 transition-colors duration-200"></div>
 
         {/* Decorative Blurred Blobs (Aurora Effect) */}
         {/* Top Right Blob */}
         <div
-          className="absolute -top-[10%] -right-[10%] w-[60%] h-[40%] bg-blue-100/40 rounded-full blur-[120px] animate-pulse"
+          className="absolute -top-[10%] -right-[10%] w-[60%] h-[40%] bg-blue-100/40 dark:bg-blue-900/20 rounded-full blur-[120px] animate-pulse transition-colors duration-200"
           style={{ animationDuration: "8s" }}
         ></div>
 
         {/* Mid Left Blob */}
         <div
-          className="absolute top-[30%] -left-[15%] w-[50%] h-[35%] bg-green-100/30 rounded-full blur-[100px] animate-pulse"
+          className="absolute top-[30%] -left-[15%] w-[50%] h-[35%] bg-green-100/30 dark:bg-green-900/20 rounded-full blur-[100px] animate-pulse transition-colors duration-200"
           style={{ animationDuration: "12s" }}
         ></div>
 
         {/* Deep Center Blob */}
-        <div className="absolute top-[55%] left-[20%] w-[45%] h-[25%] bg-blue-50/50 rounded-full blur-[90px]"></div>
+        <div className="absolute top-[55%] left-[20%] w-[45%] h-[25%] bg-blue-50/50 dark:bg-blue-900/20 rounded-full blur-[90px] transition-colors duration-200"></div>
 
         {/* Bottom Right Blob */}
-        <div className="absolute bottom-[5%] -right-[5%] w-[55%] h-[30%] bg-green-100/30 rounded-full blur-[110px]"></div>
+        <div className="absolute bottom-[5%] -right-[5%] w-[55%] h-[30%] bg-green-100/30 dark:bg-green-900/20 rounded-full blur-[110px] transition-colors duration-200"></div>
 
         {/* Center Right Blob */}
         <div
-          className="absolute top-[45%] -right-[10%] w-[40%] h-[30%] bg-blue-100/30 rounded-full blur-[100px] animate-pulse"
+          className="absolute top-[45%] -right-[10%] w-[40%] h-[30%] bg-blue-100/30 dark:bg-blue-900/20 rounded-full blur-[100px] animate-pulse transition-colors duration-200"
           style={{ animationDuration: "10s" }}
         ></div>
 
         {/* Bottom Left Blob */}
-        <div className="absolute -bottom-[5%] -left-[10%] w-[40%] h-[25%] bg-blue-100/20 rounded-full blur-[80px]"></div>
+        <div className="absolute -bottom-[5%] -left-[10%] w-[40%] h-[25%] bg-blue-100/20 dark:bg-blue-900/10 rounded-full blur-[80px] transition-colors duration-200"></div>
 
         {/* Bottom Center-Right Blob */}
-        <div className="absolute bottom-[15%] right-[25%] w-[45%] h-[20%] bg-green-50/40 rounded-full blur-[100px]"></div>
+        <div className="absolute bottom-[15%] right-[25%] w-[45%] h-[20%] bg-green-50/40 dark:bg-green-900/20 rounded-full blur-[100px] transition-colors duration-200"></div>
       </div>
 
       <div className="relative w-full h-[280px] sm:h-[340px] lg:h-[390px] xl:h-[440px] flex items-center justify-center overflow-hidden transition-all duration-500">

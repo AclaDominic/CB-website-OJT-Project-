@@ -11,6 +11,9 @@ import ScrollToTop from "./components/ScrollToTop";
 import DynamicTitle from "./components/DynamicTitle";
 import PageLoader from "./components/PageLoader";
 
+import { SettingsProvider } from "./context/SettingsContext";
+import AccessibilityFilters from "./components/AccessibilityFilters";
+
 // Need to import the clear cache function
 import { clearCache } from "./lib/axios";
 
@@ -78,46 +81,49 @@ const App = () => {
   }, []);
 
   return (
-    <LoadingProvider>
-      <LoadingOverlay />
-      <AuthProvider>
-        <DynamicTitle />
-        <ScrollToTop />
-        <Suspense fallback={<PageLoader fullScreen />}>
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Home />} />
-              <Route path="about-us" element={<LazyAbout />} />
-              <Route path="services" element={<LazyServices />} />
-              <Route path="projects" element={<LazyProjects />} />
-              <Route path="resources" element={<LazyResources />} />
-              <Route path="contact-us" element={<LazyContact />} />
-            </Route>
-
-            <Route path="/login" element={<Login />} />
-
-            <Route path="/system" element={<ProtectedRoute />}>
-              <Route element={<SystemLayout />}>
-                <Route index element={<Dashboard />} />
-                <Route path="about" element={<AboutEditor />} />
-                <Route path="contact" element={<ContactEditor />} />
-                <Route path="faqs" element={<FaqManager />} />
-                <Route path="services" element={<ServiceManager />} />
-                <Route path="projects" element={<ProjectManager />} />
-                <Route path="inquiries" element={<SystemInquiries />} />
-                <Route path="resources" element={<ResourceManager />} />
-                <Route path="inventory" element={<InventoryManager />} />
-                <Route path="procurement" element={<ProcurementManager />} />
-                <Route path="roles" element={<RoleManager />} />
-                <Route path="users" element={<UserManager />} />
-                <Route path="backups" element={<BackupManager />} />
-                <Route path="settings" element={<AccountSettings />} />
+    <SettingsProvider>
+      <AccessibilityFilters />
+      <LoadingProvider>
+        <LoadingOverlay />
+        <AuthProvider>
+          <DynamicTitle />
+          <ScrollToTop />
+          <Suspense fallback={<PageLoader fullScreen />}>
+            <Routes>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Home />} />
+                <Route path="about-us" element={<LazyAbout />} />
+                <Route path="services" element={<LazyServices />} />
+                <Route path="projects" element={<LazyProjects />} />
+                <Route path="resources" element={<LazyResources />} />
+                <Route path="contact-us" element={<LazyContact />} />
               </Route>
-            </Route>
-          </Routes>
-        </Suspense>
-      </AuthProvider>
-    </LoadingProvider>
+
+              <Route path="/login" element={<Login />} />
+
+              <Route path="/system" element={<ProtectedRoute />}>
+                <Route element={<SystemLayout />}>
+                  <Route index element={<Dashboard />} />
+                  <Route path="about" element={<AboutEditor />} />
+                  <Route path="contact" element={<ContactEditor />} />
+                  <Route path="faqs" element={<FaqManager />} />
+                  <Route path="services" element={<ServiceManager />} />
+                  <Route path="projects" element={<ProjectManager />} />
+                  <Route path="inquiries" element={<SystemInquiries />} />
+                  <Route path="resources" element={<ResourceManager />} />
+                  <Route path="inventory" element={<InventoryManager />} />
+                  <Route path="procurement" element={<ProcurementManager />} />
+                  <Route path="roles" element={<RoleManager />} />
+                  <Route path="users" element={<UserManager />} />
+                  <Route path="backups" element={<BackupManager />} />
+                  <Route path="settings" element={<AccountSettings />} />
+                </Route>
+              </Route>
+            </Routes>
+          </Suspense>
+        </AuthProvider>
+      </LoadingProvider>
+    </SettingsProvider>
   );
 };
 
