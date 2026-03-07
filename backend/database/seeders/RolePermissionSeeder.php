@@ -45,12 +45,15 @@ class RolePermissionSeeder extends Seeder
         Permission::findOrCreate('procurement.complete');
         Permission::findOrCreate('procurement.archive');
         Permission::findOrCreate('procurement.delete');
+        Permission::findOrCreate('procurement.report');
 
         // --- Roles ---
 
         // 1. Admin (Super User)
+        // Give all permissions except procurement.create so they don't see the make request button
         $admin = Role::findOrCreate('Admin');
-        $admin->givePermissionTo(Permission::all());
+        $permissions = Permission::where('name', '!=', 'procurement.create')->get();
+        $admin->givePermissionTo($permissions);
 
         // 2. Project Manager
         $pm = Role::findOrCreate('Project Manager');
@@ -90,6 +93,7 @@ class RolePermissionSeeder extends Seeder
             'procurement.process',
             'procurement.complete',
             'procurement.archive',
+            'procurement.report',
         ]);
 
         // --- Assign Roles to Existing Users ---
@@ -117,7 +121,7 @@ class RolePermissionSeeder extends Seeder
                 ]
             );
             $user->assignRole($roleName);
-        }    
+        }
 
         // Assign roles based on the old 'role' column for other users
         $users = User::all();

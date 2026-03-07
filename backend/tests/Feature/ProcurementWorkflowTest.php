@@ -53,7 +53,7 @@ class ProcurementWorkflowTest extends TestCase
         ]);
 
         $response->assertStatus(201);
-        $requestId = $response->json('id');
+        $requestId = $response->json('data.id');
         $this->assertDatabaseHas('procurement_requests', ['id' => $requestId, 'status' => 'draft']);
 
         // 2. PM Submits Draft

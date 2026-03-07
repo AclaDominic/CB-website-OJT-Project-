@@ -27,6 +27,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('organization-members', \App\Http\Controllers\Api\OrganizationMemberController::class)->except(['index', 'show']);
     Route::post('/organization-members/reorder', [\App\Http\Controllers\Api\OrganizationMemberController::class, 'reorder']);
 
+    Route::get('procurement/report', [\App\Http\Controllers\Api\System\ProcurementController::class, 'generateReport']);
     Route::apiResource('procurement', \App\Http\Controllers\Api\System\ProcurementController::class);
     Route::post('procurement/{id}/status', [\App\Http\Controllers\Api\System\ProcurementController::class, 'changeStatus']);
 

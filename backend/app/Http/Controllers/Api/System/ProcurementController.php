@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\System;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\System\StoreProcurementFormRequest;
 use App\Http\Requests\System\UpdateProcurementFormRequest;
+use App\Http\Resources\ProcurementRequestResource;
 use App\Models\ProcurementRequest;
 use App\Models\ProcurementItem;
 use App\Models\Project;
@@ -12,6 +13,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use App\Models\User;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\ProcurementRequestedNotification;
 
 class ProcurementController extends Controller
 {
@@ -44,7 +48,7 @@ class ProcurementController extends Controller
             }
         }
 
-        return response()->json($query->get());
+        return ProcurementRequestResource::collection($query->get());
     }
 
     public function store(StoreProcurementFormRequest $request)
@@ -74,7 +78,10 @@ class ProcurementController extends Controller
             }
 
             DB::commit();
-            return response()->json($procurement->load('items'), 201);
+
+            $procurement->load(['items', 'project', 'user']);
+            return new ProcurementRequestResource($procurement);
+
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['message' => 'Failed to create request', 'error' => $e->getMessage()], 500);
@@ -89,7 +96,7 @@ class ProcurementController extends Controller
         }
 
         $procurement = ProcurementRequest::with(['items', 'project', 'user'])->findOrFail($id);
-        return response()->json($procurement);
+        return new ProcurementRequestResource($procurement);
     }
 
     public function update(UpdateProcurementFormRequest $request, $id)
@@ -120,7 +127,8 @@ class ProcurementController extends Controller
             }
 
             DB::commit();
-            return response()->json($procurement->load('items'));
+            $procurement->load(['items', 'project', 'user']);
+            return new ProcurementRequestResource($procurement);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['message' => 'Update failed', 'error' => $e->getMessage()], 500);
@@ -216,6 +224,66 @@ class ProcurementController extends Controller
 
         $procurement->save();
 
-        return response()->json($procurement);
+        if ($newStatus === ProcurementRequest::STATUS_SUBMITTED) {
+            $processors = User::permission('procurement.process')->get();
+            Notification::send($processors, new ProcurementRequestedNotification($procurement));
+        }
+
+        $procurement->load(['items', 'project', 'user']);
+        return new ProcurementRequestResource($procurement);
+    }
+
+    public function generateReport(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user->can('procurement.report')) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $query = ProcurementRequest::with(['items', 'project', 'user'])->latest();
+
+        // Project filter
+        $projectName = null;
+        if ($request->has('project_id') && !empty($request->project_id)) {
+            $query->where('project_id', $request->project_id);
+            $project = Project::find($request->project_id);
+            if ($project) {
+                $projectName = $project->name;
+            }
+        }
+
+        // Date range filter
+        $filterLabel = 'All Time';
+        if ($request->has('date_range') && !empty($request->date_range)) {
+            switch ($request->date_range) {
+                case 'last_30_days':
+                    $query->where('created_at', '>=', now()->subDays(30));
+                    $filterLabel = 'Last 30 Days';
+                    break;
+                case 'current_year':
+                    $query->whereYear('created_at', now()->year);
+                    $filterLabel = 'Current Year (' . now()->year . ')';
+                    break;
+                case 'last_year':
+                    $lastYear = now()->subYear()->year;
+                    $query->whereYear('created_at', $lastYear);
+                    $filterLabel = 'Last Year (' . $lastYear . ')';
+                    break;
+            }
+        }
+
+        $requests = $query->get();
+
+        if ($requests->isEmpty()) {
+            return response()->json(['message' => 'No procurement requests found for the selected criteria.'], 404);
+        }
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.procurement-report', [
+            'requests' => $requests,
+            'filterLabel' => $filterLabel,
+            'projectName' => $projectName
+        ]);
+
+        return $pdf->download('procurement-report-' . now()->format('Ymd') . '.pdf');
     }
 }

@@ -37,6 +37,7 @@ const ProjectManager = () => {
         id: null, // New item
         before: { type: "url", value: "" },
         after: { type: "url", value: "" },
+        dirty: false,
       },
     ]);
   };
@@ -50,6 +51,7 @@ const ProjectManager = () => {
   const handleGalleryChange = (index, field, { type, value }) => {
     const newItems = [...galleryItems];
     newItems[index][field] = { type, value };
+    newItems[index].dirty = true; // Mark as modified
     setGalleryItems(newItems);
   };
 
@@ -81,6 +83,16 @@ const ProjectManager = () => {
     }
   };
 
+  // Helper: append a gallery image field to FormData (handles both file and URL)
+  const appendGalleryField = (data, prefix, field, imageData) => {
+    if (!imageData.value) return;
+    if (imageData.type === "file") {
+      data.append(`${prefix}[${field}]`, imageData.value);
+    } else if (imageData.type === "url" && imageData.value) {
+      data.append(`${prefix}[${field}_url]`, imageData.value);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -99,29 +111,25 @@ const ProjectManager = () => {
     }
 
     // Process Gallery
-    // 1. Collect IDs of items that are kept (have an ID)
-    const keptIds = galleryItems
-      .filter((item) => item.id !== null)
-      .map((item) => item.id);
+    // 1. Collect IDs of existing items that are kept (not removed)
+    const existingItems = galleryItems.filter((item) => item.id !== null);
+    existingItems.forEach((item) => data.append("kept_gallery_ids[]", item.id));
 
-    keptIds.forEach((id) => data.append("kept_gallery_ids[]", id));
+    // 2. Send updates for existing items that were modified
+    existingItems
+      .filter((item) => item.dirty)
+      .forEach((item) => {
+        const prefix = `updated_gallery[${item.id}]`;
+        appendGalleryField(data, prefix, "before", item.before);
+        appendGalleryField(data, prefix, "after", item.after);
+      });
 
-    // 2. Append new items (those without ID) as files
-    // Note: We only support uploading new files for now as per controller logic.
-    // Ideally update controller to handle URLs too if mixed.
-    // But for "Before/After", it's usually uploaded files.
-    // If user enters URL for new item, we might need controller update.
-    // Let's assume user uploads files for new items for now, or just send what we have.
-    // The controller logic expects 'new_gallery' array of files.
-
+    // 3. Append new items (those without ID) — supports both files and URLs
     const newItems = galleryItems.filter((item) => item.id === null);
     newItems.forEach((item, index) => {
-      if (item.before.type === "file" && item.before.value) {
-        data.append(`new_gallery[${index}][before]`, item.before.value);
-      }
-      if (item.after.type === "file" && item.after.value) {
-        data.append(`new_gallery[${index}][after]`, item.after.value);
-      }
+      const prefix = `new_gallery[${index}]`;
+      appendGalleryField(data, prefix, "before", item.before);
+      appendGalleryField(data, prefix, "after", item.after);
     });
 
     if (editingProject) {
@@ -203,6 +211,7 @@ const ProjectManager = () => {
             id: item.id,
             before: { type: "url", value: item.before_image },
             after: { type: "url", value: item.after_image },
+            dirty: false,
           })),
         );
       } else {

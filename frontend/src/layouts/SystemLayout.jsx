@@ -1,8 +1,65 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { Menu } from "lucide-react";
-import { Toaster } from "react-hot-toast";
+import { Toaster, useToasterStore } from "react-hot-toast";
 import SystemSidebar from "../components/SystemSidebar";
+
+const playNotificationSound = (type) => {
+  try {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    if (type === "error") {
+      oscillator.type = "square";
+      oscillator.frequency.setValueAtTime(200, audioCtx.currentTime);
+      gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(
+        0.001,
+        audioCtx.currentTime + 0.3,
+      );
+      oscillator.start(audioCtx.currentTime);
+      oscillator.stop(audioCtx.currentTime + 0.3);
+    } else {
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(500, audioCtx.currentTime);
+      oscillator.frequency.setValueAtTime(750, audioCtx.currentTime + 0.1);
+      gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(
+        0.001,
+        audioCtx.currentTime + 0.3,
+      );
+      oscillator.start(audioCtx.currentTime);
+      oscillator.stop(audioCtx.currentTime + 0.3);
+    }
+  } catch (e) {
+    console.error("Audio playback failed", e);
+  }
+};
+
+const ToastListener = () => {
+  const { toasts } = useToasterStore();
+  const [played, setPlayed] = useState(new Set());
+
+  useEffect(() => {
+    const visibleToasts = toasts.filter((t) => t.visible);
+    visibleToasts.forEach((t) => {
+      if (!played.has(t.id)) {
+        playNotificationSound(t.type);
+        setPlayed((prev) => {
+          const newSet = new Set(prev);
+          newSet.add(t.id);
+          return newSet;
+        });
+      }
+    });
+  }, [toasts, played]);
+
+  return null;
+};
 
 const SystemLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -32,6 +89,7 @@ const SystemLayout = () => {
           <Outlet />
         </div>
       </main>
+      <ToastListener />
       <Toaster position="top-right" />
     </div>
   );

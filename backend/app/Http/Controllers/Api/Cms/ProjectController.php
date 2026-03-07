@@ -34,6 +34,31 @@ class ProjectController extends Controller
         return $project;
     }
 
+    /**
+     * Resolve a gallery image value from request data.
+     * Checks for file upload first, then falls back to URL string.
+     */
+    private function resolveGalleryImage(array $data, string $field, ?string $existingPath = null): ?string
+    {
+        // File upload takes priority
+        if (isset($data[$field]) && $data[$field] instanceof \Illuminate\Http\UploadedFile) {
+            if ($existingPath && !str_starts_with($existingPath, 'http')) {
+                Storage::disk('public')->delete($existingPath);
+            }
+            return $data[$field]->store('projects/gallery', 'public');
+        }
+
+        // URL string
+        if (isset($data[$field . '_url']) && !empty($data[$field . '_url'])) {
+            if ($existingPath && !str_starts_with($existingPath, 'http')) {
+                Storage::disk('public')->delete($existingPath);
+            }
+            return $data[$field . '_url'];
+        }
+
+        return $existingPath;
+    }
+
     public function store(StoreProjectRequest $request)
     {
         $validated = $request->validated();
@@ -43,28 +68,32 @@ class ProjectController extends Controller
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('projects', 'public');
+        } elseif ($request->filled('image_url')) {
+            $validated['image'] = $request->input('image_url');
         }
 
         $project = Project::create($validated);
 
-        if ($request->has('before_afters')) {
-            foreach ($request->file('before_afters', []) as $index => $files) {
-                $beforePath = null;
-                $afterPath = null;
+        // Handle new gallery items (supports both file uploads and URLs)
+        $newGallery = $request->input('new_gallery', []);
+        $newGalleryFiles = $request->file('new_gallery', []);
 
-                if (isset($files['before'])) {
-                    $beforePath = $files['before']->store('projects/gallery', 'public');
-                }
-                if (isset($files['after'])) {
-                    $afterPath = $files['after']->store('projects/gallery', 'public');
-                }
+        // Merge file and input data
+        foreach ($newGalleryFiles as $index => $files) {
+            if (!isset($newGallery[$index]))
+                $newGallery[$index] = [];
+            $newGallery[$index] = array_merge($newGallery[$index], $files);
+        }
 
-                if ($beforePath || $afterPath) {
-                    $project->beforeAfters()->create([
-                        'before_image' => $beforePath,
-                        'after_image' => $afterPath,
-                    ]);
-                }
+        foreach ($newGallery as $data) {
+            $beforePath = $this->resolveGalleryImage($data, 'before');
+            $afterPath = $this->resolveGalleryImage($data, 'after');
+
+            if ($beforePath || $afterPath) {
+                $project->beforeAfters()->create([
+                    'before_image' => $beforePath,
+                    'after_image' => $afterPath,
+                ]);
             }
         }
 
@@ -76,10 +105,15 @@ class ProjectController extends Controller
         $validated = $request->validated();
 
         if ($request->hasFile('image')) {
-            if ($project->image) {
+            if ($project->image && !str_starts_with($project->image, 'http')) {
                 Storage::disk('public')->delete($project->image);
             }
             $validated['image'] = $request->file('image')->store('projects', 'public');
+        } elseif ($request->filled('image_url')) {
+            if ($project->image && !str_starts_with($project->image, 'http')) {
+                Storage::disk('public')->delete($project->image);
+            }
+            $validated['image'] = $request->input('image_url');
         }
 
         if (isset($validated['status']) && $validated['status'] === 'completed') {
@@ -95,32 +129,57 @@ class ProjectController extends Controller
 
             $toDelete = $project->beforeAfters()->whereNotIn('id', $keptIds)->get();
             foreach ($toDelete as $item) {
-                if ($item->before_image)
+                if ($item->before_image && !str_starts_with($item->before_image, 'http'))
                     Storage::disk('public')->delete($item->before_image);
-                if ($item->after_image)
+                if ($item->after_image && !str_starts_with($item->after_image, 'http'))
                     Storage::disk('public')->delete($item->after_image);
                 $item->delete();
             }
         }
 
-        if ($request->file('new_gallery')) {
-            foreach ($request->file('new_gallery') as $files) {
-                $beforePath = null;
-                $afterPath = null;
+        // Handle updates to existing gallery items
+        $updatedGallery = $request->input('updated_gallery', []);
+        $updatedGalleryFiles = $request->file('updated_gallery', []);
 
-                if (isset($files['before'])) {
-                    $beforePath = $files['before']->store('projects/gallery', 'public');
-                }
-                if (isset($files['after'])) {
-                    $afterPath = $files['after']->store('projects/gallery', 'public');
-                }
+        foreach ($updatedGalleryFiles as $id => $files) {
+            if (!isset($updatedGallery[$id]))
+                $updatedGallery[$id] = [];
+            $updatedGallery[$id] = array_merge($updatedGallery[$id], $files);
+        }
 
-                if ($beforePath || $afterPath) {
-                    $project->beforeAfters()->create([
-                        'before_image' => $beforePath,
-                        'after_image' => $afterPath,
-                    ]);
-                }
+        foreach ($updatedGallery as $id => $data) {
+            $existing = $project->beforeAfters()->find($id);
+            if (!$existing)
+                continue;
+
+            $beforePath = $this->resolveGalleryImage($data, 'before', $existing->before_image);
+            $afterPath = $this->resolveGalleryImage($data, 'after', $existing->after_image);
+
+            $existing->update([
+                'before_image' => $beforePath,
+                'after_image' => $afterPath,
+            ]);
+        }
+
+        // Handle new gallery items (supports both file uploads and URLs)
+        $newGallery = $request->input('new_gallery', []);
+        $newGalleryFiles = $request->file('new_gallery', []);
+
+        foreach ($newGalleryFiles as $index => $files) {
+            if (!isset($newGallery[$index]))
+                $newGallery[$index] = [];
+            $newGallery[$index] = array_merge($newGallery[$index], $files);
+        }
+
+        foreach ($newGallery as $data) {
+            $beforePath = $this->resolveGalleryImage($data, 'before');
+            $afterPath = $this->resolveGalleryImage($data, 'after');
+
+            if ($beforePath || $afterPath) {
+                $project->beforeAfters()->create([
+                    'before_image' => $beforePath,
+                    'after_image' => $afterPath,
+                ]);
             }
         }
 

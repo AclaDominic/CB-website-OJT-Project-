@@ -8,16 +8,46 @@ import ConfirmModal from "../../../components/system/ConfirmModal";
 import PageLoader from "../../../components/PageLoader";
 
 const SystemInquiries = () => {
-  const [inquiries, setInquiries] = useState([]);
+  const [tabData, setTabData] = useState({
+    inbox: { items: [], loaded: false },
+    archived: { items: [], loaded: false },
+  });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("inbox");
   const { user } = useAuth();
 
   // Filters
-  const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
-  const [archivedFrom, setArchivedFrom] = useState("");
-  const [archivedTo, setArchivedTo] = useState("");
+  const [filters, setFilters] = useState({
+    inbox: { dateFrom: "", dateTo: "" },
+    archived: { dateFrom: "", dateTo: "", archivedFrom: "", archivedTo: "" },
+  });
+
+  const inquiries = tabData[activeTab]?.items || [];
+  const currentFilters = filters[activeTab] || {};
+  const { dateFrom, dateTo, archivedFrom, archivedTo } = currentFilters;
+
+  const updateFilter = (key, value) => {
+    const newTabFilters = { ...filters[activeTab], [key]: value };
+    setFilters((prev) => ({
+      ...prev,
+      [activeTab]: newTabFilters,
+    }));
+    fetchInquiries(activeTab, newTabFilters);
+  };
+
+  const clearFilters = () => {
+    const defaultFilters = {
+      dateFrom: "",
+      dateTo: "",
+      archivedFrom: "",
+      archivedTo: "",
+    };
+    setFilters((prev) => ({
+      ...prev,
+      [activeTab]: defaultFilters,
+    }));
+    fetchInquiries(activeTab, defaultFilters);
+  };
 
   // Modal State
   const [confirmModal, setConfirmModal] = useState({
@@ -30,22 +60,33 @@ const SystemInquiries = () => {
   });
 
   useEffect(() => {
-    fetchInquiries();
-  }, [activeTab, dateFrom, dateTo, archivedFrom, archivedTo]);
+    if (!tabData[activeTab].loaded) {
+      fetchInquiries(activeTab, filters[activeTab]);
+    }
+  }, [activeTab]);
 
-  const fetchInquiries = async () => {
+  const fetchInquiries = async (
+    tabToFetch = activeTab,
+    specificFilters = null,
+  ) => {
     setLoading(true);
     try {
+      const tabFilters = specificFilters || filters[tabToFetch] || {};
       const params = {
-        archived: activeTab === "archived" ? 1 : 0,
-        ...(dateFrom && { date_from: dateFrom }),
-        ...(dateTo && { date_to: dateTo }),
-        ...(archivedFrom && { archived_from: archivedFrom }),
-        ...(archivedTo && { archived_to: archivedTo }),
+        archived: tabToFetch === "archived" ? 1 : 0,
+        ...(tabFilters.dateFrom && { date_from: tabFilters.dateFrom }),
+        ...(tabFilters.dateTo && { date_to: tabFilters.dateTo }),
+        ...(tabFilters.archivedFrom && {
+          archived_from: tabFilters.archivedFrom,
+        }),
+        ...(tabFilters.archivedTo && { archived_to: tabFilters.archivedTo }),
       };
 
       const response = await api.get("/api/inquiries", { params });
-      setInquiries(response.data);
+      setTabData((prev) => ({
+        ...prev,
+        [tabToFetch]: { items: response.data, loaded: true },
+      }));
     } catch (error) {
       console.error("Error fetching inquiries", error);
       toast.error("Failed to fetch inquiries");
@@ -92,6 +133,18 @@ const SystemInquiries = () => {
     });
   };
 
+  // Inquiry Modal State
+  const [selectedInquiry, setSelectedInquiry] = useState(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+
+  const handleRowClick = (inquiry) => {
+    // Only open if they have permission, otherwise it's just a raw table
+    if (user?.all_permissions?.includes("cms.edit")) {
+      setSelectedInquiry(inquiry);
+      setIsViewModalOpen(true);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold text-gray-900">Inquiries</h1>
@@ -102,8 +155,6 @@ const SystemInquiries = () => {
           className={`py-2 px-4 font-medium transition-colors ${activeTab === "inbox" ? "border-b-2 border-blue-500 text-blue-600" : "text-gray-500 hover:text-gray-700"}`}
           onClick={() => {
             setActiveTab("inbox");
-            setArchivedFrom("");
-            setArchivedTo("");
           }}
         >
           Inbox
@@ -125,8 +176,8 @@ const SystemInquiries = () => {
           </label>
           <input
             type="date"
-            value={dateFrom}
-            onChange={(e) => setDateFrom(e.target.value)}
+            value={dateFrom || ""}
+            onChange={(e) => updateFilter("dateFrom", e.target.value)}
             className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>
@@ -136,8 +187,8 @@ const SystemInquiries = () => {
           </label>
           <input
             type="date"
-            value={dateTo}
-            onChange={(e) => setDateTo(e.target.value)}
+            value={dateTo || ""}
+            onChange={(e) => updateFilter("dateTo", e.target.value)}
             className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>
@@ -151,8 +202,8 @@ const SystemInquiries = () => {
               </label>
               <input
                 type="date"
-                value={archivedFrom}
-                onChange={(e) => setArchivedFrom(e.target.value)}
+                value={archivedFrom || ""}
+                onChange={(e) => updateFilter("archivedFrom", e.target.value)}
                 className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
@@ -162,8 +213,8 @@ const SystemInquiries = () => {
               </label>
               <input
                 type="date"
-                value={archivedTo}
-                onChange={(e) => setArchivedTo(e.target.value)}
+                value={archivedTo || ""}
+                onChange={(e) => updateFilter("archivedTo", e.target.value)}
                 className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
@@ -172,12 +223,7 @@ const SystemInquiries = () => {
 
         {(dateFrom || dateTo || archivedFrom || archivedTo) && (
           <button
-            onClick={() => {
-              setDateFrom("");
-              setDateTo("");
-              setArchivedFrom("");
-              setArchivedTo("");
-            }}
+            onClick={clearFilters}
             className="text-sm text-gray-500 hover:text-gray-700 underline mb-2 ml-auto"
           >
             Clear Filters
@@ -226,7 +272,11 @@ const SystemInquiries = () => {
                 </tr>
               ) : (
                 inquiries.map((inquiry) => (
-                  <tr key={inquiry.id} className="hover:bg-gray-50">
+                  <tr
+                    key={inquiry.id}
+                    onClick={() => handleRowClick(inquiry)}
+                    className="hover:bg-gray-50 cursor-pointer transition-colors"
+                  >
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {new Date(inquiry.created_at).toLocaleDateString()}
                       <div className="text-xs text-gray-400">
@@ -251,7 +301,7 @@ const SystemInquiries = () => {
                     </td>
                     <td
                       className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate"
-                      title={inquiry.message}
+                      title="Click to view full message"
                     >
                       {inquiry.message}
                     </td>
@@ -266,28 +316,24 @@ const SystemInquiries = () => {
                       {activeTab === "inbox" ? (
                         <>
                           {user?.all_permissions?.includes("cms.edit") && (
-                            <>
-                              <a
-                                href={`https://mail.google.com/mail/?view=cm&fs=1&to=${inquiry.email}&su=${encodeURIComponent(inquiry.subject || "Inquiry Reply")}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded border border-blue-200 inline-block"
-                              >
-                                Reply
-                              </a>
-                              <button
-                                onClick={() => openArchiveModal(inquiry.id)}
-                                className="text-amber-600 hover:text-amber-900 bg-amber-50 px-3 py-1 rounded border border-amber-200"
-                              >
-                                Archive
-                              </button>
-                            </>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openArchiveModal(inquiry.id);
+                              }}
+                              className="text-amber-600 hover:text-amber-900 bg-amber-50 px-3 py-1 rounded border border-amber-200"
+                            >
+                              Archive
+                            </button>
                           )}
                         </>
                       ) : (
                         user?.all_permissions?.includes("cms.edit") && (
                           <button
-                            onClick={() => openDeleteModal(inquiry.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openDeleteModal(inquiry.id);
+                            }}
                             className="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded border border-red-200"
                           >
                             Delete
@@ -300,6 +346,103 @@ const SystemInquiries = () => {
               )}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Inquiry Detail Modal */}
+      {isViewModalOpen && selectedInquiry && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
+          onClick={() => setIsViewModalOpen(false)}
+        >
+          <div
+            className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+              <h2 className="text-xl font-bold text-gray-800">
+                Inquiry Details
+              </h2>
+              <button
+                onClick={() => setIsViewModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600 focus:outline-none"
+              >
+                <span className="text-2xl leading-none">&times;</span>
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto flex-1 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">
+                    Sender
+                  </h3>
+                  <div className="text-gray-900 font-medium">
+                    {selectedInquiry.name}
+                  </div>
+                  <div className="text-blue-600 text-sm mt-0.5">
+                    <a
+                      href={`mailto:${selectedInquiry.email}`}
+                      className="hover:underline"
+                    >
+                      {selectedInquiry.email}
+                    </a>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">
+                    Date Received
+                  </h3>
+                  <div className="text-gray-900 font-medium">
+                    {new Date(selectedInquiry.created_at).toLocaleDateString()}
+                  </div>
+                  <div className="text-gray-500 text-sm mt-0.5">
+                    {new Date(selectedInquiry.created_at).toLocaleTimeString()}
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">
+                  Subject
+                </h3>
+                <div className="text-gray-900 font-medium bg-gray-50 p-3 rounded-lg border border-gray-100">
+                  {selectedInquiry.subject || (
+                    <span className="text-gray-400 italic">
+                      No subject provided
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                  Message
+                </h3>
+                <div className="text-gray-800 bg-gray-50 p-4 rounded-lg border border-gray-200 whitespace-pre-wrap leading-relaxed">
+                  {selectedInquiry.message}
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+              <button
+                onClick={() => setIsViewModalOpen(false)}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+              >
+                Close
+              </button>
+              <a
+                href={`https://mail.google.com/mail/?view=cm&fs=1&to=${selectedInquiry.email}&su=${encodeURIComponent(selectedInquiry.subject || "Inquiry Reply")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition shadow-sm"
+              >
+                Reply via Email
+              </a>
+            </div>
+          </div>
         </div>
       )}
 

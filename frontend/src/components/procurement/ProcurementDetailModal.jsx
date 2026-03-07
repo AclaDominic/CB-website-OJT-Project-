@@ -109,7 +109,7 @@ const ProcurementDetailModal = ({ isOpen, onClose, request }) => {
   const canSubmit =
     request.status === "draft" &&
     user?.all_permissions?.includes("procurement.submit") &&
-    request.user_id === user.id;
+    request.requested_by?.id === user.id;
   // const canSubmit = request.status === 'draft' && user?.all_permissions?.includes('procurement.submit'); // If generic submit allowed
   const canProcess =
     request.status === "submitted" &&
@@ -123,7 +123,7 @@ const ProcurementDetailModal = ({ isOpen, onClose, request }) => {
   const canDelete =
     request.status === "draft" &&
     user?.all_permissions?.includes("procurement.delete") &&
-    request.user_id === user.id;
+    request.requested_by?.id === user.id;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
