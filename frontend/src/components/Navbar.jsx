@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../assets/logo.svg';
 import SettingsMenu from './SettingsMenu';
+import DownloadProfileButton from './DownloadProfileButton';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -37,6 +38,8 @@ const Navbar = () => {
                                 {item.name}
                             </Link>
                         ))}
+                        {/* Download Company Profile button */}
+                        <DownloadProfileButton compact />
                         <SettingsMenu />
                         <Link
                             to="/login"
@@ -73,6 +76,10 @@ const Navbar = () => {
                                 {item.name}
                             </Link>
                         ))}
+                        {/* Mobile Download Button */}
+                        <div className="pt-2">
+                            <DownloadProfileButton compact />
+                        </div>
                         <Link
                             to="/login"
                             className="block w-full text-center bg-gradient-to-r from-blue-400 to-green-500 text-white font-medium py-3 rounded mt-4"

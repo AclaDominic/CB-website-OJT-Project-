@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import api from "../lib/axios";
 import PublicPageLayout from "../components/PublicPageLayout";
+import DownloadProfileButton from "../components/DownloadProfileButton";
 import {
   Facebook,
   Linkedin,
@@ -381,6 +382,26 @@ export const Contact = () => {
                 </div>
               )}
           </div>
+        </div>
+      </div>
+
+      {/* Download Company Profile CTA */}
+      <div className="mt-20 mb-4">
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:!bg-gray-800 rounded-3xl p-10 md:p-14 border border-blue-100 dark:border-gray-700 text-center shadow-sm">
+          <div className="flex justify-center mb-5">
+            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/40 rounded-2xl flex items-center justify-center shadow-inner">
+              <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+          </div>
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3 transition-colors">
+            Download Our Company Profile
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400 text-base max-w-xl mx-auto mb-8 leading-relaxed">
+            Get a complete overview of Cliberduche Corporation — our services, background, mission, vision, and contact information — all in one professional PDF document.
+          </p>
+          <DownloadProfileButton />
         </div>
       </div>
     </PublicPageLayout>
