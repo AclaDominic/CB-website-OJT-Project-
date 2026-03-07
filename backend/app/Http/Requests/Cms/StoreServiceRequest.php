@@ -18,6 +18,7 @@ class StoreServiceRequest extends FormRequest
             'description' => 'required',
             'type' => 'required|in:primary,secondary',
             'image' => 'nullable|image',
+            'image_url' => 'nullable|url',
         ];
     }
 }

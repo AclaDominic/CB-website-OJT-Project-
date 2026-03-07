@@ -31,6 +31,8 @@ class ServiceController extends Controller
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('services', 'public');
+        } elseif ($request->has('image_url')) {
+            $validated['image'] = $request->input('image_url');
         }
 
         return Service::create($validated);
@@ -41,10 +43,15 @@ class ServiceController extends Controller
         $validated = $request->validated();
 
         if ($request->hasFile('image')) {
-            if ($service->image) {
+            if ($service->image && !str_starts_with($service->image, 'http')) {
                 Storage::disk('public')->delete($service->image);
             }
             $validated['image'] = $request->file('image')->store('services', 'public');
+        } elseif ($request->has('image_url')) {
+            if ($service->image && !str_starts_with($service->image, 'http') && $service->image !== $request->input('image_url')) {
+                Storage::disk('public')->delete($service->image);
+            }
+            $validated['image'] = $request->input('image_url');
         }
 
         $service->update($validated);
@@ -53,7 +60,7 @@ class ServiceController extends Controller
 
     public function destroy(Service $service)
     {
-        if ($service->image) {
+        if ($service->image && !str_starts_with($service->image, 'http')) {
             Storage::disk('public')->delete($service->image);
         }
         $service->delete();

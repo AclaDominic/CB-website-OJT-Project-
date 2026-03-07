@@ -31,6 +31,10 @@ class ProcurementRequestResource extends JsonResource
                 'id' => $this->user_id,
                 'name' => $this->user ? $this->user->name : null,
             ],
+            'user' => [
+                'id' => $this->user_id,
+                'name' => $this->user ? $this->user->name : null,
+            ],
             'items' => ProcurementItemResource::collection($this->whenLoaded('items')),
         ];
     }

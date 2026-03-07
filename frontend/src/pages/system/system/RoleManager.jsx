@@ -4,6 +4,7 @@ import { Plus, Trash2, Edit2, Shield, Check, X, Loader2 } from "lucide-react";
 import { useAuth } from "../../../context/AuthContext";
 import { Navigate } from "react-router-dom";
 import PageLoader from "../../../components/PageLoader";
+import ConfirmModal from "../../../components/system/ConfirmModal";
 
 /**
  * RoleManager Component
@@ -16,6 +17,11 @@ const RoleManager = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRole, setEditingRole] = useState(null);
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    message: "",
+    action: null,
+  });
 
   // Form State
   const [roleName, setRoleName] = useState("");
@@ -111,14 +117,18 @@ const RoleManager = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this role?")) {
-      try {
-        await axiosClient.delete(`/api/system/roles/${id}`);
-        fetchData();
-      } catch (error) {
-        console.error("Error deleting role:", error);
-      }
-    }
+    setConfirmModal({
+      isOpen: true,
+      message: "Are you sure you want to delete this role?",
+      action: async () => {
+        try {
+          await axiosClient.delete(`/api/system/roles/${id}`);
+          fetchData();
+        } catch (error) {
+          console.error("Error deleting role:", error);
+        }
+      },
+    });
   };
 
   // Group permissions for better UI
@@ -326,6 +336,14 @@ const RoleManager = () => {
           </div>
         </div>
       )}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+        onConfirm={confirmModal.action || (() => {})}
+        title="Confirm Delete"
+        message={confirmModal.message}
+        isDestructive={true}
+      />
     </div>
   );
 };

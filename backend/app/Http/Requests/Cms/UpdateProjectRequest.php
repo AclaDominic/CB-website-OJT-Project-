@@ -21,6 +21,7 @@ class UpdateProjectRequest extends FormRequest
             'status' => 'sometimes|required|in:ongoing,completed',
             'is_public' => 'boolean',
             'image' => 'nullable|image',
+            'image_url' => 'nullable|url',
         ];
     }
 }

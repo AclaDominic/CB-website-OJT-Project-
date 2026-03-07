@@ -79,6 +79,26 @@ const SystemSidebar = ({ isOpen, onClose }) => {
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const notificationRef = React.useRef(null);
+
+  // Close notifications when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target)
+      ) {
+        setShowNotifications(false);
+      }
+    };
+
+    if (showNotifications) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showNotifications]);
 
   useEffect(() => {
     fetchNotifications();
@@ -124,6 +144,10 @@ const SystemSidebar = ({ isOpen, onClose }) => {
     }
   };
 
+  // Helper to check if user has any of the given permissions
+  const hasAny = (...perms) =>
+    perms.some((p) => user?.all_permissions?.includes(p));
+
   // Navigation Structure
   const navigationGroups = [
     {
@@ -140,64 +164,92 @@ const SystemSidebar = ({ isOpen, onClose }) => {
       title: "Content Management",
       icon: <Layers size={18} />,
       items: [
-        {
-          path: "/system/projects",
-          label: "Projects",
-          icon: <FolderKanban size={18} />,
-        },
-        {
-          path: "/system/services",
-          label: "Services",
-          icon: <Briefcase size={18} />,
-        },
-        {
-          path: "/system/resources",
-          label: "Resources",
-          icon: <Truck size={18} />,
-        },
-        {
-          path: "/system/about",
-          label: "About Us",
-          icon: <FileText size={18} />,
-        },
-        {
-          path: "/system/contact",
-          label: "Contact Info",
-          icon: <Phone size={18} />,
-        },
-        {
-          path: "/system/faqs",
-          label: "FAQ Content",
-          icon: <HelpCircle size={18} />,
-        },
+        ...(hasAny("projects.view", "projects.create", "projects.edit")
+          ? [
+              {
+                path: "/system/projects",
+                label: "Projects",
+                icon: <FolderKanban size={18} />,
+              },
+            ]
+          : []),
+        ...(hasAny("cms.view", "cms.edit")
+          ? [
+              {
+                path: "/system/services",
+                label: "Services",
+                icon: <Briefcase size={18} />,
+              },
+            ]
+          : []),
+        ...(hasAny("cms.view", "cms.edit")
+          ? [
+              {
+                path: "/system/resources",
+                label: "Resources",
+                icon: <Truck size={18} />,
+              },
+            ]
+          : []),
+        ...(hasAny("cms.view", "cms.edit")
+          ? [
+              {
+                path: "/system/about",
+                label: "About Us",
+                icon: <FileText size={18} />,
+              },
+              {
+                path: "/system/contact",
+                label: "Contact Info",
+                icon: <Phone size={18} />,
+              },
+              {
+                path: "/system/faqs",
+                label: "FAQ Content",
+                icon: <HelpCircle size={18} />,
+              },
+            ]
+          : []),
       ],
     },
     {
       title: "Operations",
       icon: <ClipboardList size={18} />,
       items: [
-        {
-          path: "/system/inventory",
-          label: "Inventory",
-          icon: <Package size={18} />,
-        },
-        {
-          path: "/system/procurement",
-          label: "Procurement",
-          icon: <ShoppingCart size={18} />,
-        },
-        {
-          path: "/system/inquiries",
-          label: "Inquiries",
-          icon: <Mail size={18} />,
-        },
+        ...(hasAny("inventory.view", "inventory.edit")
+          ? [
+              {
+                path: "/system/inventory",
+                label: "Inventory",
+                icon: <Package size={18} />,
+              },
+            ]
+          : []),
+        ...(hasAny("procurement.view", "procurement.create")
+          ? [
+              {
+                path: "/system/procurement",
+                label: "Procurement",
+                icon: <ShoppingCart size={18} />,
+              },
+            ]
+          : []),
+        ...(hasAny("cms.view", "cms.edit")
+          ? [
+              {
+                path: "/system/inquiries",
+                label: "Inquiries",
+                icon: <Mail size={18} />,
+              },
+            ]
+          : []),
       ],
     },
     {
       title: "System Administration",
       icon: <Settings size={18} />,
       items: [
-        ...(user?.all_permissions?.includes("system.manage_users")
+        ...(hasAny("system.manage_users")
           ? [
               {
                 path: "/system/users",
@@ -206,7 +258,7 @@ const SystemSidebar = ({ isOpen, onClose }) => {
               },
             ]
           : []),
-        ...(user?.all_permissions?.includes("system.manage_roles")
+        ...(hasAny("system.manage_roles")
           ? [
               {
                 path: "/system/roles",
@@ -215,7 +267,7 @@ const SystemSidebar = ({ isOpen, onClose }) => {
               },
             ]
           : []),
-        ...(user?.all_permissions?.includes("view_backups")
+        ...(hasAny("view_backups")
           ? [
               {
                 path: "/system/backups",
@@ -282,7 +334,7 @@ const SystemSidebar = ({ isOpen, onClose }) => {
 
           <div className="flex items-center gap-2">
             {/* Notification Bell */}
-            <div className="relative">
+            <div className="relative" ref={notificationRef}>
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
                 className="relative text-gray-500 hover:text-gray-900 transition-colors p-1"

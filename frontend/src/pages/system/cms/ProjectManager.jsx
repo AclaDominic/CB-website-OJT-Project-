@@ -4,14 +4,18 @@ import { Plus, Edit2, Trash2, X, Loader2 } from "lucide-react";
 import ImagePicker from "../../../components/ImagePicker";
 import { useAuth } from "../../../context/AuthContext";
 import PageLoader from "../../../components/PageLoader";
-
+import ConfirmModal from "../../../components/system/ConfirmModal";
 const ProjectManager = () => {
   const { user } = useAuth();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
-
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    message: "",
+    action: null,
+  });
   // Image State
   const [imageType, setImageType] = useState("url");
   const [selectedFile, setSelectedFile] = useState(null);
@@ -110,26 +114,45 @@ const ProjectManager = () => {
       data.append("image", selectedFile);
     }
 
-    // Process Gallery
-    // 1. Collect IDs of existing items that are kept (not removed)
+    // 1. Collect IDs of items that are kept (have an ID)
+    const keptIds = galleryItems
+      .filter((item) => item.id !== null)
+      .map((item) => item.id);
+
+    keptIds.forEach((id) => data.append("kept_gallery_ids[]", id));
+
+    // 2. Append existing items with potentially updated images/urls
     const existingItems = galleryItems.filter((item) => item.id !== null);
-    existingItems.forEach((item) => data.append("kept_gallery_ids[]", item.id));
+    existingItems.forEach((item, index) => {
+      data.append(`updated_gallery[${index}][id]`, item.id);
 
-    // 2. Send updates for existing items that were modified
-    existingItems
-      .filter((item) => item.dirty)
-      .forEach((item) => {
-        const prefix = `updated_gallery[${item.id}]`;
-        appendGalleryField(data, prefix, "before", item.before);
-        appendGalleryField(data, prefix, "after", item.after);
-      });
+      if (item.before.type === "file" && item.before.value) {
+        data.append(`updated_gallery[${index}][before]`, item.before.value);
+      } else if (item.before.type === "url" && item.before.value) {
+        data.append(`updated_gallery[${index}][before_url]`, item.before.value);
+      }
 
-    // 3. Append new items (those without ID) — supports both files and URLs
+      if (item.after.type === "file" && item.after.value) {
+        data.append(`updated_gallery[${index}][after]`, item.after.value);
+      } else if (item.after.type === "url" && item.after.value) {
+        data.append(`updated_gallery[${index}][after_url]`, item.after.value);
+      }
+    });
+
+    // 3. Append new items (those without ID) as files or URLs
     const newItems = galleryItems.filter((item) => item.id === null);
     newItems.forEach((item, index) => {
-      const prefix = `new_gallery[${index}]`;
-      appendGalleryField(data, prefix, "before", item.before);
-      appendGalleryField(data, prefix, "after", item.after);
+      if (item.before.type === "file" && item.before.value) {
+        data.append(`new_gallery[${index}][before]`, item.before.value);
+      } else if (item.before.type === "url" && item.before.value) {
+        data.append(`new_gallery[${index}][before_url]`, item.before.value);
+      }
+
+      if (item.after.type === "file" && item.after.value) {
+        data.append(`new_gallery[${index}][after]`, item.after.value);
+      } else if (item.after.type === "url" && item.after.value) {
+        data.append(`new_gallery[${index}][after_url]`, item.after.value);
+      }
     });
 
     if (editingProject) {
@@ -156,16 +179,20 @@ const ProjectManager = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this project?")) {
-      try {
-        await axiosClient.delete(`/api/projects/${id}`, {
-          skipLoading: true,
-        });
-        fetchProjects();
-      } catch (error) {
-        console.error("Error deleting project:", error);
-      }
-    }
+    setConfirmModal({
+      isOpen: true,
+      message: "Are you sure you want to delete this project?",
+      action: async () => {
+        try {
+          await axiosClient.delete(`/api/projects/${id}`, {
+            skipLoading: true,
+          });
+          fetchProjects();
+        } catch (error) {
+          console.error("Error deleting project:", error);
+        }
+      },
+    });
   };
 
   const handleToggleVisibility = async (project) => {
@@ -560,6 +587,15 @@ const ProjectManager = () => {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+        onConfirm={confirmModal.action || (() => {})}
+        title="Confirm Delete"
+        message={confirmModal.message}
+        isDestructive={true}
+      />
     </div>
   );
 };

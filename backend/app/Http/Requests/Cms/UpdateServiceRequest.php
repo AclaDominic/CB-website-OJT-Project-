@@ -18,6 +18,7 @@ class UpdateServiceRequest extends FormRequest
             'description' => 'sometimes|required',
             'type' => 'sometimes|required|in:primary,secondary',
             'image' => 'nullable|image',
+            'image_url' => 'nullable|url',
         ];
     }
 }
