@@ -21,6 +21,7 @@ import {
   Settings,
   ClipboardList,
   HelpCircle,
+  Database,
 } from "lucide-react";
 import axiosClient from "../lib/axios";
 import logo from "../assets/logo.svg";
