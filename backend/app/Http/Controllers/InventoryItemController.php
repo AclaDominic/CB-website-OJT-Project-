@@ -22,6 +22,10 @@ class InventoryItemController extends Controller
 
     public function index(Request $request)
     {
+        if (!auth()->user()->can('inventory.view') && !auth()->user()->can('inventory.create')) {
+            abort(403, 'Unauthorized access to inventory.');
+        }
+
         $query = InventoryItem::with('category');
 
         if ($request->has('category_id')) {

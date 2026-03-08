@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axiosClient from "../../../lib/axios";
-import { Plus, Edit2, Trash2, X, Loader2 } from "lucide-react";
+import { Plus, Edit2, Trash2, X, Loader2, AlertTriangle } from "lucide-react";
 import ImagePicker from "../../../components/ImagePicker";
 import { useAuth } from "../../../context/AuthContext";
 import PageLoader from "../../../components/PageLoader";
@@ -8,6 +8,21 @@ import ConfirmModal from "../../../components/system/ConfirmModal";
 
 const ServiceManager = () => {
   const { user } = useAuth();
+
+  if (!user?.all_permissions?.includes("cms.view")) {
+    return (
+      <div className="flex flex-col items-center justify-center p-12 bg-white rounded-xl shadow-sm border border-gray-100 min-h-[400px]">
+        <AlertTriangle className="w-16 h-16 text-gray-400 mb-4 opacity-50" />
+        <h2 className="text-xl font-bold text-gray-700 mb-2 uppercase tracking-wide">
+          Unauthorized Access
+        </h2>
+        <p className="text-gray-500 text-center max-w-md">
+          You do not have the required permissions to access Service Management.
+        </p>
+      </div>
+    );
+  }
+
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -359,7 +374,7 @@ const ServiceManager = () => {
       <ConfirmModal
         isOpen={confirmModal.isOpen}
         onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
-        onConfirm={confirmModal.action || (() => { })}
+        onConfirm={confirmModal.action || (() => {})}
         title="Confirm Delete"
         message={confirmModal.message}
         isDestructive={true}

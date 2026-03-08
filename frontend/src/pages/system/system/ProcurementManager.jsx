@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Search, Filter, Eye } from "lucide-react";
+import { Plus, Search, Filter, Eye, AlertTriangle } from "lucide-react";
 import { toast } from "react-hot-toast";
 import axiosClient from "../../../lib/axios";
 import { useAuth } from "../../../context/AuthContext";
@@ -12,6 +12,11 @@ const REQUESTS_PER_PAGE = 15;
 const ProcurementManager = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("active"); // active, completed, report
+
+  const canViewProcurement =
+    user?.all_permissions?.includes("procurement.view");
+  const canCreateProcurement =
+    user?.all_permissions?.includes("procurement.create");
 
   const [tabData, setTabData] = useState({
     active: { items: [], loaded: false },
@@ -194,6 +199,21 @@ const ProcurementManager = () => {
         return "bg-gray-100 text-gray-800";
     }
   };
+
+  if (!canViewProcurement && !canCreateProcurement) {
+    return (
+      <div className="flex flex-col items-center justify-center p-12 bg-white rounded-xl shadow-sm border border-gray-100 min-h-[400px]">
+        <AlertTriangle className="w-16 h-16 text-gray-400 mb-4 opacity-50" />
+        <h2 className="text-xl font-bold text-gray-700 mb-2 uppercase tracking-wide">
+          Unauthorized Access
+        </h2>
+        <p className="text-gray-500 text-center max-w-md">
+          You do not have the required permissions to access the Procurement
+          Manager.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

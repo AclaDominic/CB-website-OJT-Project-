@@ -22,6 +22,11 @@ class ProcurementController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
+
+        if (!$user->can('procurement.view') && !$user->can('procurement.create')) {
+            return response()->json(['message' => 'Unauthorized access'], 403);
+        }
+
         $query = ProcurementRequest::with(['items', 'project', 'user'])->latest();
 
         if ($user->hasRole(['Project Manager', 'Site Engineer'])) {

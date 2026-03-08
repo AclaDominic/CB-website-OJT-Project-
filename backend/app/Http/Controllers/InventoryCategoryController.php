@@ -18,6 +18,10 @@ class InventoryCategoryController extends Controller
 
     public function index()
     {
+        if (!auth()->user()->can('inventory.view') && !auth()->user()->can('inventory.create')) {
+            abort(403, 'Unauthorized access to inventory.');
+        }
+
         // Return categories with their items and count
         return response()->json(InventoryCategory::with('items')->withCount('items')->get());
     }
@@ -32,6 +36,10 @@ class InventoryCategoryController extends Controller
 
     public function show($id)
     {
+        if (!auth()->user()->can('inventory.view') && !auth()->user()->can('inventory.create')) {
+            abort(403, 'Unauthorized access to inventory.');
+        }
+
         return response()->json(InventoryCategory::with('items')->findOrFail($id));
     }
 

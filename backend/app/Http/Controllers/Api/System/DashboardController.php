@@ -89,10 +89,15 @@ class DashboardController extends Controller
             'project_stats' => $projectStats,
             'system_status' => $systemStatus,
             'system_alerts' => $activeAlerts,
+            'is_personal_procurement_view' => !$isStaffOrAdmin,
             'permissions' => [
-                'can_view_inventory' => $canViewInventory,
-                'can_create_project' => $user->can('projects.create') || $user->hasRole('Admin'),
-                'can_create_user' => $user->can('system.manage_users') || $user->hasRole('Admin'),
+                'can_view_inventory' => (bool) $canViewInventory,
+                'can_create_project' => (bool) ($user->can('projects.create') || $user->hasRole('Admin')),
+                'can_view_project' => (bool) ($user->can('projects.view') || $user->hasRole('Admin')),
+                'can_view_machinery' => (bool) ($user->can('inventory.view') || $user->can('procurement.view') || $user->hasRole('Admin')),
+                'can_create_user' => (bool) ($user->can('system.manage_users') || $user->hasRole('Admin')),
+                'can_process_procurement' => (bool) ($user->can('procurement.process') || $user->hasRole('Admin')),
+                'can_view_procurement' => (bool) ($user->can('procurement.view') || $user->hasRole('Admin')),
             ]
         ]);
     }
