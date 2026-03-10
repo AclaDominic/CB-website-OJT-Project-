@@ -25,7 +25,13 @@ const Login = () => {
       await login({ email, password });
       // navigate('/system'); // Handled by AuthContext or useEffect
     } catch (err) {
-      setError("Invalid credentials");
+      if (err.response?.data?.errors?.email?.[0]) {
+        setError(err.response.data.errors.email[0]);
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("Invalid credentials");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -38,7 +44,7 @@ const Login = () => {
         className="absolute inset-0 bg-cover bg-center z-0"
         style={{
           backgroundImage: `url(${bgHeader})`,
-          backgroundPosition: 'center 60%',
+          backgroundPosition: "center 60%",
         }}
       >
         <div className="absolute inset-0 bg-white/10 backdrop-blur-[4px]"></div>
@@ -72,7 +78,9 @@ const Login = () => {
 
         <form onSubmit={handleSubmit}>
           <div className="mb-5">
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-widest mb-2 ml-1">Email</label>
+            <label className="block text-xs font-bold text-gray-700 uppercase tracking-widest mb-2 ml-1">
+              Email
+            </label>
             <input
               type="email"
               className="w-full px-5 py-3.5 bg-white/50 border border-gray-200/50 rounded-2xl focus:ring-2 focus:ring-green-400 focus:border-green-400 focus:bg-white transition-all duration-300 outline-none placeholder:text-gray-400 text-gray-900"
@@ -82,7 +90,9 @@ const Login = () => {
             />
           </div>
           <div className="mb-8">
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-widest mb-2 ml-1">Password</label>
+            <label className="block text-xs font-bold text-gray-700 uppercase tracking-widest mb-2 ml-1">
+              Password
+            </label>
             <input
               type="password"
               className="w-full px-5 py-3.5 bg-white/50 border border-gray-200/50 rounded-2xl focus:ring-2 focus:ring-green-400 focus:border-green-400 focus:bg-white transition-all duration-300 outline-none placeholder:text-gray-400 text-gray-900"

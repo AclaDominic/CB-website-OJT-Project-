@@ -141,7 +141,7 @@ const BackupManager = () => {
             ) : (
               <Database className="w-5 h-5" />
             )}
-            {isBackingUp ? "Generating..." : "Run Backup Now"}
+            {isBackingUp ? "Generating..." : "Create Backup"}
           </button>
         )}
       </div>
@@ -160,11 +160,9 @@ const BackupManager = () => {
         </div>
       )}
 
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
-        <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-slate-700">
-          <h3 className="font-semibold text-gray-800 dark:text-white">
-            Backup Archives
-          </h3>
+      <div className="bg-white rounded-lg shadow overflow-hidden overflow-x-auto">
+        <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+          <h3 className="font-semibold text-gray-800">Backup Archives</h3>
           <button
             onClick={fetchBackups}
             className="p-2 text-gray-500 hover:text-blue-500"
@@ -185,52 +183,60 @@ const BackupManager = () => {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-gray-50 dark:bg-slate-900/50 text-gray-600 dark:text-gray-400 text-sm">
-                  <th className="p-4 font-medium">Archive Filename</th>
-                  <th className="p-4 font-medium text-center">Size (MB)</th>
-                  <th className="p-4 font-medium">Date Created</th>
-                  <th className="p-4 font-medium text-right">Actions</th>
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-blue-600">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                    Archive Filename
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-bold text-white uppercase tracking-wider">
+                    Size (MB)
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                    Date Created
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-bold text-white uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
+              <tbody className="bg-white divide-y divide-gray-200">
                 {(backups || []).map((backup, index) => (
                   <tr
                     key={index}
-                    className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors"
+                    className="hover:bg-gray-50 transition-colors"
                   >
-                    <td className="p-4">
-                      <span className="font-medium text-sm text-gray-800 dark:text-gray-200">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-sm font-medium text-gray-900">
                         {backup.file_name}
                       </span>
                     </td>
-                    <td className="p-4 text-center">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
                         {backup.file_size} MB
                       </span>
                     </td>
-                    <td className="p-4 text-gray-500 dark:text-gray-400 text-sm">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {backup.date}
                     </td>
-                    <td className="p-4">
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
                       <div className="flex justify-end gap-2">
                         {canDownload && (
                           <button
                             onClick={() => handleDownload(backup.file_name)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             title="Download Encrypted Archive"
                           >
-                            <Download className="w-4 h-4" />
+                            <Download className="w-5 h-5" />
                           </button>
                         )}
                         {canDelete && (
                           <button
                             onClick={() => handleDelete(backup.file_name)}
-                            className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             title="Delete Backup"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-5 h-5" />
                           </button>
                         )}
                       </div>
