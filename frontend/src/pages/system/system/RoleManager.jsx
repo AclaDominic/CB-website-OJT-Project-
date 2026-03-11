@@ -25,6 +25,7 @@ const PERMISSION_LABELS = {
   // CMS
   "cms.view": "View Website Content",
   "cms.edit": "Manage Website Content",
+  "cms.manage-company-profile": "Manage Company Profile",
 
   // System
   "system.view": "Access System Backend",
