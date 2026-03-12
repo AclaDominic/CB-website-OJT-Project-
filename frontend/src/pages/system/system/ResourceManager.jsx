@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axiosClient from "../../../lib/axios";
-import { Plus, Trash2, Edit2, X, Truck, MapPin, Loader2 } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  Edit2,
+  X,
+  Truck,
+  MapPin,
+  Loader2,
+  AlertTriangle,
+} from "lucide-react";
 import ImagePicker from "../../../components/ImagePicker";
 import { useAuth } from "../../../context/AuthContext";
 import PageLoader from "../../../components/PageLoader";
@@ -11,6 +20,21 @@ const ResourceManager = () => {
   const [showPlateNumbers, setShowPlateNumbers] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const { user } = useAuth();
+
+  if (!user?.all_permissions?.includes("inventory.view")) {
+    return (
+      <div className="flex flex-col items-center justify-center p-12 bg-white rounded-xl shadow-sm border border-gray-100 min-h-[400px]">
+        <AlertTriangle className="w-16 h-16 text-gray-400 mb-4 opacity-50" />
+        <h2 className="text-xl font-bold text-gray-700 mb-2 uppercase tracking-wide">
+          Unauthorized Access
+        </h2>
+        <p className="text-gray-500 text-center max-w-md">
+          You do not have the required permissions to access Resource
+          Management.
+        </p>
+      </div>
+    );
+  }
 
   useEffect(() => {
     fetchSettings();

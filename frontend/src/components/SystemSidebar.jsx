@@ -80,6 +80,7 @@ const SystemSidebar = ({ isOpen, onClose }) => {
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [selectedNotification, setSelectedNotification] = useState(null);
   const notificationRef = React.useRef(null);
 
   // Close notifications when clicking outside
@@ -369,13 +370,25 @@ const SystemSidebar = ({ isOpen, onClose }) => {
                           key={notification.id}
                           className="p-3 border-b hover:bg-gray-50 transition-colors"
                         >
-                          <div className="flex justify-between items-start">
-                            <p className="text-sm text-gray-800 mb-1 line-clamp-2">
-                              {notification.data.message}
-                            </p>
+                          <div className="flex justify-between items-start gap-3">
                             <button
-                              onClick={() => markAsRead(notification.id)}
-                              className="text-gray-400 hover:text-green-600 shrink-0 ml-2"
+                              onClick={() => {
+                                setSelectedNotification(notification);
+                                setShowNotifications(false);
+                              }}
+                              className="text-left flex-1"
+                            >
+                              <p className="text-sm text-gray-800 mb-1 line-clamp-2 hover:text-blue-600 transition-colors">
+                                {notification.data.message}
+                              </p>
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                markAsRead(notification.id);
+                              }}
+                              className="text-gray-400 hover:text-green-600 shrink-0 mt-0.5 p-1 hover:bg-green-50 rounded transition-colors"
+                              title="Mark as read"
                             >
                               <Check size={14} />
                             </button>
@@ -482,6 +495,88 @@ const SystemSidebar = ({ isOpen, onClose }) => {
           </button>
         </div>
       </div>
+
+      {/* Notification Details Modal */}
+      {selectedNotification && (
+        <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                  <Bell size={20} />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">
+                    Notification Details
+                  </h3>
+                  <p className="text-xs text-gray-500">
+                    {formatDistanceToNow(
+                      new Date(selectedNotification.created_at),
+                      { addSuffix: true },
+                    )}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedNotification(null)}
+                className="text-gray-400 hover:text-gray-900 transition-colors p-2 hover:bg-gray-100 rounded-full"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-6">
+              <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+                {selectedNotification.data.message}
+              </p>
+
+              {/* Render extra data fields if they exist */}
+              {Object.entries(selectedNotification.data).filter(
+                ([key]) => !["message", "type", "preview"].includes(key),
+              ).length > 0 && (
+                <div className="mt-6 pt-6 border-t border-gray-100 space-y-3">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">
+                    Additional Details
+                  </h4>
+                  {Object.entries(selectedNotification.data)
+                    .filter(
+                      ([key]) => !["message", "type", "preview"].includes(key),
+                    )
+                    .map(([key, value]) => (
+                      <div
+                        key={key}
+                        className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3 text-sm"
+                      >
+                        <span className="text-gray-500 w-1/3 capitalize shrink-0">
+                          {key.replace(/_/g, " ")}:
+                        </span>
+                        <span className="font-medium text-gray-900 break-all">
+                          {String(value)}
+                        </span>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+            <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  markAsRead(selectedNotification.id);
+                  setSelectedNotification(null);
+                }}
+                className="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-blue-200"
+              >
+                Mark as Read
+              </button>
+              <button
+                onClick={() => setSelectedNotification(null)}
+                className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition-colors shadow-sm"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

@@ -37,6 +37,7 @@ export const StatCard = ({
   icon: Icon,
   colorClass,
   delay = 0,
+  hasPermission = true,
 }) => {
   return (
     <motion.div
@@ -44,26 +45,45 @@ export const StatCard = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay }}
       className={cn(
-        "relative overflow-hidden rounded-xl p-6 shadow-sm border border-gray-100 bg-white",
-        colorClass,
+        "relative overflow-hidden rounded-xl p-6 shadow-sm border bg-white",
+        hasPermission
+          ? cn("border-gray-100", colorClass)
+          : "border-gray-200 bg-gray-50 text-gray-400 opacity-75 grayscale pointer-events-none",
       )}
     >
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
-          <h3 className="text-3xl font-bold text-gray-900">{value}</h3>
-          {subtext && (
-            <p className="text-xs mt-2 text-gray-500 flex items-center gap-1">
-              {subtext}
-            </p>
+      <div className="flex items-start justify-between h-full">
+        <div className="relative z-10 w-full flex flex-col h-full">
+          <p className="text-sm font-medium mb-1 text-gray-600">{title}</p>
+
+          {!hasPermission ? (
+            <div className="flex flex-col items-center justify-center flex-1 py-4 gap-2 mt-2">
+              <AlertTriangle className="w-8 h-8 text-gray-400 mb-1" />
+              <span className="text-sm font-bold tracking-wider uppercase text-gray-400">
+                Not Permitted
+              </span>
+            </div>
+          ) : (
+            <div>
+              <h3 className="text-3xl font-bold text-gray-900">{value}</h3>
+              {subtext && (
+                <p className="text-xs mt-2 text-gray-500 flex items-center gap-1">
+                  {subtext}
+                </p>
+              )}
+            </div>
           )}
         </div>
-        <div className="p-3 bg-white/50 rounded-lg backdrop-blur-sm">
-          <Icon className="w-6 h-6 text-gray-700" />
-        </div>
+
+        {hasPermission && (
+          <div className="relative z-10 p-3 bg-white/50 rounded-lg backdrop-blur-sm shrink-0">
+            <Icon className="w-6 h-6 text-gray-700" />
+          </div>
+        )}
       </div>
       {/* Decorative gradient orb */}
-      <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-white/20 rounded-full blur-2xl pointer-events-none"></div>
+      {hasPermission && (
+        <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-white/20 rounded-full blur-2xl pointer-events-none"></div>
+      )}
     </motion.div>
   );
 };
@@ -155,7 +175,26 @@ export const ResourceUtilizationChart = ({ data }) => {
 };
 
 // --- Activity Tables ---
-export const RecentProcurementTable = ({ requests, onViewClick }) => {
+export const RecentProcurementTable = ({
+  requests,
+  onViewClick,
+  hasPermission = true,
+  isPersonalView = false,
+}) => {
+  if (!hasPermission) {
+    return (
+      <div className="p-8 flex flex-col items-center justify-center text-gray-400 bg-gray-50/50 min-h-[200px]">
+        <AlertTriangle className="w-8 h-8 opacity-50 mb-3" />
+        <span className="text-sm font-bold uppercase tracking-wider text-gray-400">
+          Not Permitted
+        </span>
+        <p className="text-xs text-gray-500 mt-1">
+          You do not have permission to view procurement requests.
+        </p>
+      </div>
+    );
+  }
+
   const getStatusColor = (status) => {
     switch (status) {
       case "approved":
@@ -172,7 +211,9 @@ export const RecentProcurementTable = ({ requests, onViewClick }) => {
   if (!requests || requests.length === 0) {
     return (
       <div className="p-8 text-center text-gray-500">
-        No recent requests found.
+        {isPersonalView
+          ? "You have not made any procurement request yet."
+          : "No recent requests found."}
       </div>
     );
   }
@@ -231,22 +272,51 @@ export const RecentProcurementTable = ({ requests, onViewClick }) => {
 };
 
 // --- Quick Actions ---
-export const QuickActionButton = ({ label, icon: Icon, to, colorClass }) => (
-  <Link
-    to={to}
-    className={cn(
-      "flex items-center gap-3 p-4 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-md border border-gray-100 bg-white",
-      colorClass,
-    )}
-  >
-    <div
+export const QuickActionButton = ({
+  label,
+  icon: Icon,
+  to,
+  colorClass,
+  hasPermission = true,
+}) => {
+  if (!hasPermission) {
+    return (
+      <div
+        className={cn(
+          "flex items-center gap-3 p-4 rounded-xl border border-gray-200 bg-gray-50 opacity-60 grayscale cursor-not-allowed",
+        )}
+        title="No Permission"
+      >
+        <div className="p-2 rounded-lg bg-gray-200 text-gray-500">
+          <AlertTriangle size={20} />
+        </div>
+        <span className="font-semibold text-gray-500 line-through decoration-gray-400">
+          {label}
+        </span>
+        <span className="ml-auto text-xs font-bold text-gray-400 uppercase tracking-widest">
+          No Access
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <Link
+      to={to}
       className={cn(
-        "p-2 rounded-lg bg-opacity-20",
-        colorClass.replace("bg-", "text-"),
+        "flex items-center gap-3 p-4 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-md border border-gray-100 bg-white",
+        colorClass,
       )}
     >
-      <Icon size={20} />
-    </div>
-    <span className="font-semibold text-gray-700">{label}</span>
-  </Link>
-);
+      <div
+        className={cn(
+          "p-2 rounded-lg bg-opacity-20",
+          colorClass.replace("bg-", "text-"),
+        )}
+      >
+        <Icon size={20} />
+      </div>
+      <span className="font-semibold text-gray-700">{label}</span>
+    </Link>
+  );
+};

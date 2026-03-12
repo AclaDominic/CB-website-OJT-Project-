@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import api from "../lib/axios";
 import PublicPageLayout from "../components/PublicPageLayout";
+import DownloadProfileButton from "../components/DownloadProfileButton";
 import {
   Facebook,
   Linkedin,
@@ -139,9 +140,9 @@ export const Contact = () => {
       <div className="grid lg:grid-cols-5 gap-12 items-start">
         {/* Contact Form */}
         <div className="lg:col-span-3">
-          <div className="bg-white p-8 md:p-10 rounded-2xl shadow-[0_4px_25px_rgba(0,0,0,0.05)] border border-gray-50 transition-all duration-300">
+          <div className="bg-white dark:!bg-gray-800 p-8 md:p-10 rounded-2xl shadow-[0_4px_25px_rgba(0,0,0,0.05)] border border-gray-50 dark:border-gray-700 transition-all duration-300">
             <div className="text-center md:text-left mb-10">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-200">
                 Send us a Message
               </h2>
               <div className="w-20 h-1.5 bg-green-500 mx-auto md:mx-0 rounded-full"></div>
@@ -183,14 +184,14 @@ export const Contact = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
+                  <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1">
                     Full Name
                   </label>
                   <input
                     type="text"
                     required
                     placeholder="John Doe"
-                    className="w-full px-5 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all duration-300 outline-none placeholder:text-gray-300"
+                    className="w-full px-5 py-3.5 bg-gray-50 dark:!bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:ring-indigo-400/40 focus:bg-white dark:focus:bg-gray-800 transition-all duration-300 outline-none placeholder:text-gray-300 dark:placeholder-gray-500"
                     value={formData.name}
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
@@ -198,14 +199,14 @@ export const Contact = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
+                  <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1">
                     Email Address
                   </label>
                   <input
                     type="email"
                     required
                     placeholder="john@example.com"
-                    className="w-full px-5 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all duration-300 outline-none placeholder:text-gray-300"
+                    className="w-full px-5 py-3.5 bg-gray-50 dark:!bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:ring-indigo-400/40 focus:bg-white dark:focus:bg-gray-800 transition-all duration-300 outline-none placeholder:text-gray-300 dark:placeholder-gray-500"
                     value={formData.email}
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
@@ -214,13 +215,13 @@ export const Contact = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
+                <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1">
                   Subject
                 </label>
                 <input
                   type="text"
                   placeholder="Project Inquiry"
-                  className="w-full px-5 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all duration-300 outline-none placeholder:text-gray-300"
+                  className="w-full px-5 py-3.5 bg-gray-50 dark:!bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:ring-indigo-400/40 focus:bg-white dark:focus:bg-gray-800 transition-all duration-300 outline-none placeholder:text-gray-300 dark:placeholder-gray-500"
                   value={formData.subject}
                   onChange={(e) =>
                     setFormData({ ...formData, subject: e.target.value })
@@ -228,14 +229,14 @@ export const Contact = () => {
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">
+                <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1">
                   Your Message
                 </label>
                 <textarea
                   required
                   rows="5"
                   placeholder="Tell us about your project..."
-                  className="w-full px-5 py-3.5 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all duration-300 outline-none placeholder:text-gray-300 resize-none"
+                  className="w-full px-5 py-3.5 bg-gray-50 dark:!bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-2xl text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:ring-indigo-400/40 focus:bg-white dark:focus:bg-gray-800 transition-all duration-300 outline-none placeholder:text-gray-300 dark:placeholder-gray-500 resize-none"
                   value={formData.message}
                   onChange={(e) =>
                     setFormData({ ...formData, message: e.target.value })
@@ -264,26 +265,26 @@ export const Contact = () => {
         <div className="lg:col-span-2 space-y-8">
           <div className="flex items-center gap-4 mb-2">
             <div className="h-10 w-2 bg-teal-500 rounded-full"></div>
-            <h2 className="text-3xl font-extrabold text-gray-900">
+            <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white transition-colors duration-200">
               Office Information
             </h2>
           </div>
 
           <div className="grid gap-6">
             {/* Address Card */}
-            <div className="group bg-white p-8 rounded-[2rem] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.06)] border border-gray-100 transition-all duration-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] hover:-translate-y-1">
+            <div className="group bg-white dark:!bg-gray-800 p-8 rounded-[2rem] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.06)] border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] hover:-translate-y-1">
               <div className="flex items-start gap-5">
-                <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
+                <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
                   <MapPin className="w-6 h-6" />
                 </div>
                 <div>
-                  <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-2">
+                  <p className="text-[10px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest mb-2">
                     Primary Office
                   </p>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                     Location
                   </h3>
-                  <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">
+                  <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed whitespace-pre-line transition-colors duration-200">
                     {officeInfo.address || "Loading..."}
                   </p>
                 </div>
@@ -293,19 +294,19 @@ export const Contact = () => {
             {/* Email & Phone Grid */}
             <div className="grid md:grid-cols-2 lg:grid-cols-1 gap-6">
               {officeInfo.email?.visible && officeInfo.email?.value && (
-                <div className="group bg-white p-8 rounded-[2rem] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.06)] border border-gray-100 transition-all duration-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] hover:-translate-y-1">
+                <div className="group bg-white dark:!bg-gray-800 p-8 rounded-[2rem] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.06)] border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] hover:-translate-y-1">
                   <div className="flex items-start gap-5">
-                    <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
+                    <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
                       <Mail className="w-6 h-6" />
                     </div>
                     <div>
-                      <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-2">
+                      <p className="text-[10px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest mb-2">
                         Digital Inquiry
                       </p>
-                      <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-emerald-600 transition-colors">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                         Email Us
                       </h3>
-                      <p className="text-gray-600 text-sm font-medium">
+                      <p className="text-gray-600 dark:text-gray-300 text-sm font-medium transition-colors duration-200">
                         {officeInfo.email.value}
                       </p>
                     </div>
@@ -314,28 +315,28 @@ export const Contact = () => {
               )}
 
               {(officeInfo.mobile?.visible || officeInfo.landline?.visible) && (
-                <div className="group bg-white p-8 rounded-[2rem] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.06)] border border-gray-100 transition-all duration-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] hover:-translate-y-1">
+                <div className="group bg-white dark:!bg-gray-800 p-8 rounded-[2rem] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.06)] border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] hover:-translate-y-1">
                   <div className="flex items-start gap-5">
-                    <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
+                    <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 flex-shrink-0">
                       <Phone className="w-6 h-6" />
                     </div>
                     <div>
-                      <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-2">
+                      <p className="text-[10px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest mb-2">
                         Voice Support
                       </p>
-                      <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                         Call Us
                       </h3>
                       <div className="space-y-1">
                         {officeInfo.mobile?.visible &&
                           officeInfo.mobile?.value && (
-                            <p className="text-gray-600 text-sm font-medium">
+                            <p className="text-gray-600 dark:text-gray-300 text-sm font-medium transition-colors duration-200">
                               {officeInfo.mobile.value}
                             </p>
                           )}
                         {officeInfo.landline?.visible &&
                           officeInfo.landline?.value && (
-                            <p className="text-gray-600 text-sm font-medium">
+                            <p className="text-gray-600 dark:text-gray-300 text-sm font-medium transition-colors duration-200">
                               {officeInfo.landline.value}
                             </p>
                           )}
@@ -349,11 +350,11 @@ export const Contact = () => {
             {/* Social Media Card */}
             {officeInfo.socials &&
               officeInfo.socials.some((s) => s.visible && s.value) && (
-                <div className="group bg-white p-8 rounded-[2rem] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.06)] border border-gray-100 transition-all duration-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)]">
+                <div className="group bg-white dark:!bg-gray-800 p-8 rounded-[2rem] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.06)] border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)]">
                   <div>
                     <div className="flex items-center gap-2 mb-6">
                       <div className="w-1 h-4 bg-teal-500 rounded-full"></div>
-                      <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest">
+                      <h3 className="text-sm font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                         Connect With Us
                       </h3>
                     </div>
@@ -381,6 +382,26 @@ export const Contact = () => {
                 </div>
               )}
           </div>
+        </div>
+      </div>
+
+      {/* Download Company Profile CTA */}
+      <div className="mt-20 mb-4">
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:!bg-gray-800 rounded-3xl p-10 md:p-14 border border-blue-100 dark:border-gray-700 text-center shadow-sm">
+          <div className="flex justify-center mb-5">
+            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/40 rounded-2xl flex items-center justify-center shadow-inner">
+              <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+          </div>
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3 transition-colors">
+            Download Our Company Profile
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400 text-base max-w-xl mx-auto mb-8 leading-relaxed">
+            Get a complete overview of Cliberduche Corporation — our services, background, mission, vision, and contact information — all in one professional PDF document.
+          </p>
+          <DownloadProfileButton />
         </div>
       </div>
     </PublicPageLayout>

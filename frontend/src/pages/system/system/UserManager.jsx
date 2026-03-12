@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axiosClient from "../../../lib/axios";
-import { User, Users, Edit2, Check, X, Loader2, Plus } from "lucide-react";
+import {
+  User,
+  Users,
+  Edit2,
+  Check,
+  X,
+  Loader2,
+  Plus,
+  AlertTriangle,
+} from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "../../../context/AuthContext";
-import { Navigate } from "react-router-dom";
 import PageLoader from "../../../components/PageLoader";
 
 const UserManager = () => {
@@ -30,7 +38,17 @@ const UserManager = () => {
   }
 
   if (!user?.all_permissions?.includes("system.manage_users")) {
-    return <Navigate to="/system" replace />;
+    return (
+      <div className="flex flex-col items-center justify-center p-12 bg-white rounded-xl shadow-sm border border-gray-100 min-h-[400px]">
+        <AlertTriangle className="w-16 h-16 text-gray-400 mb-4 opacity-50" />
+        <h2 className="text-xl font-bold text-gray-700 mb-2 uppercase tracking-wide">
+          Unauthorized Access
+        </h2>
+        <p className="text-gray-500 text-center max-w-md">
+          You do not have the required permissions to access User Management.
+        </p>
+      </div>
+    );
   }
 
   useEffect(() => {
@@ -213,12 +231,13 @@ const UserManager = () => {
                     </select>
                   ) : (
                     <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.roles &&
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        user.roles &&
                         user.roles.length > 0 &&
                         user.roles[0].name === "Admin"
-                        ? "bg-purple-100 text-purple-800"
-                        : "bg-green-100 text-green-800"
-                        }`}
+                          ? "bg-purple-100 text-purple-800"
+                          : "bg-green-100 text-green-800"
+                      }`}
                     >
                       {user.roles && user.roles.length > 0
                         ? user.roles[0].name
@@ -285,8 +304,9 @@ const UserManager = () => {
                     name="name"
                     value={newUser.name}
                     onChange={handleAddUserChange}
-                    className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border ${errors.name ? "border-red-500" : ""
-                      }`}
+                    className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border ${
+                      errors.name ? "border-red-500" : ""
+                    }`}
                     placeholder="John Doe"
                     required
                   />
@@ -306,8 +326,9 @@ const UserManager = () => {
                     name="email"
                     value={newUser.email}
                     onChange={handleAddUserChange}
-                    className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border ${errors.email ? "border-red-500" : ""
-                      }`}
+                    className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border ${
+                      errors.email ? "border-red-500" : ""
+                    }`}
                     placeholder="john@example.com"
                     required
                   />
@@ -327,8 +348,9 @@ const UserManager = () => {
                     name="password"
                     value={newUser.password}
                     onChange={handleAddUserChange}
-                    className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border ${errors.password ? "border-red-500" : ""
-                      }`}
+                    className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border ${
+                      errors.password ? "border-red-500" : ""
+                    }`}
                     placeholder="••••••••"
                     required
                   />
@@ -362,8 +384,9 @@ const UserManager = () => {
                     name="role"
                     value={newUser.role}
                     onChange={handleAddUserChange}
-                    className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border ${errors.role ? "border-red-500" : ""
-                      }`}
+                    className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border ${
+                      errors.role ? "border-red-500" : ""
+                    }`}
                     required
                   >
                     {roles.map((role) => (

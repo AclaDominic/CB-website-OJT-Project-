@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-800 font-sans;
+    @apply bg-gray-50 text-gray-800 font-sans transition-colors duration-200 dark:bg-gray-900 dark:text-gray-100;
   }
 
   h1,
@@ -13,7 +13,7 @@
   h4,
   h5,
   h6 {
-    @apply font-bold text-company-dark;
+    @apply font-bold text-company-dark dark:text-white;
   }
 }
 
@@ -47,6 +47,26 @@
     scrollbar-width: none;
     /* Firefox */
   }
+}
+
+/* Vision Accessibilty Filters */
+.vision-blurred { 
+  filter: blur(1.5px) !important; 
+}
+.vision-reduced-contrast { 
+  filter: contrast(75%) saturate(80%) !important; 
+}
+.vision-protanopia { 
+  filter: url('#protanopia-filter') !important; 
+}
+.vision-deuteranopia { 
+  filter: url('#deuteranopia-filter') !important; 
+}
+.vision-tritanopia { 
+  filter: url('#tritanopia-filter') !important; 
+}
+.vision-achromatopsia { 
+  filter: grayscale(100%) !important; 
 }
 
 @keyframes zoomInOut {

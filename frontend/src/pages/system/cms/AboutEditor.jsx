@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axiosClient from "../../../lib/axios";
-import { Save, Loader2 } from "lucide-react";
+import { Save, Loader2, AlertTriangle } from "lucide-react";
 import OrganizationManager from "../../../components/system/OrganizationManager";
 import { useAuth } from "../../../context/AuthContext";
 import PageLoader from "../../../components/PageLoader";
@@ -15,6 +15,21 @@ const AboutEditor = () => {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const { user } = useAuth();
+
+  if (!user?.all_permissions?.includes("cms.view")) {
+    return (
+      <div className="flex flex-col items-center justify-center p-12 bg-white rounded-xl shadow-sm border border-gray-100 min-h-[400px]">
+        <AlertTriangle className="w-16 h-16 text-gray-400 mb-4 opacity-50" />
+        <h2 className="text-xl font-bold text-gray-700 mb-2 uppercase tracking-wide">
+          Unauthorized Access
+        </h2>
+        <p className="text-gray-500 text-center max-w-md">
+          You do not have the required permissions to access the About Page
+          Editor.
+        </p>
+      </div>
+    );
+  }
 
   useEffect(() => {
     fetchContent();

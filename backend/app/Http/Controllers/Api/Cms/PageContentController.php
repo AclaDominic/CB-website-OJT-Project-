@@ -28,8 +28,9 @@ class PageContentController extends Controller
 
         $contents = $query->get();
 
-        // Secure filtering for public users
-        if (!$request->user('sanctum')) {
+        // Secure filtering for public users or authenticated users without cms.view
+        $user = $request->user('sanctum');
+        if (!$user || !$user->can('cms.view')) {
             $contents->transform(function ($item) {
                 if ($item->page_name === 'contact' && $item->section_name === 'office_info') {
                     try {

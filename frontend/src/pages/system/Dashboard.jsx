@@ -95,8 +95,29 @@ const Dashboard = () => {
   }
 
   // Permission Checks
-  const canViewInventory = stats.permissions?.can_view_inventory;
-  const canCreateProject = stats.permissions?.can_create_project;
+  // Permission Checks
+  const canViewInventory =
+    user?.all_permissions?.includes("inventory.view") ||
+    user?.roles?.some((r) => r.name === "Admin");
+  const canCreateProject =
+    user?.all_permissions?.includes("projects.create") ||
+    user?.roles?.some((r) => r.name === "Admin");
+  const canViewProject =
+    user?.all_permissions?.includes("projects.view") ||
+    user?.roles?.some((r) => r.name === "Admin");
+  const canViewMachinery =
+    user?.all_permissions?.includes("inventory.view") ||
+    user?.all_permissions?.includes("procurement.view") ||
+    user?.roles?.some((r) => r.name === "Admin");
+  const canProcessProcurement =
+    user?.all_permissions?.includes("procurement.process") ||
+    user?.roles?.some((r) => r.name === "Admin");
+  const canCreateProcurement =
+    user?.all_permissions?.includes("procurement.create") ||
+    user?.roles?.some((r) => r.name === "Admin");
+  const canViewProcurement =
+    user?.all_permissions?.includes("procurement.view") ||
+    user?.roles?.some((r) => r.name === "Admin");
 
   return (
     <motion.div
@@ -119,28 +140,31 @@ const Dashboard = () => {
               setIsAlertsModalOpen(true);
             }
           }}
-          className={`flex items-center gap-2 px-3 py-1 rounded-full border transition-colors ${stats.system_status === "Critical Problem"
+          className={`flex items-center gap-2 px-3 py-1 rounded-full border transition-colors ${
+            stats.system_status === "Critical Problem"
               ? "bg-red-50 border-red-200 hover:bg-red-100 cursor-pointer"
               : stats.system_status === "Minor Problem"
                 ? "bg-amber-50 border-amber-200 hover:bg-amber-100 cursor-pointer"
                 : "bg-green-50 border-green-100"
-            }`}
+          }`}
         >
           <div
-            className={`w-2 h-2 rounded-full animate-pulse ${stats.system_status === "Critical Problem"
+            className={`w-2 h-2 rounded-full animate-pulse ${
+              stats.system_status === "Critical Problem"
                 ? "bg-red-500"
                 : stats.system_status === "Minor Problem"
                   ? "bg-amber-500"
                   : "bg-green-500"
-              }`}
+            }`}
           ></div>
           <span
-            className={`text-sm font-medium ${stats.system_status === "Critical Problem"
+            className={`text-sm font-medium ${
+              stats.system_status === "Critical Problem"
                 ? "text-red-700"
                 : stats.system_status === "Minor Problem"
                   ? "text-amber-700"
                   : "text-green-700"
-              }`}
+            }`}
           >
             {stats.system_status || "System Operational"}
           </span>
@@ -160,24 +184,29 @@ const Dashboard = () => {
           icon={Briefcase}
           colorClass="bg-gradient-to-br from-blue-50 to-white text-blue-600 border-blue-100"
           delay={0.1}
+          hasPermission={canViewProject}
         />
         <StatCard
           title="Pending Requests"
           value={stats.pending_procurement_count}
-          subtext="Need approval"
+          subtext={
+            stats.is_personal_procurement_view
+              ? "Awaiting approval"
+              : "Need approval"
+          }
           icon={Clock}
           colorClass="bg-gradient-to-br from-amber-50 to-white text-amber-600 border-amber-100"
           delay={0.2}
+          hasPermission={canProcessProcurement}
         />
-        {canViewInventory && (
-          <StatCard
-            title="Low Stock Items"
-            value={stats.low_stock_count}
-            icon={AlertTriangle}
-            colorClass="bg-gradient-to-br from-red-50 to-white text-red-600 border-red-100"
-            delay={0.3}
-          />
-        )}
+        <StatCard
+          title="Low Stock Items"
+          value={stats.low_stock_count}
+          icon={AlertTriangle}
+          colorClass="bg-gradient-to-br from-red-50 to-white text-red-600 border-red-100"
+          delay={0.3}
+          hasPermission={canViewInventory}
+        />
         <StatCard
           title="Machinery Active"
           value={stats.machinery_stats?.in_use || 0}
@@ -185,6 +214,7 @@ const Dashboard = () => {
           icon={Truck}
           colorClass="bg-gradient-to-br from-emerald-50 to-white text-emerald-600 border-emerald-100"
           delay={0.4}
+          hasPermission={canViewMachinery}
         />
       </div>
 
@@ -193,41 +223,56 @@ const Dashboard = () => {
         {/* Left Column: Stats & Actions */}
         <div className="flex flex-col gap-6">
           {/* Resource Utilization */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col flex-1">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col flex-1 relative overflow-hidden">
             <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
               <Activity size={20} className="text-emerald-500" /> Equipment
               Usage
             </h3>
-            <ResourceUtilizationChart data={stats.machinery_stats} />
-            <div className="mt-4 space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-emerald-500"></div>{" "}
-                  Available
+
+            {!canViewMachinery ? (
+              <div className="flex flex-col items-center justify-center flex-1 py-8 gap-3 bg-gray-50/50 rounded-lg absolute inset-0 mt-14 mb-4 mx-4">
+                <AlertTriangle className="w-10 h-10 text-gray-400 opacity-50" />
+                <span className="text-sm font-bold tracking-wider uppercase text-gray-400">
+                  Not Permitted
                 </span>
-                <span className="font-semibold">
-                  {stats.machinery_stats?.available}
-                </span>
+                <p className="text-xs text-gray-500 text-center max-w-[200px]">
+                  You do not have permission to view machinery analytics.
+                </p>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-blue-500"></div> In
-                  Use
-                </span>
-                <span className="font-semibold">
-                  {stats.machinery_stats?.in_use}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500"></div>{" "}
-                  Maintenace
-                </span>
-                <span className="font-semibold">
-                  {stats.machinery_stats?.maintenance}
-                </span>
-              </div>
-            </div>
+            ) : (
+              <>
+                <ResourceUtilizationChart data={stats.machinery_stats} />
+                <div className="mt-4 space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-emerald-500"></div>{" "}
+                      Available
+                    </span>
+                    <span className="font-semibold">
+                      {stats.machinery_stats?.available}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-blue-500"></div>{" "}
+                      In Use
+                    </span>
+                    <span className="font-semibold">
+                      {stats.machinery_stats?.in_use}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-red-500"></div>{" "}
+                      Maintenace
+                    </span>
+                    <span className="font-semibold">
+                      {stats.machinery_stats?.maintenance}
+                    </span>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Quick Actions */}
@@ -236,28 +281,27 @@ const Dashboard = () => {
               Quick Actions
             </h3>
             <div className="space-y-3">
-              {canCreateProject && (
-                <QuickActionButton
-                  to="/system/projects"
-                  label="New Project"
-                  icon={Plus}
-                  colorClass="bg-blue-50 hover:bg-blue-100 text-blue-600"
-                />
-              )}
+              <QuickActionButton
+                to="/system/projects"
+                label="New Project"
+                icon={Plus}
+                colorClass="bg-blue-50 hover:bg-blue-100 text-blue-600"
+                hasPermission={canCreateProject}
+              />
               <QuickActionButton
                 to="/system/procurement"
                 label="Request Materials"
                 icon={Package}
                 colorClass="bg-amber-50 hover:bg-amber-100 text-amber-600"
+                hasPermission={canCreateProcurement}
               />
-              {canViewInventory && (
-                <QuickActionButton
-                  to="/system/inventory"
-                  label="Add Inventory"
-                  icon={Files}
-                  colorClass="bg-green-50 hover:bg-green-100 text-green-600"
-                />
-              )}
+              <QuickActionButton
+                to="/system/inventory"
+                label="Add Inventory"
+                icon={Files}
+                colorClass="bg-green-50 hover:bg-green-100 text-green-600"
+                hasPermission={canViewInventory}
+              />
             </div>
           </div>
         </div>
@@ -268,16 +312,25 @@ const Dashboard = () => {
             <h3 className="text-lg font-bold text-gray-800">
               Recent Procurement Requests
             </h3>
-            <Link
-              to="/system/procurement"
-              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-            >
-              View All
-            </Link>
+            {(canViewProcurement ||
+              (stats.is_personal_procurement_view && canCreateProcurement)) && (
+              <Link
+                to="/system/procurement"
+                className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+              >
+                View All
+              </Link>
+            )}
           </div>
           <RecentProcurementTable
             requests={stats.recent_procurement}
             onViewClick={handleViewDetail}
+            hasPermission={canViewProcurement || canCreateProcurement}
+            isPersonalView={
+              !user?.roles?.some(
+                (r) => r.name === "Admin" || r.name === "Staff",
+              ) && canCreateProcurement
+            }
           />
         </div>
       </div>

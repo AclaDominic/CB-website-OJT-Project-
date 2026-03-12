@@ -19,6 +19,10 @@ class InquiryController extends Controller
 
     public function index(Request $request)
     {
+        if (!auth()->user()->can('cms.view')) {
+            abort(403, 'Unauthorized access to inquiries.');
+        }
+
         $query = Inquiry::query();
 
         // 1. Filter by Status (Active vs Archived)
@@ -76,6 +80,10 @@ class InquiryController extends Controller
 
     public function show(Inquiry $inquiry)
     {
+        if (!auth()->user()->can('cms.view')) {
+            abort(403, 'Unauthorized access to inquiries.');
+        }
+
         return $inquiry;
     }
 

@@ -8,6 +8,15 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Cache;
 use App\Models\User;
 
+/**
+ * NOTE: This controller is NOT actively used by any route.
+ * It is kept here as a backup/reference for a simpler login rate-limiting approach.
+ *
+ * The ACTIVE login logic is handled by:
+ *   - Route:        routes/auth.php -> AuthenticatedSessionController::store
+ *   - Rate Limiting: App\Http\Requests\Auth\LoginRequest (inhumane speed ban + dynamic lockout)
+ *   - Controller:    App\Http\Controllers\Auth\AuthenticatedSessionController
+ */
 class AuthController extends Controller
 {
     public function login(Request $request)
