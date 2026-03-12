@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PublicCompanyProfileController extends Controller
 {
@@ -14,13 +15,11 @@ class PublicCompanyProfileController extends Controller
             return response()->json(['message' => 'Public profile not found.'], 404);
         }
 
-        $fullPath = storage_path('app/public/' . $profile->public_profile_path);
-
-        if (!file_exists($fullPath)) {
+        if (!Storage::disk('public')->exists($profile->public_profile_path)) {
             return response()->json(['message' => 'File not found on server.'], 404);
         }
 
-        return response()->download($fullPath, 'Cliberduche Company Profile.pdf', [
+        return Storage::disk('public')->download($profile->public_profile_path, 'Cliberduche Company Profile.pdf', [
             'Content-Type' => 'application/pdf',
         ]);
     }
@@ -49,14 +48,12 @@ class PublicCompanyProfileController extends Controller
             return response()->json(['message' => 'Full profile not found.'], 404);
         }
 
-        $fullPath = storage_path('app/public/' . $profile->full_profile_path);
-
-        if (!file_exists($fullPath)) {
+        if (!Storage::disk('public')->exists($profile->full_profile_path)) {
             \App\Models\ProfileDownloadLink::where('id', $link->id)->update(['is_used' => false]);
             return response()->json(['message' => 'File not found on server.'], 404);
         }
 
-        return response()->download($fullPath, 'Cliberduche Full Company Profile.pdf', [
+        return Storage::disk('public')->download($profile->full_profile_path, 'Cliberduche Full Company Profile.pdf', [
             'Content-Type' => 'application/pdf',
         ]);
     }

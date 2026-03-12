@@ -68,7 +68,7 @@ class CompanyProfileTest extends TestCase
 
         $response = $this->get('/api/company-profile/download/public');
         $response->assertStatus(200);
-        $response->assertDownload('Public_Company_Profile.pdf');
+        $response->assertDownload('Cliberduche Company Profile.pdf');
     }
 
     public function test_authorized_user_can_generate_link()
@@ -112,7 +112,7 @@ class CompanyProfileTest extends TestCase
         // First download succeeds
         $response1 = $this->get('/api/company-profile/download/random-token-123');
         $response1->assertStatus(200);
-        $response1->assertDownload('Full_Company_Profile.pdf');
+        $response1->assertDownload('Cliberduche Full Company Profile.pdf');
 
         // Link is now marked used
         $this->assertTrue($link->fresh()->is_used);
