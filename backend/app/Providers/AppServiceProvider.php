@@ -3,7 +3,10 @@
 namespace App\Providers;
 
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use App\Models\ProcurementRequest;
+use App\Policies\ProcurementPolicy;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,6 +23,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::policy(ProcurementRequest::class, ProcurementPolicy::class);
+
         \Illuminate\Notifications\DatabaseNotification::saved(function ($model) {
             event(new \App\Events\NotificationSent());
             event(new \App\Events\DashboardUpdated());
