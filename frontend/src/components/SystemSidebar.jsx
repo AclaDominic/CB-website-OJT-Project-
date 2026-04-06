@@ -212,6 +212,15 @@ const SystemSidebar = ({ isOpen, onClose }) => {
               },
             ]
           : []),
+        ...(hasAny("cms.manage-company-profile")
+          ? [
+              {
+                path: "/system/company-profile",
+                label: "Company Profile",
+                icon: <FileText size={18} />,
+              },
+            ]
+          : []),
       ],
     },
     {

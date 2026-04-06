@@ -25,6 +25,7 @@ class RolePermissionSeeder extends Seeder
         // CMS (Website Content)
         Permission::findOrCreate('cms.view');
         Permission::findOrCreate('cms.edit');
+        Permission::findOrCreate('cms.manage-company-profile');
 
         // System (Users, Roles, Settings)
         Permission::findOrCreate('system.view');

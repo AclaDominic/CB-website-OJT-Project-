@@ -43,6 +43,9 @@ const ProjectManager = React.lazy(
 const SystemInquiries = React.lazy(
   () => import("./pages/system/cms/SystemInquiries"),
 );
+const CompanyProfileManager = React.lazy(
+  () => import("./pages/system/cms/CompanyProfileManager"),
+);
 
 // System Pages
 const UserManager = React.lazy(
@@ -116,6 +119,7 @@ const App = () => {
                   <Route path="roles" element={<RoleManager />} />
                   <Route path="users" element={<UserManager />} />
                   <Route path="backups" element={<BackupManager />} />
+                  <Route path="company-profile" element={<CompanyProfileManager />} />
                   <Route path="settings" element={<AccountSettings />} />
                 </Route>
               </Route>

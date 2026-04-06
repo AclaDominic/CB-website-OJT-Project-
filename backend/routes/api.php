@@ -73,6 +73,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
         $request->user()->unreadNotifications->markAsRead();
         return response()->json(['message' => 'All marked as read']);
     });
+    // Company Profile (CMS)
+    Route::middleware(['permission:cms.manage-company-profile'])->group(function () {
+        Route::get('/company-profile', [\App\Http\Controllers\Api\Cms\CompanyProfileController::class, 'index']);
+        Route::post('/company-profile', [\App\Http\Controllers\Api\Cms\CompanyProfileController::class, 'update']);
+        Route::post('/company-profile/generate-link', [\App\Http\Controllers\Api\Cms\CompanyProfileController::class, 'generateLink']);
+        Route::get('/company-profile/links', [\App\Http\Controllers\Api\Cms\CompanyProfileController::class, 'listLinks']);
+        Route::delete('/company-profile/links/{id}', [\App\Http\Controllers\Api\Cms\CompanyProfileController::class, 'deleteLink']);
+    });
 });
 
 Route::get('/services', [\App\Http\Controllers\Api\Cms\ServiceController::class, 'index']);
@@ -93,3 +101,8 @@ Route::get('/page-contents', [\App\Http\Controllers\Api\Cms\PageContentControlle
 Route::get('/organization-members', [\App\Http\Controllers\Api\OrganizationMemberController::class, 'index']);
 
 Route::post('/inquiries', [\App\Http\Controllers\Api\Cms\InquiryController::class, 'store'])->middleware('throttle:5,1');
+
+// Public Company Profile
+Route::get('/company-profile/download/public', [\App\Http\Controllers\Api\PublicCompanyProfileController::class, 'downloadPublic']);
+Route::get('/company-profile/download/{token}', [\App\Http\Controllers\Api\PublicCompanyProfileController::class, 'downloadFull']);
+
