@@ -7,18 +7,14 @@ use App\Http\Requests\System\StoreProcurementFormRequest;
 use App\Http\Requests\System\UpdateProcurementFormRequest;
 use App\Http\Resources\ProcurementRequestResource;
 use App\Models\ProcurementRequest;
-use App\Models\ProcurementItem;
-use App\Models\Project;
+use App\Services\ProcurementService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
-use App\Models\User;
-use Illuminate\Support\Facades\Notification;
-use App\Notifications\ProcurementRequestedNotification;
 
 class ProcurementController extends Controller
 {
+    public function __construct(protected ProcurementService $service) {}
+
     public function index(Request $request)
     {
         $user = Auth::user();
@@ -28,10 +24,6 @@ class ProcurementController extends Controller
         }
 
         $query = ProcurementRequest::with(['items', 'project', 'user'])->latest();
-
-        if ($user->hasRole(['Project Manager', 'Site Engineer'])) {
-            // PM/SE can view all requests — frontend handles filtering
-        }
 
         if ($request->has('status')) {
             $query->where('status', $request->status);
@@ -58,49 +50,19 @@ class ProcurementController extends Controller
 
     public function store(StoreProcurementFormRequest $request)
     {
-        // Enforce Role: PM or SE (Strict check as Admin shouldn't create)
-        if (!Auth::user()->hasRole(['Project Manager', 'Site Engineer'])) {
-            return response()->json(['message' => 'Unauthorized. Only Project Managers and Site Engineers can create requests.'], 403);
-        }
+        $this->authorize('create', ProcurementRequest::class);
 
-        if (!Auth::user()->can('procurement.create')) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        $procurement = $this->service->create($request->validated(), Auth::id());
 
-        $validated = $request->validated();
-
-        DB::beginTransaction();
-        try {
-            $procurement = ProcurementRequest::create([
-                'project_id' => $validated['project_id'],
-                'user_id' => Auth::id(),
-                'status' => ProcurementRequest::STATUS_DRAFT,
-                'remarks' => $validated['remarks'] ?? null,
-            ]);
-
-            foreach ($validated['items'] as $item) {
-                $procurement->items()->create($item);
-            }
-
-            DB::commit();
-
-            $procurement->load(['items', 'project', 'user']);
-            return new ProcurementRequestResource($procurement);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['message' => 'Failed to create request', 'error' => $e->getMessage()], 500);
-        }
+        return (new ProcurementRequestResource($procurement))->response()->setStatusCode(201);
     }
 
     public function show($id)
     {
-        // Check view permission
-        if (!Auth::user()->can('procurement.view')) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        $this->authorize('view', ProcurementRequest::class);
 
         $procurement = ProcurementRequest::with(['items', 'project', 'user'])->findOrFail($id);
+
         return new ProcurementRequestResource($procurement);
     }
 
@@ -108,35 +70,13 @@ class ProcurementController extends Controller
     {
         $procurement = ProcurementRequest::findOrFail($id);
 
-        // Enforce Owner/Role
-        if ($procurement->user_id !== Auth::id()) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        $this->authorize('update', $procurement);
 
-        // Only DRAFT can be edited
-        if ($procurement->status !== ProcurementRequest::STATUS_DRAFT) {
-            return response()->json(['message' => 'Cannot edit a request that is not in draft status'], 400);
-        }
-
-        $validated = $request->validated();
-
-        DB::beginTransaction();
         try {
-            $procurement->update($request->only(['project_id', 'remarks']));
-
-            if ($request->has('items')) {
-                $procurement->items()->delete();
-                foreach ($request->items as $item) {
-                    $procurement->items()->create($item);
-                }
-            }
-
-            DB::commit();
-            $procurement->load(['items', 'project', 'user']);
-            return new ProcurementRequestResource($procurement);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['message' => 'Update failed', 'error' => $e->getMessage()], 500);
+            $updated = $this->service->update($procurement, $request->validated());
+            return new ProcurementRequestResource($updated);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
         }
     }
 
@@ -144,151 +84,55 @@ class ProcurementController extends Controller
     {
         $procurement = ProcurementRequest::findOrFail($id);
 
-        if (!Auth::user()->can('procurement.delete')) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        $this->authorize('delete', $procurement);
 
-        if ($procurement->user_id !== Auth::id()) {
-            return response()->json(['message' => 'Unauthorized. You can only delete your own requests.'], 403);
+        try {
+            $this->service->delete($procurement);
+            return response()->json(['message' => 'Request deleted']);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
         }
-
-        if ($procurement->status !== ProcurementRequest::STATUS_DRAFT) {
-            return response()->json(['message' => 'Cannot delete a request that is not in draft status'], 400);
-        }
-
-        $procurement->delete();
-        return response()->json(['message' => 'Request deleted']);
     }
 
     public function changeStatus(Request $request, $id)
     {
         $procurement = ProcurementRequest::findOrFail($id);
-        $user = Auth::user();
-        $newStatus = $request->status;
+        $newStatus   = $request->status;
 
-        // Validation Logic for Transitions
-        switch ($newStatus) {
-            case ProcurementRequest::STATUS_SUBMITTED:
-                if ($procurement->status !== ProcurementRequest::STATUS_DRAFT) {
-                    return response()->json(['message' => 'Invalid status transition'], 400);
-                }
-
-                if (!$user->hasRole(['Project Manager', 'Site Engineer'])) {
-                    return response()->json(['message' => 'Unauthorized. Only Project Managers and Site Engineers can submit requests.'], 403);
-                }
-
-                if (!$user->can('procurement.submit')) {
-                    return response()->json(['message' => 'Unauthorized to submit'], 403);
-                }
-                if ($procurement->user_id !== $user->id) {
-                    return response()->json(['message' => 'Only the creator can submit this request'], 403);
-                }
-                break;
-
-            case ProcurementRequest::STATUS_PROCESSING:
-                if ($procurement->status !== ProcurementRequest::STATUS_SUBMITTED) {
-                    return response()->json(['message' => 'Invalid status transition'], 400);
-                }
-                if (!$user->can('procurement.process')) {
-                    return response()->json(['message' => 'Unauthorized to process'], 403);
-                }
-                break;
-
-            case ProcurementRequest::STATUS_COMPLETED:
-                if ($procurement->status !== ProcurementRequest::STATUS_PROCESSING) {
-                    return response()->json(['message' => 'Invalid status transition'], 400);
-                }
-                if (!$user->can('procurement.complete')) {
-                    return response()->json(['message' => 'Unauthorized to complete'], 403);
-                }
-                break;
-
-            case ProcurementRequest::STATUS_ARCHIVED:
-                if ($procurement->status !== ProcurementRequest::STATUS_COMPLETED) {
-                    return response()->json(['message' => 'Invalid status transition'], 400);
-                }
-                if (!$user->can('procurement.archive')) {
-                    return response()->json(['message' => 'Unauthorized to archive'], 403);
-                }
-                break;
-
-            default:
-                return response()->json(['message' => 'Invalid status'], 400);
+        // Validate that the requested status is a valid target at all.
+        // This returns 400 before any Policy check, matching the original behaviour
+        // where the switch default returned "Invalid status".
+        $validTargetStatuses = ['submitted', 'processing', 'completed', 'archived'];
+        if (!in_array($newStatus, $validTargetStatuses, true)) {
+            return response()->json(['message' => 'Invalid status'], 400);
         }
 
-        // Update Status
-        $procurement->status = $newStatus;
+        // Policy: does this user have the right role/permission for this transition?
+        $this->authorize('transitionTo', [$procurement, $newStatus]);
 
-        // Add Staff notes if provided during processing
-        if ($request->has('supplier_notes')) {
-            $procurement->supplier_notes = $request->supplier_notes;
+        // Service: is this a sequentially valid transition given the current state?
+        try {
+            $updated = $this->service->transitionStatus($procurement, $newStatus, $request->only([
+                'supplier_notes',
+                'expected_arrival_date',
+            ]));
+            return new ProcurementRequestResource($updated);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
         }
-        if ($request->has('expected_arrival_date')) {
-            $procurement->expected_arrival_date = $request->expected_arrival_date;
-        }
-
-        $procurement->save();
-
-        if ($newStatus === ProcurementRequest::STATUS_SUBMITTED) {
-            $processors = User::permission('procurement.process')->get();
-            Notification::send($processors, new ProcurementRequestedNotification($procurement));
-        }
-
-        $procurement->load(['items', 'project', 'user']);
-        return new ProcurementRequestResource($procurement);
     }
 
     public function generateReport(Request $request)
     {
-        $user = Auth::user();
-        if (!$user->can('procurement.report')) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        $this->authorize('generateReport', ProcurementRequest::class);
+
+        try {
+            return $this->service->generateReport($request->only([
+                'project_id',
+                'date_range',
+            ]));
+        } catch (\InvalidArgumentException $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
         }
-
-        $query = ProcurementRequest::with(['items', 'project', 'user'])->latest();
-
-        // Project filter
-        $projectName = null;
-        if ($request->has('project_id') && !empty($request->project_id)) {
-            $query->where('project_id', $request->project_id);
-            $project = Project::find($request->project_id);
-            if ($project) {
-                $projectName = $project->name;
-            }
-        }
-
-        // Date range filter
-        $filterLabel = 'All Time';
-        if ($request->has('date_range') && !empty($request->date_range)) {
-            switch ($request->date_range) {
-                case 'last_30_days':
-                    $query->where('created_at', '>=', now()->subDays(30));
-                    $filterLabel = 'Last 30 Days';
-                    break;
-                case 'current_year':
-                    $query->whereYear('created_at', now()->year);
-                    $filterLabel = 'Current Year (' . now()->year . ')';
-                    break;
-                case 'last_year':
-                    $lastYear = now()->subYear()->year;
-                    $query->whereYear('created_at', $lastYear);
-                    $filterLabel = 'Last Year (' . $lastYear . ')';
-                    break;
-            }
-        }
-
-        $requests = $query->get();
-
-        if ($requests->isEmpty()) {
-            return response()->json(['message' => 'No procurement requests found for the selected criteria.'], 404);
-        }
-
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.procurement-report', [
-            'requests' => $requests,
-            'filterLabel' => $filterLabel,
-            'projectName' => $projectName
-        ]);
-
-        return $pdf->download('procurement-report-' . now()->format('Ymd') . '.pdf');
     }
 }

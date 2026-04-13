@@ -163,6 +163,23 @@ class SystemAlertsTest extends TestCase
         ]);
     }
 
+    public function test_authorization_exception_does_not_create_system_alert()
+    {
+        // A Staff user accessing an Admin-only route triggers an AuthorizationException
+        // via the 'role:Admin' middleware. This test verifies that such a 403 response
+        // does NOT create a critical System Alert in the database — it's an expected denial,
+        // not an unhandled error.
+        $staff = User::factory()->create();
+        $staff->assignRole('Staff');
+
+        $response = $this->actingAs($staff)->getJson('/api/system/roles');
+
+        $response->assertStatus(403);
+
+        // No alert should be created for a normal authorization denial
+        $this->assertDatabaseCount('system_alerts', 0);
+    }
+
     public function test_system_status_is_minor_problem_when_only_minor_alerts_exist()
     {
         $admin = User::factory()->create();
