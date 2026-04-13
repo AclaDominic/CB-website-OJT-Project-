@@ -1,104 +1,222 @@
-# CB-website
-development of cliberduche corporation's website
+<p align="center">
+  <h1 align="center">🏗️ Cliberduche Corporation — Company Portal</h1>
+  <p align="center">
+    A full-stack web platform for a construction company, featuring a public-facing website with CMS and an internal operations management system.
+  </p>
+</p>
 
-# Agile Development Timeline
-
-## Project Overview
-**Project:** Cliberduche Corporation Website  
-**Methodology:** Agile (Scrum)  
-**Duration:** 7 Weeks  
-**Final Submission:** March 2 – March 7  
-
----
-
-## Week 1: Planning and Requirements Analysis (Sprint 0)
-- Conduct project kickoff meeting
-- Assign team roles and responsibilities
-- Identify system users:
-  - Administrator
-  - Staff
-  - Public Users
-- Gather functional and non-functional requirements
-- Define construction company features:
-  - Company profile and credentials
-  - Construction services
-  - Ongoing and completed projects
-  - Client inquiries and quotation requests
-  - Employee or staff records
-- Create product backlog and user stories
-- Design initial database schema (ERD)
+<p align="center">
+  <img src="https://img.shields.io/badge/React-18.3-61DAFB?style=flat-square&logo=react&logoColor=white" />
+  <img src="https://img.shields.io/badge/Laravel-12-FF2D20?style=flat-square&logo=laravel&logoColor=white" />
+  <img src="https://img.shields.io/badge/Vite-5-646CFF?style=flat-square&logo=vite&logoColor=white" />
+  <img src="https://img.shields.io/badge/TailwindCSS-3.4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" />
+  <img src="https://img.shields.io/badge/Sanctum-4-FF2D20?style=flat-square&logo=laravel&logoColor=white" />
+  <img src="https://img.shields.io/badge/PHPUnit-11-3C9CD7?style=flat-square&logo=php&logoColor=white" />
+</p>
 
 ---
 
-## Week 2: UI/UX Design and System Setup (Sprint 1)
-- Create wireframes and UI mockups
-- Design website structure and navigation
-- Develop static pages:
-  - Home
-  - About
-  - Services
-  - Projects
-  - Contact
-- Set up development environment
-- Initialize backend framework and database
+## 📌 Overview
+
+**Cliberduche Corporation Portal** is a full-stack web application built for a construction company. It serves two audiences:
+
+1. **Public Website** — A dynamic, CMS-driven site showcasing the company's services, projects, team, and contact information.
+2. **Internal System Portal** — A role-based admin panel for managing content, procurement, inventory, users, and system operations.
+
+The entire application is built with a **React** SPA frontend consuming a **Laravel 12** REST API backend, following modern full-stack development practices.
 
 ---
 
-## Week 3: Core Website Development (Sprint 2)
-- Convert static pages into dynamic pages
-- Integrate company information (mission, vision, background)
-- Develop Services module:
-  - Add, edit, and delete construction services
-- Develop Projects module:
-  - Ongoing projects
-  - Completed projects
-  - Project images and descriptions
-- Connect frontend components to the database
+## ✨ Key Features
+
+### 🌐 Public Website
+- **Home** — Hero carousel with animated sections
+- **About Us** — Company profile, mission/vision, organizational chart
+- **Services** — Dynamic listing of construction services
+- **Projects** — Portfolio with gallery, before/after images, and public/private visibility
+- **Resources** — Machinery fleet and development sites showcase
+- **Contact** — Inquiry form with rate-limiting protection
+- **FAQ** — Frequently asked questions managed via CMS
+- **Chatbot** — Interactive assistant for visitor queries
+- **Company Profile Download** — Secure, tokenized PDF download links
+
+### 🔒 System Portal (Admin Panel)
+- **Dashboard** — Statistics overview with Recharts data visualization and real-time system alerts
+- **CMS Modules** — Full CRUD management for About, Services, Projects, FAQs, Contact, and Company Profile
+- **Inquiry Management** — View, archive, and manage client inquiries
+- **Procurement Workflow** — Request creation → status tracking → PDF report generation (via DomPDF)
+- **Inventory Management** — Categories, items, stock in/out tracking
+- **Organization Manager** — Hierarchical team structure with drag-and-drop reordering
+- **User & Role Management** — Spatie Permission-based RBAC with granular permissions
+- **Backup Management** — System backup creation, download, and deletion (permission-gated)
+- **Account Settings** — Password management and profile configuration
+- **Real-time Notifications** — Laravel-powered notification system
 
 ---
 
-## Week 4: Company System and Admin Features (Sprint 3)
-- Implement user authentication (login and logout)
-- Develop admin dashboard
-- Implement role-based access control
-- Create management modules for:
-  - Services
-  - Projects
-  - Website content
-  - Employee or staff records
-- Secure admin and staff functionalities
+## 🛠️ Tech Stack
+
+| Layer | Technologies |
+|-------|-------------|
+| **Frontend** | React 18, React Router 6, Vite 5, TailwindCSS 3, Bootstrap 5, Framer Motion |
+| **Backend** | Laravel 12, PHP 8.2+, Laravel Sanctum (token auth), Spatie Permission (RBAC) |
+| **Database** | SQLite (dev) / MySQL (prod), 25+ migrations, Eloquent ORM |
+| **Testing** | PHPUnit 11, 19+ feature test suites |
+| **PDF Generation** | DomPDF (procurement reports, company profiles) |
+| **Data Viz** | Recharts (dashboard analytics) |
+| **Real-time** | Laravel Reverb, Pusher, Laravel Echo |
+| **Dev Tools** | ESLint, Laravel Pint, Faker (seeders/factories) |
 
 ---
 
-## Week 5: Client Interaction and Inquiry Management (Sprint 4)
-- Develop contact form and inquiry submission feature
-- Store client inquiries and quotation requests in the database
-- Create inquiry management panel for administrators
-- Implement basic reporting features:
-  - Inquiry reports
-  - Project summaries
-  - Service listings
-- Add email or notification support (optional)
+## 🏗️ Architecture
+
+```
+CB-website/
+├── frontend/                    # React SPA
+│   └── src/
+│       ├── api/                 # Axios API service layer
+│       ├── components/          # 24 reusable components
+│       ├── context/             # Auth, Loading, Settings providers
+│       ├── layouts/             # Public Layout + System Layout
+│       ├── lib/                 # Axios instance & cache management
+│       ├── pages/               # 10 public pages + 14 system pages
+│       └── utils/               # Helper utilities
+│
+├── backend/                     # Laravel 12 API
+│   ├── app/
+│   │   ├── Http/Controllers/    # 28 API controllers
+│   │   ├── Models/              # Eloquent models
+│   │   ├── Notifications/       # Event-driven notifications
+│   │   └── Http/Resources/      # API resource transformers
+│   ├── database/
+│   │   ├── migrations/          # 25+ schema migrations
+│   │   ├── seeders/             # 8 data seeders
+│   │   └── factories/           # 5 model factories
+│   ├── routes/api.php           # 100+ RESTful API endpoints
+│   └── tests/Feature/           # 19 feature test suites
+```
 
 ---
 
-## Week 6: Testing, Optimization, and Refinement (Sprint 5)
-- Conduct functional and system testing
-- Fix identified bugs and issues
-- Improve UI and UX consistency
-- Optimize website performance
-- Ensure mobile and tablet responsiveness
-- Perform security checks and data validation
+## 🔐 Security & Access Control
+
+- **Authentication**: Laravel Sanctum token-based authentication
+- **Authorization**: Spatie Permission RBAC with 4 roles (Admin, Project Manager, Site Engineer, Staff)
+- **Route Protection**: Middleware-based role and permission guards on both frontend and backend
+- **Rate Limiting**: Throttle middleware on public endpoints (e.g., contact form: 5 requests/min)
+- **API Security**: CORS configuration, CSRF protection, input validation on all endpoints
 
 ---
 
-## Week 7: Finalization, Deployment, and Submission (Sprint 6)
-- Perform final system review and polishing
-- Clean and validate database records
-- Conduct final testing
-- Prepare project documentation:
-  - System overview
-  - User manual
-  - Agile timeline
-- Deploy system to local or hosting server
-- Final presentation and project submission
+## 🧪 Testing
+
+The backend includes **19+ automated feature tests** covering:
+
+| Test Suite | Coverage |
+|-----------|----------|
+| `AuthenticationTest` | Login, registration, session management |
+| `RbacTest` | Role-based access control enforcement |
+| `ProcurementWorkflowTest` | Full procurement lifecycle |
+| `ProcurementReportTest` | PDF report generation |
+| `SecurityDemoTest` | Security vulnerability protection |
+| `DatabaseConsistencyTest` | Data integrity validation |
+| `InventoryTest` | Stock management operations |
+| `SystemAlertsTest` | Alert creation and resolution |
+| `BackupRbacTest` | Permission-gated backup operations |
+| `FaqEndpointTest` | FAQ CRUD operations |
+| `CompanyProfileTest` | Company profile management |
+| `OrganizationMemberTest` | Team structure management |
+| `RoleManagementTest` | Role CRUD and permission assignment |
+| `DashboardTest` | Dashboard statistics API |
+| `SystemCapabilitiesTest` | End-to-end system validation |
+
+```bash
+# Run all tests
+cd backend
+php artisan test
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- PHP 8.2+
+- Composer
+- Node.js 18+
+- npm
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/CB-website.git
+cd CB-website
+
+# Backend setup
+cd backend
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+
+# Frontend setup
+cd ../frontend
+npm install
+
+# Run the application
+# Terminal 1 — Backend
+cd backend
+php artisan serve
+
+# Terminal 2 — Frontend
+cd frontend
+npm run dev
+```
+
+The frontend runs on `http://localhost:5173` and the API on `http://localhost:8000`.
+
+---
+
+## 📊 API Overview
+
+The backend exposes **100+ RESTful endpoints** organized into:
+
+| Module | Endpoints | Description |
+|--------|-----------|-------------|
+| **Auth** | `POST /login`, `POST /register`, `POST /logout` | Sanctum token authentication |
+| **CMS** | `/services`, `/projects`, `/faqs`, `/inquiries`, `/page-contents` | Public content management |
+| **System** | `/system/dashboard-stats`, `/system/users`, `/system/roles` | Internal administration |
+| **Procurement** | `/procurement`, `/procurement/{id}/status`, `/procurement/report` | Procurement workflow + PDF |
+| **Inventory** | `/inventory-categories`, `/inventory-items`, `add-stock`, `remove-stock` | Stock management |
+| **Company Profile** | `/company-profile`, `/company-profile/generate-link` | Profile management + secure downloads |
+| **Notifications** | `/notifications`, `/notifications/{id}/read` | Real-time notification system |
+| **Backups** | `/system/backups` | Database backup management |
+
+All protected endpoints require `Authorization: Bearer <token>` header.
+
+---
+
+## 👤 Default Accounts (Seeded)
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | admin@gmail.com | password |
+| Project Manager | pm@gmail.com | password |
+| Site Engineer | engineer@gmail.com | password |
+| Staff | staff@gmail.com | password |
+
+> Run `php artisan migrate --seed` to populate default data.
+
+---
+
+## 📄 License
+
+This project was developed as part of an academic capstone project for Cliberduche Corporation.
+
+---
+
+<p align="center">
+  Built with ❤️ using React + Laravel
+</p>
