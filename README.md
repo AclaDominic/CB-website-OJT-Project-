@@ -37,7 +37,7 @@ The entire application is built with a **React** SPA frontend consuming a **Lara
 - **Resources** — Machinery fleet and development sites showcase
 - **Contact** — Inquiry form with rate-limiting protection
 - **FAQ** — Frequently asked questions managed via CMS
-- **Chatbot** — Interactive assistant for visitor queries
+- **Interactive FAQ Widget** — Searchable FAQ panel with dark/light theme support; unmatched queries route to the Contact page as pre-filled inquiries
 - **Company Profile Download** — Secure, tokenized PDF download links
 
 ### 🔒 System Portal (Admin Panel)
@@ -211,9 +211,15 @@ All protected endpoints require `Authorization: Bearer <token>` header.
 
 ---
 
+## 👥 Team
+
+This project was developed as a team deliverable during our OJT (On-the-Job Training) internship. While this was a group effort, I served as the primary developer — responsible for the full-stack architecture, backend API, authentication, RBAC, testing, and the majority of frontend system modules. Contributions from team members are reflected in the git history.
+
+---
+
 ## 📄 License
 
-This project was developed as part of an academic capstone project for Cliberduche Corporation.
+This project was developed during an OJT internship for Cliberduche Corporation.
 
 ---
 
