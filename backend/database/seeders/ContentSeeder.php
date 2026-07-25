@@ -223,7 +223,7 @@ class ContentSeeder extends Seeder
 
         // Level 1
         $president = \App\Models\OrganizationMember::create([
-            'name' => 'Rolando Climaco',
+            'name' => 'Roberto Mendoza',
             'role' => 'President / CEO',
             'category' => 'leadership',
             'order' => 1
@@ -231,7 +231,7 @@ class ContentSeeder extends Seeder
 
         // Level 2
         $vp = \App\Models\OrganizationMember::create([
-            'name' => 'Maria Bella Climaco',
+            'name' => 'Elena Santos',
             'role' => 'Vice President',
             'category' => 'leadership',
             'order' => 2,
@@ -240,7 +240,7 @@ class ContentSeeder extends Seeder
 
         // Level 3
         $marketing = \App\Models\OrganizationMember::create([
-            'name' => 'Rheamie Alberastine',
+            'name' => 'Angela Reyes',
             'role' => 'Marketing Manager',
             'category' => 'management',
             'order' => 1,
@@ -248,7 +248,7 @@ class ContentSeeder extends Seeder
         ]);
 
         $siteOps = \App\Models\OrganizationMember::create([
-            'name' => 'Rolando Climaco',
+            'name' => 'Roberto Mendoza',
             'role' => 'Chief of Site Operations',
             'category' => 'management',
             'order' => 2,
@@ -256,7 +256,7 @@ class ContentSeeder extends Seeder
         ]);
 
         $purchasingHead = \App\Models\OrganizationMember::create([
-            'name' => 'Benilda Padilla',
+            'name' => 'Gloria Villanueva',
             'role' => 'Purchasing Head',
             'category' => 'management',
             'order' => 3,
@@ -264,7 +264,7 @@ class ContentSeeder extends Seeder
         ]);
 
         $hrLegalHead = \App\Models\OrganizationMember::create([
-            'name' => 'Ofelia Macaldo',
+            'name' => 'Teresa Navarro',
             'role' => 'Head - HR Admin & Legal',
             'category' => 'management',
             'order' => 4,
@@ -273,7 +273,7 @@ class ContentSeeder extends Seeder
 
         // Level 4
         $accounting = \App\Models\OrganizationMember::create([
-            'name' => 'Maria Cristina Dino',
+            'name' => 'Patricia Lim',
             'role' => 'Accounting Head',
             'category' => 'staff',
             'order' => 1,
@@ -281,7 +281,7 @@ class ContentSeeder extends Seeder
         ]);
 
         $pmGenesis = \App\Models\OrganizationMember::create([
-            'name' => 'Genesis De Guzman',
+            'name' => 'Marco Alvarez',
             'role' => 'Project Manager',
             'category' => 'staff',
             'order' => 2,
@@ -289,7 +289,7 @@ class ContentSeeder extends Seeder
         ]);
 
         $purchasingOfficer = \App\Models\OrganizationMember::create([
-            'name' => 'Ivan Roy Climaco',
+            'name' => 'Daniel Ramos',
             'role' => 'Purchasing Officer',
             'category' => 'staff',
             'order' => 3,
@@ -297,7 +297,7 @@ class ContentSeeder extends Seeder
         ]);
 
         $hrAdminOfficer = \App\Models\OrganizationMember::create([
-            'name' => 'Ian Climaco',
+            'name' => 'Miguel Torres',
             'role' => 'HR Admin Officer',
             'category' => 'staff',
             'order' => 4,
@@ -306,7 +306,7 @@ class ContentSeeder extends Seeder
 
         // Level 5
         \App\Models\OrganizationMember::create([
-            'name' => 'Rommel Matias',
+            'name' => 'Carlos Bautista',
             'role' => 'Field Agent',
             'category' => 'staff',
             'order' => 5,
@@ -314,7 +314,7 @@ class ContentSeeder extends Seeder
         ]);
 
         $pmCaringal = \App\Models\OrganizationMember::create([
-            'name' => 'Col. Jose Caringal',
+            'name' => 'Fernando Dela Cruz',
             'role' => 'Project Manager',
             'category' => 'staff',
             'order' => 6,
@@ -322,7 +322,7 @@ class ContentSeeder extends Seeder
         ]);
 
         $legalOfficer1 = \App\Models\OrganizationMember::create([
-            'name' => 'Atty. Paulo Punzalan',
+            'name' => 'Atty. Ricardo Aguilar',
             'role' => 'Legal Officer',
             'category' => 'staff',
             'order' => 7,
@@ -331,7 +331,7 @@ class ContentSeeder extends Seeder
 
         // Level 6
         $engManager = \App\Models\OrganizationMember::create([
-            'name' => 'Rheamie Alberastine',
+            'name' => 'Angela Reyes',
             'role' => 'Engineering Manager',
             'category' => 'staff',
             'order' => 8,
@@ -339,7 +339,7 @@ class ContentSeeder extends Seeder
         ]);
 
         $seniorEng = \App\Models\OrganizationMember::create([
-            'name' => 'Aldwin Miranda',
+            'name' => 'Jason Castillo',
             'role' => 'Senior Engineer',
             'category' => 'staff',
             'order' => 9,
@@ -347,7 +347,7 @@ class ContentSeeder extends Seeder
         ]);
 
         \App\Models\OrganizationMember::create([
-            'name' => 'Atty. Dante Manguiat',
+            'name' => 'Atty. Eduardo Pascual',
             'role' => 'Legal Officer',
             'category' => 'staff',
             'order' => 10,
@@ -356,7 +356,7 @@ class ContentSeeder extends Seeder
 
         // Level 7
         $foremanLucas = \App\Models\OrganizationMember::create([
-            'name' => 'Lucas Martinez',
+            'name' => 'Adrian Garcia',
             'role' => 'Site Foreman',
             'category' => 'staff',
             'order' => 11,
@@ -364,7 +364,7 @@ class ContentSeeder extends Seeder
         ]);
 
         $supervisorRolisdio = \App\Models\OrganizationMember::create([
-            'name' => 'Rolisdio Climaco',
+            'name' => 'Rafael Soriano',
             'role' => 'Supervisor/Safety Officer',
             'category' => 'staff',
             'order' => 12,
@@ -373,7 +373,7 @@ class ContentSeeder extends Seeder
 
         // Level 8
         \App\Models\OrganizationMember::create([
-            'name' => 'Renato Nebrida',
+            'name' => 'Ernesto Valdez',
             'role' => 'Site Foreman',
             'category' => 'staff',
             'order' => 13,
@@ -381,7 +381,7 @@ class ContentSeeder extends Seeder
         ]);
 
         $qaqc = \App\Models\OrganizationMember::create([
-            'name' => 'Katleen Mae Martinez',
+            'name' => 'Christine Flores',
             'role' => 'QA / QC Engineer',
             'category' => 'staff',
             'order' => 14,
@@ -390,7 +390,7 @@ class ContentSeeder extends Seeder
 
         // Level 9
         \App\Models\OrganizationMember::create([
-            'name' => 'Persues Sarte',
+            'name' => 'Vincent Salazar',
             'role' => 'Site Engineer',
             'category' => 'staff',
             'order' => 15,
